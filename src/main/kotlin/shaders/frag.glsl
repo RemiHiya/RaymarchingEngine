@@ -19,7 +19,7 @@ in vec2 TexCoord;
 uniform vec2 u_screenSize;
 uniform float u_time;
 uniform vec3 camera_pos = vec3(0, 0, 0);
-uniform vec3 light = normalize(vec3(.5, 1, 0));
+uniform vec3 light = normalize(vec3(2, 1, 0));
 out vec4 outputColor;
 
 float FOV = 90;
@@ -40,6 +40,9 @@ float castRay(vec3 ro, vec3 rd) {
     float epsilon = 0.001;
     float maxDistance = 100.0;
     float distance = 0.0;
+
+    vec2 result;
+    result.y = -1;
 
     for (int i = 0; i < 10000; i++) {
         vec3 p = ro + rd * distance;
@@ -66,6 +69,21 @@ vec3 GetSurfaceNormal(vec3 p) {
     return normalize(d0 - d1);
 }
 
+float softshadow(in vec3 ro, in vec3 rd, float w) {
+    float mint = 0.1;
+    float maxt = 100;
+    float res = 1.0;
+    float t = mint;
+    for( int i=0; i<256 && t<maxt; i++ )
+    {
+        float h = map(ro + t*rd);
+        res = min( res, h/(w*t) );
+        t += clamp(h, 0.005, 0.50);
+        if( res<-1.0 || t>maxt ) break;
+    }
+    res = max(res,-1.0);
+    return 0.25*(1.0+res)*(1.0+res)*(2.0-res);
+}
 
 vec3 render(vec2 coords) {
     vec3 col;
@@ -87,7 +105,7 @@ vec3 render(vec2 coords) {
         vec3 LAmbient = vec3(0.03, 0.04, 0.1);
         vec3 diffuse = objectSurfaceColour * (LDirectional + LAmbient);
         col = vec3(diffuse);
-
+        /*
         // Ombres projetées
         float shadow = 0.0;
         float shadowRayCount = 2.0;
@@ -102,9 +120,12 @@ vec3 render(vec2 coords) {
             }
         }
         vec3 s = shadow * (LDirectional-LAmbient);
-        col = mix(col, col*.0, s);
+        col = mix(col, col*.0, s);*/
         //col = col * (1-s) + col * 0.0 * s;
         //col = LDirectional;
+
+        float softshadow = 1-softshadow(direction*t, light, .3);
+        col = mix(col, objectSurfaceColour*LAmbient, softshadow);
 
     }
 

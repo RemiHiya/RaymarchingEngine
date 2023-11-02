@@ -18,7 +18,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private var shaderProgram: ShaderProgram? = null
     private var time = 0f
 
-    fun tick(deltaTime: Float) {
+    private fun tick(deltaTime: Float) {
         println(1/deltaTime)
         /*
         TODO : Scene tick
@@ -50,8 +50,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
         ShaderProgram.pedantic = false
-
-
 
         if (!shaderProgram!!.isCompiled) {
             throw GdxRuntimeException("Shader compilation failed: ${shaderProgram!!.log}")

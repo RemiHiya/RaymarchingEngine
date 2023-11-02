@@ -1,7 +1,6 @@
 package elements
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import misc.PATH
 
 class SceneParser(private val scene : Scene) {

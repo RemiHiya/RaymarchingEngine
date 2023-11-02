@@ -11,11 +11,6 @@ float rand(vec2 coord) {
     return fract(sin(dot(coord.xy, vec2(12.9898,78.233))) * 43758.5453);
 } // Fonction pseudo random
 
-float opSmoothUnion( float d1, float d2, float k ) {
-    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
-    return mix( d2, d1, h ) - k*h*(1.0-h);
-}
-
 
 in vec2 TexCoord;
 uniform vec2 u_screenSize;
@@ -61,20 +56,31 @@ float castRay(vec3 ro, vec3 rd) {
 
     return -1;
 }
-
+/* Ancien calcul des normals
 vec3 GetSurfaceNormal(vec3 p) {
     float d0 = map(p);
-    const vec2 epsilon = vec2(.0001,0);
+    const vec2 epsilon = vec2(.05,0);
     vec3 d1 = vec3(
-    map(p-epsilon.xyy),
-    map(p-epsilon.yxy),
-    map(p-epsilon.yyx));
-    return normalize(d0 - d1);
+    map(p+epsilon.xyy),
+    map(p+epsilon.yxy),
+    map(p+epsilon.yyx));
+    return normalize(d1);
+}*/
+
+
+vec3 GetSurfaceNormal(in vec3 p)
+{
+    const float h = 0.01; // replace by an appropriate value
+    const vec2 k = vec2(1,-1);
+    return normalize( k.xyy*map( p + k.xyy*h ) +
+        k.yyx*map( p + k.yyx*h ) +
+        k.yxy*map( p + k.yxy*h ) +
+        k.xxx*map( p + k.xxx*h ) );
 }
 
 float softshadow(in vec3 ro, in vec3 rd, float w) {
-    float mint = 0.1;
-    float maxt = 100;
+    float mint = 0.03;
+    float maxt = 10;
     float res = 1.0;
     float t = mint;
     for( int i=0; i<256 && t<maxt; i++ ) {
@@ -155,5 +161,5 @@ void main() {
 
 
     outputColor = vec4(col, 1.0);
-    outputColor = vec4(vec3(instructions, 0, 0)/500, 1.0);
+    //outputColor = vec4(vec3(instructions, 0, 0)/500, 1.0);
 }

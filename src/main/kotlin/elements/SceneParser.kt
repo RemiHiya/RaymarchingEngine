@@ -22,7 +22,11 @@ class SceneParser(private val scene : Scene) {
             "    float extra;\n" +
             "    int shader;\n" +
             "    int material;\n" +
-            "}; obj objects[MAX_OBJECTS]; \n"
+            "}; obj objects[MAX_OBJECTS]; \n" +
+            "float opSmoothUnion( float d1, float d2, float k ) {\n" +
+            "    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );\n" +
+            "    return mix( d2, d1, h ) - k*h*(1.0-h);\n" +
+            "}"
 
     /*
     TODO : Chercher récursivement les références de chaque shader qui va être utilisé
@@ -78,7 +82,7 @@ class SceneParser(private val scene : Scene) {
                     "   } \n"
         }
         //out += "if(i==0){m=d;}"
-        out += "m = min(d, m);"
+        out += "m = opSmoothUnion(d, m, 0.7);"
 
         out += "}"
 

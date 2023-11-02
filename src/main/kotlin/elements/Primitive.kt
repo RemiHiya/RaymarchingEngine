@@ -1,8 +1,5 @@
 package elements
 
-import utils.Vector4
-import java.util.Vector
-
 abstract class Primitive(private var material: String) {
 
     private lateinit var shader: String
@@ -27,7 +24,4 @@ abstract class Primitive(private var material: String) {
         material = new
         return new
     }
-
-
-
 }

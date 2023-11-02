@@ -19,7 +19,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private var time = 0f
 
     private fun tick(deltaTime: Float) {
-        println(1/deltaTime)
+        //println(1/deltaTime)
         /*
         TODO : Scene tick
          */

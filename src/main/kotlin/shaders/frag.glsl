@@ -4,6 +4,8 @@
 
 uniform int SCENE_SIZE;
 
+int instructions = 0;
+
 
 float rand(vec2 coord) {
     return fract(sin(dot(coord.xy, vec2(12.9898,78.233))) * 43758.5453);
@@ -45,6 +47,7 @@ float castRay(vec3 ro, vec3 rd) {
     result.y = -1;
 
     for (int i = 0; i < 10000; i++) {
+        instructions++;
         vec3 p = ro + rd * distance;
         float objectDistance = map(p);
         distance += objectDistance;
@@ -74,8 +77,7 @@ float softshadow(in vec3 ro, in vec3 rd, float w) {
     float maxt = 100;
     float res = 1.0;
     float t = mint;
-    for( int i=0; i<256 && t<maxt; i++ )
-    {
+    for( int i=0; i<256 && t<maxt; i++ ) {
         float h = map(ro + t*rd);
         res = min( res, h/(w*t) );
         t += clamp(h, 0.005, 0.50);
@@ -150,5 +152,8 @@ void main() {
         }
     }
     col /= count;
+
+
     outputColor = vec4(col, 1.0);
+    outputColor = vec4(vec3(instructions, 0, 0)/500, 1.0);
 }

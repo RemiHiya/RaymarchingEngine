@@ -22,7 +22,7 @@ class SceneParser(private val scene : Scene) {
             "    float extra;\n" +
             "    int shader;\n" +
             "    int material;\n" +
-            "}; obj objects[MAX_OBJECTS]; \n" +
+            "}; uniform obj objects[MAX_OBJECTS]; \n" +
             "float opSmoothUnion( float d1, float d2, float k ) {\n" +
             "    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );\n" +
             "    return mix( d2, d1, h ) - k*h*(1.0-h);\n" +
@@ -82,7 +82,7 @@ class SceneParser(private val scene : Scene) {
                     "   } \n"
         }
         //out += "if(i==0){m=d;}"
-        out += "m = opSmoothUnion(d, m, 0.7);"
+        out += "m = opSmoothUnion(d, m, 1);"
 
         out += "}"
 
@@ -110,4 +110,18 @@ class SceneParser(private val scene : Scene) {
 
         return out
     }
+
+    fun getV1(obj: PrimitiveObject): FloatArray {
+        val t = obj.getTransform().getLocation()
+        return floatArrayOf(t.x, t.y, t.z, 0f)
+    }
+
+    fun getV2(obj: PrimitiveObject): FloatArray {
+        val t = obj.getTransform().getLocation()
+        return floatArrayOf(4f, 4f, 4f, 4f)
+    }
+
+    fun getExtra(obj: PrimitiveObject) = 1f
+    fun getShader(obj: PrimitiveObject) = shaders.indexOf("shaders/" + obj.getShader())
+    fun getMaterial(obj: PrimitiveObject) = 0f
 }

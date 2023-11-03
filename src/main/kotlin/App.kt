@@ -17,9 +17,10 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private var texture: Texture? = null
     private var shaderProgram: ShaderProgram? = null
     private var time = 0f
+    private val parser = SceneParser(scene)
 
     private fun tick(deltaTime: Float) {
-        //println(1/deltaTime)
+        println(1/deltaTime)
         /*
         TODO : Scene tick
          */
@@ -39,13 +40,12 @@ class App(private val scene: Scene) : ApplicationAdapter() {
                 gl_Position = a_position;
             }
         """.trimIndent()
-        val parser = SceneParser(scene)
 
         var shaderCode = parser.initialize()
         shaderCode += parser.computeScene() + "\n"
         shaderCode += parser.computeMapper() + "\n"
 
-        shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString().replace("//objects",parser.computeObjects())
+        shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()//.replace("//objects",parser.computeObjects())
         //println(shaderCode)
 
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
@@ -65,6 +65,20 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         spriteBatch!!.begin()
         shaderProgram?.bind()
         time += Gdx.graphics.deltaTime
+
+
+        var index = 0
+        for (i in scene.getObjects()) {
+            if (i != null) {
+                shaderProgram?.setUniform4fv("objects[$index].v1", parser.getV1(i), 0, 4)
+                shaderProgram?.setUniform4fv("objects[$index].v2", parser.getV2(i), 0, 4)
+                shaderProgram?.setUniformf("objects[$index].extra", parser.getExtra(i))
+                shaderProgram?.setUniformi("objects[$index].shader", parser.getShader(i))
+                shaderProgram?.setUniformf("objects[$index].material", parser.getMaterial(i))
+                index ++
+            }
+        }
+
         shaderProgram?.setUniformf("u_time", time)
         shaderProgram?.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(), (Gdx.graphics.height).toFloat())
         spriteBatch!!.shader = shaderProgram

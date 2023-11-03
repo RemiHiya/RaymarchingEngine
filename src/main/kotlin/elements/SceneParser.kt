@@ -1,6 +1,8 @@
 package elements
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import misc.MAX_OBJECTS
 import misc.PATH
 
 class SceneParser(private val scene : Scene) {
@@ -15,7 +17,8 @@ class SceneParser(private val scene : Scene) {
     private var shaderCalls: Map<Int, String> = mapOf()
 
     fun initialize() = "#version 330 core\n" +
-            "#define MAX_OBJECTS ${scene.getObjects().size}\n" +
+            "#define MAX_OBJECTS ${MAX_OBJECTS}\n" +
+            "uniform int SCENE_SIZE; \n" +
             "struct obj {\n" +
             "    vec4 v1;\n" +
             "    vec4 v2;\n" +
@@ -70,7 +73,7 @@ class SceneParser(private val scene : Scene) {
                 "float m=10000;"
 
         // Loop sur tout les objets
-        out += "for(int i=0; i<objects.length(); i++){ \n"
+        out += "for(int i=0; i<SCENE_SIZE; i++){ \n"
         out += "    float d;\n"
         //out += "    vec4 v1 = objects[i].v1; vec4 v2 = objects[i].v2; float extra = objects[i].extra; \n"
 
@@ -81,8 +84,9 @@ class SceneParser(private val scene : Scene) {
                     "       d = ${shaderCalls[i]}; \n" +
                     "   } \n"
         }
-        //out += "if(i==0){m=d;}"
         out += "m = opSmoothUnion(d, m, 1);"
+        //out += "if(i==0){m=d;}"
+        out += ""
 
         out += "}"
 
@@ -111,17 +115,31 @@ class SceneParser(private val scene : Scene) {
         return out
     }
 
-    fun getV1(obj: PrimitiveObject): FloatArray {
+    private fun getV1(obj: PrimitiveObject): FloatArray {
         val t = obj.getTransform().getLocation()
         return floatArrayOf(t.x, t.y, t.z, 0f)
     }
 
-    fun getV2(obj: PrimitiveObject): FloatArray {
+    private fun getV2(obj: PrimitiveObject): FloatArray {
         val t = obj.getTransform().getLocation()
         return floatArrayOf(4f, 4f, 4f, 4f)
     }
 
-    fun getExtra(obj: PrimitiveObject) = 1f
-    fun getShader(obj: PrimitiveObject) = shaders.indexOf("shaders/" + obj.getShader())
-    fun getMaterial(obj: PrimitiveObject) = 0f
+    private fun getExtra(obj: PrimitiveObject) = 1f
+    private fun getShader(obj: PrimitiveObject) = shaders.indexOf("shaders/" + obj.getShader())
+    private fun getMaterial(obj: PrimitiveObject) = 0f
+
+    fun updateShaderObjects(sp: ShaderProgram?) {
+        var index = 0
+        for (i in scene.getObjects()) {
+            if (i != null) {
+                sp?.setUniform4fv("objects[$index].v1", getV1(i), 0, 4)
+                sp?.setUniform4fv("objects[$index].v2", getV2(i), 0, 4)
+                sp?.setUniformf("objects[$index].extra", getExtra(i))
+                sp?.setUniformi("objects[$index].shader", getShader(i))
+                sp?.setUniformf("objects[$index].material", getMaterial(i))
+                index ++
+            }
+        }
+    }
 }

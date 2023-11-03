@@ -2,8 +2,6 @@
 #define SHADOW_FALLOFF .02
 #define DRAW_DIST 500
 
-uniform int SCENE_SIZE;
-
 int instructions = 0;
 
 

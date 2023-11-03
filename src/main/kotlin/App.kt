@@ -45,7 +45,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderCode += parser.computeScene() + "\n"
         shaderCode += parser.computeMapper() + "\n"
 
-        shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()//.replace("//objects",parser.computeObjects())
+        shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()
         //println(shaderCode)
 
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
@@ -59,6 +59,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
     override fun render() {
         tick(Gdx.graphics.deltaTime)
+
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
@@ -66,21 +67,14 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram?.bind()
         time += Gdx.graphics.deltaTime
 
+        // Update la liste d'objets du shader
+        shaderProgram?.setUniformi("SCENE_SIZE", scene.getObjects().size)
+        parser.updateShaderObjects(shaderProgram)
 
-        var index = 0
-        for (i in scene.getObjects()) {
-            if (i != null) {
-                shaderProgram?.setUniform4fv("objects[$index].v1", parser.getV1(i), 0, 4)
-                shaderProgram?.setUniform4fv("objects[$index].v2", parser.getV2(i), 0, 4)
-                shaderProgram?.setUniformf("objects[$index].extra", parser.getExtra(i))
-                shaderProgram?.setUniformi("objects[$index].shader", parser.getShader(i))
-                shaderProgram?.setUniformf("objects[$index].material", parser.getMaterial(i))
-                index ++
-            }
-        }
-
+        // Update les input du shader
         shaderProgram?.setUniformf("u_time", time)
-        shaderProgram?.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(), (Gdx.graphics.height).toFloat())
+        shaderProgram?.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(),
+            (Gdx.graphics.height).toFloat())
         spriteBatch!!.shader = shaderProgram
         spriteBatch!!.draw(texture, -1f, -1f)
         spriteBatch!!.end()

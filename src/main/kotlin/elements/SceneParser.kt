@@ -99,7 +99,7 @@ class SceneParser(private val scene : Scene) {
         var index = 0
         for (i in scene.getObjects()) {
             if (i != null) {
-                val t = i.getTransform().getLocation()
+                val t = i.getTransform().location
                 out += "objects[$index] = obj(" +
                         "vec4(${t.x}, ${t.y}, ${t.z}, 0)," +
                         "vec4(4, 4, 4, 1)," +
@@ -115,29 +115,22 @@ class SceneParser(private val scene : Scene) {
         return out
     }
 
-    private fun getV1(obj: PrimitiveObject): FloatArray {
-        val t = obj.getTransform().getLocation()
-        return floatArrayOf(t.x, t.y, t.z, 0f)
-    }
 
-    private fun getV2(obj: PrimitiveObject): FloatArray {
-        val t = obj.getTransform().getLocation()
-        return floatArrayOf(4f, 4f, 4f, 4f)
-    }
-
-    private fun getExtra(obj: PrimitiveObject) = 1f
     private fun getShader(obj: PrimitiveObject) = shaders.indexOf("shaders/" + obj.getShader())
-    private fun getMaterial(obj: PrimitiveObject) = 0f
+    private fun getMaterial(obj: PrimitiveObject) = 0
 
     fun updateShaderObjects(sp: ShaderProgram?) {
         var index = 0
         for (i in scene.getObjects()) {
             if (i != null) {
-                sp?.setUniform4fv("objects[$index].v1", getV1(i), 0, 4)
-                sp?.setUniform4fv("objects[$index].v2", getV2(i), 0, 4)
-                sp?.setUniformf("objects[$index].extra", getExtra(i))
+                val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
+                //println("${v1[0]} ; ${v1[1]} ; ${v1[2]} ; ${v1[3]}")
+                val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
+                sp?.setUniform4fv("objects[$index].v1", v1, 0, 4)
+                sp?.setUniform4fv("objects[$index].v2", v2, 0, 4)
+                sp?.setUniformf("objects[$index].extra", i.extra)
                 sp?.setUniformi("objects[$index].shader", getShader(i))
-                sp?.setUniformf("objects[$index].material", getMaterial(i))
+                sp?.setUniformi("objects[$index].material", getMaterial(i))
                 index ++
             }
         }

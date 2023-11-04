@@ -1,3 +1,3 @@
 package utils
 
-data class MarcherOperator(var operator: Int, var smoothness: Float)
+data class MarcherOperator(var operator: OperatorType, var smoothness: Float)

@@ -2,11 +2,11 @@ package elements.primitives
 
 import elements.Primitive
 import elements.PrimitiveObject
-import utils.Transform
+import utils.Transform4
 import utils.Vector3
 import utils.Vector4
 
-class Cube(transform: Transform, material: String = "") : PrimitiveObject(transform, material) {
+class Cube(transform: Transform4, material: String = "") : PrimitiveObject(transform, material) {
 
     /*
     override fun getShaderCall(v1: Vector4, v2: Vector4, extra: Float): String {

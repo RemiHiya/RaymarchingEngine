@@ -9,10 +9,6 @@ data class Vector3(val x: Float, val y: Float, val z: Float) {
     operator fun times(scalar: Float) = Vector3(x * scalar, y * scalar, z * scalar)
     operator fun div(scalar: Float) = Vector3(x / scalar, y / scalar, z / scalar)
 
-    fun x() = x
-    fun y() = y
-    fun z() = z
-
     fun length() = sqrt(x * x + y * y + z * z)
     fun normalize() = this / length()
     fun dot(other: Vector3) = x * other.x + y * other.y + z * other.z

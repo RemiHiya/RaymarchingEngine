@@ -1,9 +1,9 @@
 package elements.primitives
 
 import elements.PrimitiveObject
-import utils.Transform
+import utils.Transform4
 
-class Sphere(transform: Transform, material: String) : PrimitiveObject(transform, material) {
+class Sphere(transform: Transform4, material: String) : PrimitiveObject(transform, material) {
 
     override fun getShaderCall(v1: String, v2: String, extra: String): String {
         return shaderCall.replace("v1", "$v1.xyz").replace("extra", extra)

@@ -1,13 +1,18 @@
 import elements.Scene
 import elements.primitives.Cube
 import elements.primitives.Sphere
-import utils.Transform
-import utils.Vector3
+import utils.Transform4
+import utils.Vector4
 
 class SceneTest: Scene() {
     init {
+        val s = Sphere(Transform4(Vector4(0f, 0f, -4f)), "")
+        s.setPrimitiveParameters(Vector4(), 1f)
 
-        add(Sphere(Transform(Vector3(0f, 0f, -4f)), ""))
-        add(Cube(Transform(Vector3(0f, -5f, -5f))))
+        val c = Cube(Transform4(Vector4(0f, -5f, -5f)))
+        c.setPrimitiveParameters(Vector4(4f, 4f, 4f, 4f), 0f)
+
+        add(s)
+        add(c)
     }
 }

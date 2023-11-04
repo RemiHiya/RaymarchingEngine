@@ -3,15 +3,11 @@ package utils
 import kotlin.math.sqrt
 import kotlin.math.max
 
-data class Vector4(val x: Float, val y: Float, val z: Float, val w: Float) {
+data class Vector4(val x: Float = 0f, val y: Float = 0f, val z: Float = 0f, val w: Float = 0f) {
     operator fun plus(other: Vector4) = Vector4(x + other.x, y + other.y, z + other.z, w + other.w)
     operator fun minus(other: Vector4) = Vector4(x - other.x, y - other.y, z - other.z, w - other.w)
     operator fun times(scalar: Float) = Vector4(x * scalar, y * scalar, z * scalar, w * scalar)
     operator fun div(scalar: Float) = Vector4(x / scalar, y / scalar, z / scalar, w / scalar)
-
-    fun x() = x
-    fun y() = y
-    fun z() = z
 
     fun length() = sqrt(x*x + y*y + z*z + w*w)
     fun normalize() = this / length()

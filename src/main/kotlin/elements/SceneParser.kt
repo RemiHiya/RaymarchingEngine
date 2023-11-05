@@ -69,7 +69,7 @@ class SceneParser(private val scene : Scene) {
     }
 
     fun computeMapper(): String {
-        var out = "float map(vec3 ro) { \n" +
+        var out = "float map(vec4 ro) { \n" +
                 "float m=10000;"
 
         // Loop sur tout les objets

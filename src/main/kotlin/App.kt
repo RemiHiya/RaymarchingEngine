@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException
 import elements.Scene
 import elements.SceneParser
 import misc.PATH
+import kotlin.math.sin
 
 
 class App(private val scene: Scene) : ApplicationAdapter() {
@@ -73,6 +74,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         // Update les input du shader
         shaderProgram?.setUniformf("u_time", time)
+        shaderProgram?.setUniformf("w", sin(time))
         shaderProgram?.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(),
             (Gdx.graphics.height).toFloat())
         spriteBatch!!.shader = shaderProgram

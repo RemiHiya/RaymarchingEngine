@@ -14,8 +14,11 @@ in vec2 TexCoord;
 uniform vec2 u_screenSize;
 uniform float u_time;
 uniform vec3 camera_pos = vec3(0, 0, 0);
+uniform vec3 camera_rot = vec3(0, 0, 0);
+uniform float w = 0;
 uniform vec3 light = normalize(vec3(0, 2, 1));
 out vec4 outputColor;
+out vec4 test;
 
 float FOV = 110;
 
@@ -48,7 +51,7 @@ vec3 computeDirection(vec2 coords, vec3 rotation) {
     return direction;
 }
 
-float castRay(vec3 ro, vec3 rd) {
+float castRay(vec4 ro, vec3 rd) {
     float epsilon = 0.001;
     float maxDistance = 100.0;
     float distance = 0.0;
@@ -58,8 +61,8 @@ float castRay(vec3 ro, vec3 rd) {
 
     for (int i = 0; i < 10000; i++) {
         instructions++;
-        vec3 p = ro + rd * distance;
-        float objectDistance = map(p);
+        vec3 p = ro.xyz + rd * distance;
+        float objectDistance = map(vec4(p, ro.w));
         distance += objectDistance;
         if (abs(objectDistance) < epsilon) {
             return distance;
@@ -73,22 +76,23 @@ float castRay(vec3 ro, vec3 rd) {
 }
 
 
-vec3 GetSurfaceNormal(in vec3 p) {
+vec3 GetSurfaceNormal(in vec4 p) {
     const float h = 0.01; // replace by an appropriate value
     const vec2 k = vec2(1,-1);
-    return normalize( k.xyy*map( p + k.xyy*h ) +
-        k.yyx*map( p + k.yyx*h ) +
-        k.yxy*map( p + k.yxy*h ) +
-        k.xxx*map( p + k.xxx*h ) );
+    vec3 pos = p.xyz;
+    return normalize( k.xyy*map( vec4(pos + k.xyy*h, p.w) ) +
+        k.yyx*map( vec4(pos + k.yyx*h, p.w) ) +
+        k.yxy*map( vec4(pos + k.yxy*h, p.w) ) +
+        k.xxx*map( vec4(pos + k.xxx*h, p.w) ) );
 }
 
-float softshadow(in vec3 ro, in vec3 rd, float w) {
+float softshadow(in vec4 ro, in vec3 rd, float w) {
     float mint = 0.03;
     float maxt = 10;
     float res = 1.0;
     float t = mint;
     for( int i=0; i<256 && t<maxt; i++ ) {
-        float h = map(ro + t*rd);
+        float h = map(vec4(ro.xyz + t*rd, ro.w));
         res = min( res, h/(w*t) );
         t += clamp(h, 0.005, 0.50);
         if( res<-1.0 || t>maxt ) break;
@@ -99,10 +103,10 @@ float softshadow(in vec3 ro, in vec3 rd, float w) {
 
 vec3 render(vec2 coords) {
     vec3 col;
-    vec3 direction = computeDirection(coords, vec3(0, 0, sin(u_time)));
-    float t = castRay(camera_pos, direction);
+    vec3 direction = computeDirection(coords, camera_rot);
+    float t = castRay(vec4(camera_pos, w), direction);
     vec3 pos = camera_pos + direction*t;
-    vec3 n = GetSurfaceNormal(pos);
+    vec3 n = GetSurfaceNormal(vec4(pos, w));
 
 
     if(t == -1 || t > DRAW_DIST) {
@@ -136,7 +140,7 @@ vec3 render(vec2 coords) {
         //col = col * (1-s) + col * 0.0 * s;
         //col = LDirectional;
 
-        float softshadow = 1-softshadow(pos, light, .3);
+        float softshadow = 1-softshadow(vec4(pos, w), light, .3);
         col = mix(col, objectSurfaceColour*LAmbient, softshadow);
 
     }

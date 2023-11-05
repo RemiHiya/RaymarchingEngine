@@ -1,6 +1,8 @@
 package elements
 
+import utils.MarcherObjetct
 import utils.MarcherOperator
+import utils.OperatorType
 import utils.Vector4
 
 abstract class Primitive(private var material: String) {
@@ -9,6 +11,7 @@ abstract class Primitive(private var material: String) {
     lateinit var v2: Vector4
     var extra: Float = 0.0f
 
+    private var index = 0
     lateinit var operator: MarcherOperator
 
     private lateinit var shader: String
@@ -37,5 +40,13 @@ abstract class Primitive(private var material: String) {
     fun setPrimitiveParameters(v2: Vector4, extra: Float) {
         this.v2 = v2
         this.extra = extra
+    }
+
+    fun setObjectIndex(new: Int) {
+        index = new
+    }
+
+    fun setObjectOperator(new: MarcherOperator) {
+        operator = new
     }
 }

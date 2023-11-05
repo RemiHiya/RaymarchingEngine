@@ -13,7 +13,7 @@ float rand(vec2 coord) {
 in vec2 TexCoord;
 uniform vec2 u_screenSize;
 uniform float u_time;
-uniform vec3 camera_pos = vec3(0, 0, 0);
+uniform vec3 camera_pos = vec3(0, 0, 2);
 uniform vec3 light = normalize(vec3(2, 1, 0));
 out vec4 outputColor;
 
@@ -54,16 +54,6 @@ float castRay(vec3 ro, vec3 rd) {
 
     return -1;
 }
-/* Ancien calcul des normals
-vec3 GetSurfaceNormal(vec3 p) {
-    float d0 = map(p);
-    const vec2 epsilon = vec2(.05,0);
-    vec3 d1 = vec3(
-    map(p+epsilon.xyy),
-    map(p+epsilon.yxy),
-    map(p+epsilon.yyx));
-    return normalize(d1);
-}*/
 
 
 vec3 GetSurfaceNormal(in vec3 p)
@@ -94,7 +84,7 @@ float softshadow(in vec3 ro, in vec3 rd, float w) {
 vec3 render(vec2 coords) {
     vec3 col;
     vec3 direction = computeDirection(coords);
-    float t = castRay(vec3(0, 0, 0), direction);
+    float t = castRay(camera_pos, direction);
     vec3 pos = camera_pos + direction*t;
     vec3 n = GetSurfaceNormal(pos);
 
@@ -130,7 +120,7 @@ vec3 render(vec2 coords) {
         //col = col * (1-s) + col * 0.0 * s;
         //col = LDirectional;
 
-        float softshadow = 1-softshadow(direction*t, light, .3);
+        float softshadow = 1-softshadow(pos, light, .3);
         col = mix(col, objectSurfaceColour*LAmbient, softshadow);
 
     }

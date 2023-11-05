@@ -124,7 +124,6 @@ class SceneParser(private val scene : Scene) {
         for (i in scene.getObjects()) {
             if (i != null) {
                 val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
-                //println("${v1[0]} ; ${v1[1]} ; ${v1[2]} ; ${v1[3]}")
                 val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
                 sp?.setUniform4fv("objects[$index].v1", v1, 0, 4)
                 sp?.setUniform4fv("objects[$index].v2", v2, 0, 4)

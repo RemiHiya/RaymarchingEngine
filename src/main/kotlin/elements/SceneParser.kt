@@ -25,11 +25,10 @@ class SceneParser(private val scene : Scene) {
             "    float extra;\n" +
             "    int shader;\n" +
             "    int material;\n" +
+            "    int operator;\n" +
+            "    float smoothness;\n" +
             "}; uniform obj objects[MAX_OBJECTS]; \n" +
-            "float opSmoothUnion( float d1, float d2, float k ) {\n" +
-            "    float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );\n" +
-            "    return mix( d2, d1, h ) - k*h*(1.0-h);\n" +
-            "}"
+            Gdx.files.internal(PATH + "shaders/operators.glsl").readString()
 
     /*
     TODO : Chercher récursivement les références de chaque shader qui va être utilisé
@@ -84,37 +83,20 @@ class SceneParser(private val scene : Scene) {
                     "       d = ${shaderCalls[i]}; \n" +
                     "   } \n"
         }
-        out += "m = opSmoothUnion(d, m, 1);"
-        //out += "if(i==0){m=d;}"
-        out += ""
+
+        // Opérations d'union/sub/inter
+        out += "m = op(d, m, objects[i].operator, objects[i].smoothness);"
+
+        /*
+        TODO : Operators
+         */
+
 
         out += "}"
 
         out += "return m;}"
         return out
     }
-
-    fun computeObjects(): String {
-        var out = ""
-        var index = 0
-        for (i in scene.getObjects()) {
-            if (i != null) {
-                val t = i.getTransform().location
-                out += "objects[$index] = obj(" +
-                        "vec4(${t.x}, ${t.y}, ${t.z}, 0)," +
-                        "vec4(4, 4, 4, 1)," +
-                        "1," +
-                        shaders.indexOf("shaders/" + i.getShader()) +"," +
-                        "1" +
-                        ");"
-
-                index ++
-            }
-        }
-
-        return out
-    }
-
 
     private fun getShader(obj: PrimitiveObject) = shaders.indexOf("shaders/" + obj.getShader())
     private fun getMaterial(obj: PrimitiveObject) = 0
@@ -130,6 +112,8 @@ class SceneParser(private val scene : Scene) {
                 sp?.setUniformf("objects[$index].extra", i.extra)
                 sp?.setUniformi("objects[$index].shader", getShader(i))
                 sp?.setUniformi("objects[$index].material", getMaterial(i))
+                sp?.setUniformi("objects[$index].operator", i.operator.operator.value)
+                sp?.setUniformf("objects[$index].smoothness", i.operator.smoothness)
                 index ++
             }
         }

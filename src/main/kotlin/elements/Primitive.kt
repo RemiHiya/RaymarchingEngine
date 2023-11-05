@@ -11,7 +11,7 @@ abstract class Primitive(private var material: String) {
     lateinit var v2: Vector4
     var extra: Float = 0.0f
 
-    private var index = 0
+    var index = 0
     lateinit var operator: MarcherOperator
 
     private lateinit var shader: String

@@ -13,13 +13,13 @@ float rand(vec2 coord) {
 in vec2 TexCoord;
 uniform vec2 u_screenSize;
 uniform float u_time;
-uniform vec3 camera_pos = vec3(0, 0, 2);
-uniform vec3 light = normalize(vec3(2, 1, 0));
+uniform vec3 camera_pos = vec3(0, 0, 0);
+uniform vec3 light = normalize(vec3(0, 2, 1));
 out vec4 outputColor;
 
-float FOV = 90;
+float FOV = 110;
 
-vec3 computeDirection(vec2 coords) {
+vec3 computeDirection(vec2 coords, vec3 rotation) {
     vec2 normalizedCoords = (2.0 * coords - u_screenSize) / u_screenSize;
     float aspectRatio = u_screenSize.x / u_screenSize.y;
     float near = 0.1;
@@ -28,7 +28,24 @@ vec3 computeDirection(vec2 coords) {
     float yScale = 1.0 / tan(fov / 2.0);
     float xScale = yScale * aspectRatio;
     float depth = (2.0 * near * far) / (far + near - normalizedCoords.y * (far - near));
-    return normalize(vec3(normalizedCoords.x * xScale * depth, normalizedCoords.y * yScale * depth, -depth));
+    //vec3 direction = normalize(vec3(normalizedCoords.x*xScale*depth, normalizedCoords.y*yScale*depth, -depth));
+    vec3 direction = normalize(vec3(depth, normalizedCoords.x*xScale*depth, normalizedCoords.y*yScale*depth));
+
+    mat3 yawMatrix = mat3(
+    cos(rotation.z), -sin(rotation.z), 0.0,
+    sin(rotation.z), cos(rotation.z), 0.0,
+    0.0, 0.0, 1.0);
+    mat3 pitchMatrix = mat3(
+    cos(rotation.y), 0.0, sin(rotation.y),
+    0.0, 1.0, 0.0,
+    -sin(rotation.y), 0.0, cos(rotation.y));
+    mat3 rollMatrix = mat3(
+    1.0, 0.0, 0.0,
+    0.0, cos(rotation.x), -sin(rotation.x),
+    0.0, sin(rotation.x), cos(rotation.x));
+    direction = yawMatrix * pitchMatrix * rollMatrix * direction;
+
+    return direction;
 }
 
 float castRay(vec3 ro, vec3 rd) {
@@ -56,8 +73,7 @@ float castRay(vec3 ro, vec3 rd) {
 }
 
 
-vec3 GetSurfaceNormal(in vec3 p)
-{
+vec3 GetSurfaceNormal(in vec3 p) {
     const float h = 0.01; // replace by an appropriate value
     const vec2 k = vec2(1,-1);
     return normalize( k.xyy*map( p + k.xyy*h ) +
@@ -83,7 +99,7 @@ float softshadow(in vec3 ro, in vec3 rd, float w) {
 
 vec3 render(vec2 coords) {
     vec3 col;
-    vec3 direction = computeDirection(coords);
+    vec3 direction = computeDirection(coords, vec3(0, 0, sin(u_time)));
     float t = castRay(camera_pos, direction);
     vec3 pos = camera_pos + direction*t;
     vec3 n = GetSurfaceNormal(pos);

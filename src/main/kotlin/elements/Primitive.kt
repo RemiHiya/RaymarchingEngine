@@ -1,8 +1,6 @@
 package elements
 
-import utils.MarcherObjetct
 import utils.MarcherOperator
-import utils.OperatorType
 import utils.Vector4
 
 abstract class Primitive(private var material: String) {

@@ -74,7 +74,6 @@ class SceneParser(private val scene : Scene) {
         // Loop sur tout les objets
         out += "for(int i=0; i<SCENE_SIZE; i++){ \n"
         out += "    float d;\n"
-        //out += "    vec4 v1 = objects[i].v1; vec4 v2 = objects[i].v2; float extra = objects[i].extra; \n"
 
         // Switch (tout les else if) en fonction du type
         for (i in shaderCalls.keys) {
@@ -86,11 +85,6 @@ class SceneParser(private val scene : Scene) {
 
         // Opérations d'union/sub/inter
         out += "m = op(d, m, objects[i].operator, objects[i].smoothness);"
-
-        /*
-        TODO : Operators
-         */
-
 
         out += "}"
 

@@ -44,6 +44,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         var shaderCode = parser.initialize()
         shaderCode += parser.computeScene() + "\n"
+        shaderCode += parser.computeMaterials() + "\n"
         shaderCode += parser.computeMapper() + "\n"
 
         shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()

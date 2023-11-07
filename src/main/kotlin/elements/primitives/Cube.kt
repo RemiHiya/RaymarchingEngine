@@ -6,7 +6,7 @@ import utils.Transform4
 import utils.Vector3
 import utils.Vector4
 
-class Cube(transform: Transform4, material: String = "") : PrimitiveObject(transform, material) {
+class Cube(transform: Transform4, material: String = "vec3(1,0,0)") : PrimitiveObject(transform, material) {
 
     override fun getShaderCall(v1: String, v2: String, extra: String): String {
         val a = "$v1.xyz"

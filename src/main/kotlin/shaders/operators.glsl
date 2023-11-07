@@ -34,3 +34,26 @@ float op(float d1, float d2, int type, float s) {
 
     return 10000;
 }
+
+float sminCubic( float a, float b, float k ) {
+    float h =  max( k-abs(a-b), 0.0 )/k;
+    float m = h*h*h*0.5;
+    return (a<b) ? m : 1.0-m;
+}
+
+vec3 colorOp(int type, marcher o1, marcher o2, float s) {
+    if(type == 0) {
+        if(s == 0) return o2.color;
+        else return mix(o1.color, o2.color, sminCubic(o1.d, o2.d, s));
+
+    } else if (type == 1) {
+        if(s == 0) return o2.color;
+        else return o2.color;
+
+    } else if(type == 2) {
+        if(s == 0) return o2.color;
+        else return o2.color;
+
+    }
+    return vec3(0, 0, 0);
+}

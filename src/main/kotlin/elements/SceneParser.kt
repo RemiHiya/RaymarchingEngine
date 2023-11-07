@@ -19,15 +19,7 @@ class SceneParser(private val scene : Scene) {
     fun initialize() = "#version 330 core\n" +
             "#define MAX_OBJECTS ${MAX_OBJECTS}\n" +
             "uniform int SCENE_SIZE; \n" +
-            "struct obj {\n" +
-            "    vec4 v1;\n" +
-            "    vec4 v2;\n" +
-            "    float extra;\n" +
-            "    int shader;\n" +
-            "    int material;\n" +
-            "    int operator;\n" +
-            "    float smoothness;\n" +
-            "}; uniform obj objects[MAX_OBJECTS]; \n" +
+            Gdx.files.internal(PATH + "shaders/header.glsl").readString() +
             Gdx.files.internal(PATH + "shaders/operators.glsl").readString()
 
     /*
@@ -67,9 +59,22 @@ class SceneParser(private val scene : Scene) {
         return out
     }
 
+    fun computeMaterials(): String {
+        var out = ""
+        for (i in 0 until scene.getObjects().size) {
+            val a = scene.getObjects()[i]
+            if (a != null) {
+                out += "vec3 material$i(){return ${a.getMaterial()};}"
+            }
+
+        }
+        return out
+    }
+
     fun computeMapper(): String {
-        var out = "float map(vec4 ro) { \n" +
-                "float m=10000;"
+        var out = "marcher map(vec4 ro) { \n" +
+                "float m=10000;" +
+                "vec3 color; vec3 c;"
 
         // Loop sur tout les objets
         out += "for(int i=0; i<SCENE_SIZE; i++){ \n"
@@ -80,15 +85,19 @@ class SceneParser(private val scene : Scene) {
             val switcher = if(i==0) "if" else "else if"
             out += "    $switcher(objects[i].shader == $i) { \n" +
                     "       d = ${shaderCalls[i]}; \n" +
+                    "       c = material$i();" +
                     "   } \n"
         }
+
+        // Gestion des materials
+        out += "color = colorOp(objects[i].operator, marcher(m,color), marcher(d,c), objects[i].smoothness);"
 
         // Opérations d'union/sub/inter
         out += "m = op(d, m, objects[i].operator, objects[i].smoothness);"
 
         out += "}"
 
-        out += "return m;}"
+        out += "return marcher(m, color);}"
         return out
     }
 

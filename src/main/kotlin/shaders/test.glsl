@@ -67,8 +67,8 @@ vec3 colorOp(int type, marcher o1, marcher o2, float s) {
         else return o2.color;
 
     } else if(type == 2) {
-        if(s == 0) return o2.color;
-        else return o2.color;
+        if(s == 0) return o1.color;
+        else return o1.color;
 
     }
     return vec3(0, 0, 0);
@@ -78,21 +78,17 @@ vec3 colorOp(int type, marcher o1, marcher o2, float s) {
 }float sd4Sphere(vec4 p, float s, vec4 ro) {
     return length(ro - p)-s;
 }
+vec3 material0(){return vec3(.3);}vec3 material1(){return vec3(0,1,0);}
 marcher map(vec4 ro) {
-    float m=10000;vec3 color;for(int i=0; i<SCENE_SIZE; i++){
+    float m=10000;vec3 color; vec3 c;for(int i=0; i<SCENE_SIZE; i++){
         float d;
         if(objects[i].shader == 0) {
             d = sd3Box(objects[i].v1.xyz, objects[i].v2.xyz, ro);
-        }
+            c = material1();   }
         else if(objects[i].shader == 1) {
             d = sd4Sphere(objects[i].v1.xyzw, objects[i].extra, ro);
-        }
-        vec3 c = vec3(i/2);
-        colorOp(objects[i].operator, marcher(m,color), marcher(d,c), objects[i].smoothness);
-        m = op(d, m, objects[i].operator, objects[i].smoothness);
-    }
-    return marcher(m, color);
-}
+            c = material2();   }
+        color = colorOp(objects[i].operator, marcher(m,color), marcher(d,c), objects[i].smoothness);m = op(d, m, objects[i].operator, objects[i].smoothness);}return marcher(m, color);}
 #define MIN_DIST 1
 #define SHADOW_FALLOFF .02
 #define DRAW_DIST 500

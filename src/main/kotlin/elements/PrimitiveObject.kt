@@ -2,7 +2,7 @@ package elements
 
 import utils.*
 
-abstract class PrimitiveObject(private var transform: Transform4, material: String): Primitive(material) {
+abstract class PrimitiveObject(private var transform: Transform4): Primitive() {
 
     fun getTransform() = transform
 

@@ -15,6 +15,8 @@ class SceneParser(private val scene : Scene) {
     private var shaders: Array<String> = arrayOf()
     private var shadersMap: Map<String, Int> = mapOf()
     private var shaderCalls: Map<Int, String> = mapOf()
+    private var materialCalls: Array<String> = arrayOf()
+    private var materialMap: Map<Int, Int> = mapOf()
 
     fun initialize() = "#version 330 core\n" +
             "#define MAX_OBJECTS ${MAX_OBJECTS}\n" +
@@ -29,23 +31,21 @@ class SceneParser(private val scene : Scene) {
     private fun getShaders() {
         var index = 0
         for (i in scene.getObjects()) {
-            if (i != null) {
-                val s = "shaders/" + i.getShader()
-                if (s !in shaders) {
+            val s = "shaders/" + i.getShader()
+            if (s !in shaders) {
 
-                    shaders += "shaders/" + i.getShader()
-                    shaderCalls += Pair(
-                        index,
-                        i.getShaderCall("objects[i].v1", "objects[i].v2", "objects[i].extra")
-                    )
+                shaders += "shaders/" + i.getShader()
+                shaderCalls += Pair(
+                    index,
+                    i.getShaderCall("objects[i].v1", "objects[i].v2", "objects[i].extra")
+                )
 
-                    // Update la map type -> index
-                    val t = i::class.qualifiedName
-                    if (t != null) {
-                        shadersMap += Pair(t, index)
-                    }
-                    index ++
+                // Update la map type -> index
+                val t = i::class.qualifiedName
+                if (t != null) {
+                    shadersMap += Pair(t, index)
                 }
+                index ++
             }
         }
     }
@@ -59,14 +59,19 @@ class SceneParser(private val scene : Scene) {
         return out
     }
 
+
+    //Ajoute les materials au shader (évite les répétitions)
     fun computeMaterials(): String {
         var out = ""
+        var index = 0
         for (i in 0 until scene.getObjects().size) {
-            val a = scene.getObjects()[i]
-            if (a != null) {
-                out += "vec3 material$i(){return ${a.getMaterial()};}"
+            val obj = scene.getObjects()[i].getMaterial()
+            if (obj !in materialCalls) {
+                index ++
+                materialCalls += obj
+                out += "vec3 material$index(){return ${obj};}"
             }
-
+            materialMap += Pair(i, index)
         }
         return out
     }
@@ -85,10 +90,9 @@ class SceneParser(private val scene : Scene) {
             val switcher = if(i==0) "if" else "else if"
             out += "    $switcher(objects[i].shader == $i) { \n" +
                     "       d = ${shaderCalls[i]}; \n" +
-                    "       c = material$i();" +
+                    "       c = material${materialMap[i]}();" +
                     "   } \n"
         }
-
         // Gestion des materials
         out += "color = colorOp(objects[i].operator, marcher(m,color), marcher(d,c), objects[i].smoothness);"
 
@@ -96,29 +100,24 @@ class SceneParser(private val scene : Scene) {
         out += "m = op(d, m, objects[i].operator, objects[i].smoothness);"
 
         out += "}"
-
         out += "return marcher(m, color);}"
         return out
     }
 
     private fun getShader(obj: PrimitiveObject) = shaders.indexOf("shaders/" + obj.getShader())
-    private fun getMaterial(obj: PrimitiveObject) = 0
+    private fun getMaterial(obj: PrimitiveObject) = materialCalls.indexOf(obj.getMaterial())
 
     fun updateShaderObjects(sp: ShaderProgram?) {
-        var index = 0
-        for (i in scene.getObjects()) {
-            if (i != null) {
-                val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
-                val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
-                sp?.setUniform4fv("objects[$index].v1", v1, 0, 4)
-                sp?.setUniform4fv("objects[$index].v2", v2, 0, 4)
-                sp?.setUniformf("objects[$index].extra", i.extra)
-                sp?.setUniformi("objects[$index].shader", getShader(i))
-                sp?.setUniformi("objects[$index].material", getMaterial(i))
-                sp?.setUniformi("objects[$index].operator", i.operator.operator.value)
-                sp?.setUniformf("objects[$index].smoothness", i.operator.smoothness)
-                index ++
-            }
+        for ((index, i) in scene.getObjects().withIndex()) {
+            val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
+            val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
+            sp?.setUniform4fv("objects[$index].v1", v1, 0, 4)
+            sp?.setUniform4fv("objects[$index].v2", v2, 0, 4)
+            sp?.setUniformf("objects[$index].extra", i.extra)
+            sp?.setUniformi("objects[$index].shader", getShader(i))
+            sp?.setUniformi("objects[$index].material", getMaterial(i))
+            sp?.setUniformi("objects[$index].operator", i.operator.operator.value)
+            sp?.setUniformf("objects[$index].smoothness", i.operator.smoothness)
         }
     }
 }

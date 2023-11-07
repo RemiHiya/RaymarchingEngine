@@ -48,7 +48,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderCode += parser.computeMapper() + "\n"
 
         shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()
-        //println(shaderCode)
+        println(shaderCode)
 
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
         ShaderProgram.pedantic = false

@@ -51,8 +51,8 @@ vec3 colorOp(int type, marcher o1, marcher o2, float s) {
         else return o2.color;
 
     } else if(type == 2) {
-        if(s == 0) return o2.color;
-        else return o2.color;
+        if(s == 0) return o1.color;
+        else return o1.color;
 
     }
     return vec3(0, 0, 0);

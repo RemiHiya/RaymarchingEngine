@@ -1,10 +1,12 @@
 package elements
 
+import com.badlogic.gdx.Gdx
+import misc.PATH
 import utils.MarcherOperator
 import utils.Vector4
 
-abstract class Primitive(private var material: String) {
-
+abstract class Primitive() {
+    private var material: String = "vec3(.3)"
     lateinit var v1: Vector4
     lateinit var v2: Vector4
     var extra: Float = 0.0f
@@ -30,9 +32,13 @@ abstract class Primitive(private var material: String) {
         return new
     }
 
-    fun setMaterial(new: String): String {
-        material = new
-        return new
+    fun setMaterial(new: String, isFile: Boolean = false): String {
+        material = if (isFile) {
+            Gdx.files.internal(PATH + new).readString()
+        } else {
+            new
+        }
+        return material
     }
 
     fun setPrimitiveParameters(v2: Vector4, extra: Float) {

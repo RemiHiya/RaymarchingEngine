@@ -2,8 +2,6 @@
 #define SHADOW_FALLOFF .02
 #define DRAW_DIST 500
 
-int instructions = 0;
-
 
 float rand(vec2 coord) {
     return fract(sin(dot(coord.xy, vec2(12.9898,78.233))) * 43758.5453);
@@ -12,7 +10,6 @@ float rand(vec2 coord) {
 
 in vec2 TexCoord;
 uniform vec2 u_screenSize;
-uniform float u_time;
 uniform vec3 camera_pos = vec3(0, 0, 0);
 uniform vec3 camera_rot = vec3(0, 0, 0);
 uniform float w = 0;

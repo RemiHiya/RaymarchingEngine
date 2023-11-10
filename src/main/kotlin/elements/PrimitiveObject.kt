@@ -9,6 +9,7 @@ abstract class PrimitiveObject(private var transform: Transform4): Primitive() {
     init {
         v1 = transform.location
         v2 = Vector4(1f, 1f, 1f, 1f)
+        ro = transform.rotation
         extra = 0f
         operator = MarcherOperator(OperatorType.UNION, 0f)
     }

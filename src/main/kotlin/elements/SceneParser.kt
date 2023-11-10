@@ -37,7 +37,7 @@ class SceneParser(private val scene : Scene) {
                 shaders += "shaders/" + i.getShader()
                 shaderCalls += Pair(
                     index,
-                    i.getShaderCall("objects[i].v1", "objects[i].v2", "objects[i].extra")
+                    i.getShaderCall("rot(objects[i].v1, objects[i].rot)", "objects[i].v2", "objects[i].extra")
                 )
 
                 // Update la map type -> index
@@ -67,9 +67,10 @@ class SceneParser(private val scene : Scene) {
         for (i in 0 until scene.getObjects().size) {
             val obj = scene.getObjects()[i].getMaterial()
             if (obj !in materialCalls) {
-                index ++
+
                 materialCalls += obj
                 out += "vec3 material$index(){return ${obj};}"
+                index ++
             }
             materialMap += Pair(i, index)
         }
@@ -85,12 +86,17 @@ class SceneParser(private val scene : Scene) {
         out += "for(int i=0; i<SCENE_SIZE; i++){ \n"
         out += "    float d;\n"
 
+        // Loop des materials
+        for (i in 0 until materialMap.size) {
+            val switcher = if(i==0) "if" else "else if"
+            out += "$switcher(objects[i].material == ${i}) {c = material$i();}"
+        }
+
         // Switch (tout les else if) en fonction du type
         for (i in shaderCalls.keys) {
             val switcher = if(i==0) "if" else "else if"
             out += "    $switcher(objects[i].shader == $i) { \n" +
                     "       d = ${shaderCalls[i]}; \n" +
-                    "       c = material${materialMap[i]}();" +
                     "   } \n"
         }
         // Gestion des materials
@@ -111,8 +117,10 @@ class SceneParser(private val scene : Scene) {
         for ((index, i) in scene.getObjects().withIndex()) {
             val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
             val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
+            val ro = floatArrayOf(i.ro.roll, i.ro.pitch, i.ro.yaw, i.ro.w)
             sp?.setUniform4fv("objects[$index].v1", v1, 0, 4)
             sp?.setUniform4fv("objects[$index].v2", v2, 0, 4)
+            sp?.setUniform4fv("objects[$index].rot", ro, 0, 4)
             sp?.setUniformf("objects[$index].extra", i.extra)
             sp?.setUniformi("objects[$index].shader", getShader(i))
             sp?.setUniformi("objects[$index].material", getMaterial(i))

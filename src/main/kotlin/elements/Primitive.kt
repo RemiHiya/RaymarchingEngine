@@ -3,12 +3,14 @@ package elements
 import com.badlogic.gdx.Gdx
 import misc.PATH
 import utils.MarcherOperator
+import utils.Rotator4
 import utils.Vector4
 
 abstract class Primitive() {
     private var material: String = "vec3(.3)"
     lateinit var v1: Vector4
     lateinit var v2: Vector4
+    lateinit var ro: Rotator4
     var extra: Float = 0.0f
 
     var index = 0

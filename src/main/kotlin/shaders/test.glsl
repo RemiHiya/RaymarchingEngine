@@ -4,6 +4,7 @@ uniform int SCENE_SIZE;
 struct obj {
     vec4 v1;
     vec4 v2;
+    vec4 rot;
     float extra;
     int shader;
     int material;
@@ -14,7 +15,50 @@ struct obj {
 struct marcher {
     float d;
     vec3 color;
-};float opUnion( float d1, float d2 ) { return min(d1,d2); }
+};
+
+int instructions = 0;
+
+vec4 rot(vec4 pos, vec4 rot) {
+    float t = rot.w;
+    mat4 xy = mat4(1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, cos(t), -sin(t),
+    0, 0, sin(t), cos(t));
+
+    t = rot.x;
+    mat4 yz = mat4(cos(t), 0, 0, sin(t),
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    -sin(t), 0, 0, cos(t));
+
+    t = rot.y;
+    mat4 xz = mat4(1, 0, 0, 0,
+    0, cos(t), 0, -sin(t),
+    0, 0, 1, 0,
+    0, sin(t), cos(t), 1);
+
+    t = rot.z;
+    mat4 xw = mat4(1, 0, 0, 0,
+    0, cos(t), sin(t), 0,
+    0, -sin(t), cos(t), 0,
+    0, 0, 0, 1);
+
+    t = rot.y;
+    mat4 yw = mat4(cos(t), 0, -sin(t), 0,
+    0, 1, 0, 0,
+    sin(t), 0, cos(t), 0,
+    0, 0, 0, 1);
+
+    t = rot.x;
+    mat4 zw = mat4(cos(t), sin(t), 0, 0,
+    -sin(t), cos(t), 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1);
+
+
+    return xy*yz*xz*xw*yw*zw * pos;
+}float opUnion( float d1, float d2 ) { return min(d1,d2); }
 
 float opSubtraction( float d1, float d2 ) { return max(-d1,d2); }
 
@@ -75,25 +119,21 @@ vec3 colorOp(int type, marcher o1, marcher o2, float s) {
 }float sd3Box(vec3 p, vec3 b, vec4 ro) {
     vec3 q = abs(p-ro.xyz) - b;
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
-}float sd4Sphere(vec4 p, float s, vec4 ro) {
-    return length(ro - p)-s;
 }
 vec3 material0(){return vec3(.3);}vec3 material1(){return vec3(0,1,0);}
 marcher map(vec4 ro) {
-    float m=10000;vec3 color; vec3 c;for(int i=0; i<SCENE_SIZE; i++){
+    float m=10000;vec3 color; vec3 c;
+    for(int i=0; i<SCENE_SIZE; i++){
         float d;
+        if(objects[i].material == 0) {c = material0();}
+        else if(objects[i].material == 1) {c = material1();}
         if(objects[i].shader == 0) {
-            d = sd3Box(objects[i].v1.xyz, objects[i].v2.xyz, ro);
-            c = material1();   }
-        else if(objects[i].shader == 1) {
-            d = sd4Sphere(objects[i].v1.xyzw, objects[i].extra, ro);
-            c = material2();   }
+            d = sd3Box(rot(objects[i].v1, objects[i].rot).xyz, objects[i].v2.xyz, ro);
+        }
         color = colorOp(objects[i].operator, marcher(m,color), marcher(d,c), objects[i].smoothness);m = op(d, m, objects[i].operator, objects[i].smoothness);}return marcher(m, color);}
 #define MIN_DIST 1
 #define SHADOW_FALLOFF .02
 #define DRAW_DIST 500
-
-int instructions = 0;
 
 
 float rand(vec2 coord) {
@@ -103,7 +143,6 @@ float rand(vec2 coord) {
 
 in vec2 TexCoord;
 uniform vec2 u_screenSize;
-uniform float u_time;
 uniform vec3 camera_pos = vec3(0, 0, 0);
 uniform vec3 camera_rot = vec3(0, 0, 0);
 uniform float w = 0;

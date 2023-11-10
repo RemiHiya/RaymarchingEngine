@@ -1,14 +1,11 @@
 import elements.Scene
 import elements.primitives.*
-import utils.MarcherOperator
-import utils.OperatorType
-import utils.Transform4
-import utils.Vector4
+import utils.*
 
 class SceneTest: Scene() {
     init {
-        val s = Sphere4(Transform4(Vector4(4f, 0f, 0f, 0f)))
-        s.setPrimitiveParameters(Vector4(), 1f)
+        val s = Cube(Transform4(Vector4(4f, 0f, 0f, 0f), Rotator4(0f, 0f, 0f, 1f)))
+        s.setPrimitiveParameters(Vector4(1f, 1f, 1f, 1f), 1f)
         s.operator = MarcherOperator(OperatorType.UNION, 0.8f)
         s.setMaterial("vec3(0,1,0)")
 

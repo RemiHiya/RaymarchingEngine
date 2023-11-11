@@ -6,10 +6,15 @@ import com.badlogic.gdx.graphics.Pixmap.Format
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.GdxRuntimeException
 import elements.Scene
 import elements.SceneParser
 import misc.PATH
+import misc.RESOURCE_PATH
 import kotlin.math.sin
 
 
@@ -17,6 +22,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private var spriteBatch: SpriteBatch? = null
     private var texture: Texture? = null
     private var shaderProgram: ShaderProgram? = null
+    private var stage: Stage? = null
+
     private var time = 0f
     private val parser = SceneParser(scene)
 
@@ -28,6 +35,30 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     }
 
     override fun create() {
+
+        stage = Stage()
+
+        val skin = Skin(Gdx.files.internal(RESOURCE_PATH + "skins/metalui/metal-ui.json")) // Utilisez un skin de votre choix
+        val table = Table()
+        table.setFillParent(true) // Le tableau remplit la scène entière
+
+        val button = TextButton("Mon Bouton", skin)
+        button.addListener { event ->
+            if (event.isCapture) {
+                // Gérez l'action de votre bouton ici
+                // Par exemple, ouvrez un menu, changez d'écran, etc.
+            }
+            false
+        }
+
+        table.add(button).width(200f).height(60f).pad(20f) // Personnalisez les dimensions et la mise en page
+        stage?.addActor(table)
+        Gdx.input.inputProcessor = stage // Définissez le Stage comme processeur d'entrée
+
+
+        /*
+        S'occupe de générer le shader
+         */
         spriteBatch = SpriteBatch()
         val width = Gdx.graphics.width
         val height = Gdx.graphics.height
@@ -46,9 +77,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderCode += parser.computeScene() + "\n"
         shaderCode += parser.computeMaterials() + "\n"
         shaderCode += parser.computeMapper() + "\n"
-
         shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()
-        println(shaderCode)
+        //println(shaderCode)
 
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
         ShaderProgram.pedantic = false
@@ -61,6 +91,10 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
     override fun render() {
         tick(Gdx.graphics.deltaTime)
+
+        /*
+        S'occupe du rendu
+         */
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -78,15 +112,23 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram?.setUniformf("w", sin(time))
         shaderProgram?.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(),
             (Gdx.graphics.height).toFloat())
+
         spriteBatch!!.shader = shaderProgram
         spriteBatch!!.draw(texture, -1f, -1f)
         spriteBatch!!.end()
+
+        /*
+        Rendu de l'éditeur
+         */
+        stage?.act(Gdx.graphics.deltaTime)
+        stage?.draw()
     }
 
     override fun dispose() {
         spriteBatch?.dispose()
         texture?.dispose()
         shaderProgram?.dispose()
+        stage?.dispose()
     }
 
 }

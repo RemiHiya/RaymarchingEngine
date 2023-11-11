@@ -16,7 +16,7 @@ class Cube(transform: Transform4) : PrimitiveObject(transform) {
 
     init {
         setShader("primitives/sd3Box.glsl")
-        setShaderCall("sd3Box(v1, v2, ro)") // vec3 p, vec3 b
+        setShaderCall("sd3Box(v1, v2)") // vec3 p, vec3 b
     }
 }
 
@@ -30,7 +30,7 @@ class Cube4(transform: Transform4, material: String = "") : PrimitiveObject(tran
 
     init {
         setShader("primitives/sd4Box.glsl")
-        setShaderCall("sd4Box(v1, v2, ro)") // vec3 p, vec3 b
+        setShaderCall("sd4Box(v1, v2)") // vec3 p, vec3 b
     }
 
 }

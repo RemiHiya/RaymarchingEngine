@@ -11,7 +11,7 @@ class Sphere(transform: Transform4) : PrimitiveObject(transform) {
 
     init {
         setShader("primitives/sd3Sphere.glsl")
-        setShaderCall("sd3Sphere(v1, extra, ro)") // vec3 p, float s
+        setShaderCall("sd3Sphere(v1, extra)") // vec3 p, float s
     }
 }
 
@@ -23,6 +23,6 @@ class Sphere4(transform: Transform4) : PrimitiveObject(transform) {
 
     init {
         setShader("primitives/sd4Sphere.glsl")
-        setShaderCall("sd4Sphere(v1, extra, ro)") // vec4 p, float s
+        setShaderCall("sd4Sphere(v1, extra)") // vec4 p, float s
     }
 }

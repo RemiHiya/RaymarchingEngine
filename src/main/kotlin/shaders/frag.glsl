@@ -111,9 +111,8 @@ vec3 render(vec2 coords) {
 
     if(t == -1 || t > DRAW_DIST) {
         // Skybox
-        col = vec3(0.30, 0.36, 0.60) - (direction.y * .2);
+        col = vec3(0.30, 0.36, 0.60) - (direction.z * -0.2);
     } else {
-
 
         // Ombrage simple
         float NoL = 0.2 + 0.8 * max(dot(n, light), 0); // 0.2 et 0.8 pour remap

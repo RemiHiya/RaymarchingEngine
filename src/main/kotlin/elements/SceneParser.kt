@@ -37,7 +37,7 @@ class SceneParser(private val scene : Scene) {
                 shaders += "shaders/" + i.getShader()
                 shaderCalls += Pair(
                     index,
-                    i.getShaderCall("rot(objects[i].v1, objects[i].rot)", "objects[i].v2", "objects[i].extra")
+                    i.getShaderCall("p", "objects[i].v2", "objects[i].extra")
                 )
 
                 // Update la map type -> index
@@ -84,7 +84,8 @@ class SceneParser(private val scene : Scene) {
 
         // Loop sur tout les objets
         out += "for(int i=0; i<SCENE_SIZE; i++){ \n"
-        out += "    float d;\n"
+        out += "    float d;\n" +
+                "vec4 p = rot(objects[i].v1 - ro, objects[i].rot);"
 
         // Loop des materials
         for (i in 0 until materialMap.size) {

@@ -12,6 +12,8 @@ struct obj {
     float smoothness;
 }; uniform obj objects[MAX_OBJECTS];
 
+uniform float u_time;
+
 struct marcher {
     float d;
     vec3 color;
@@ -19,46 +21,103 @@ struct marcher {
 
 int instructions = 0;
 
+// Rotation matrix around the X axis.
+mat3 rotateX(float theta) {
+    float c = cos(theta);
+    float s = sin(theta);
+    return mat3(
+    vec3(1, 0, 0),
+    vec3(0, c, -s),
+    vec3(0, s, c)
+    );
+}
+
+// Rotation matrix around the Y axis.
+mat3 rotateY(float theta) {
+    float c = cos(theta);
+    float s = sin(theta);
+    return mat3(
+    vec3(c, 0, s),
+    vec3(0, 1, 0),
+    vec3(-s, 0, c)
+    );
+}
+
+// Rotation matrix around the Z axis.
+mat3 rotateZ(float theta) {
+    float c = cos(theta);
+    float s = sin(theta);
+    return mat3(
+    vec3(c, -s, 0),
+    vec3(s, c, 0),
+    vec3(0, 0, 1)
+    );
+}
+
+// Identity matrix.
+mat3 identity() {
+    return mat3(
+    vec3(1, 0, 0),
+    vec3(0, 1, 0),
+    vec3(0, 0, 1)
+    );
+}
+
 vec4 rot(vec4 pos, vec4 rot) {
-    float t = rot.w;
-    mat4 xy = mat4(1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, cos(t), -sin(t),
-    0, 0, sin(t), cos(t));
+    mat4 rotationMatrix = mat4(1.0);
 
-    t = rot.x;
-    mat4 yz = mat4(cos(t), 0, 0, sin(t),
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    -sin(t), 0, 0, cos(t));
+    // Rotation autour de l'axe X
+    float cosX = cos(rot.x);
+    float sinX = sin(rot.x);
+    mat4 rotationX = mat4(
+    1.0, 0.0, 0.0, 0.0,
+    0.0, cosX, -sinX, 0.0,
+    0.0, sinX, cosX, 0.0,
+    0.0, 0.0, 0.0, 1.0
+    );
 
-    t = rot.y;
-    mat4 xz = mat4(1, 0, 0, 0,
-    0, cos(t), 0, -sin(t),
-    0, 0, 1, 0,
-    0, sin(t), cos(t), 1);
+    // Rotation autour de l'axe Y
+    float cosY = cos(rot.y);
+    float sinY = sin(rot.y);
+    mat4 rotationY = mat4(
+    cosY, 0.0, sinY, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    -sinY, 0.0, cosY, 0.0,
+    0.0, 0.0, 0.0, 1.0
+    );
 
-    t = rot.z;
-    mat4 xw = mat4(1, 0, 0, 0,
-    0, cos(t), sin(t), 0,
-    0, -sin(t), cos(t), 0,
-    0, 0, 0, 1);
+    // Rotation autour de l'axe Z
+    float cosZ = cos(rot.z);
+    float sinZ = sin(rot.z);
+    mat4 rotationZ = mat4(
+    cosZ, -sinZ, 0.0, 0.0,
+    sinZ, cosZ, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 1.0
+    );
 
-    t = rot.y;
-    mat4 yw = mat4(cos(t), 0, -sin(t), 0,
-    0, 1, 0, 0,
-    sin(t), 0, cos(t), 0,
-    0, 0, 0, 1);
+    // Rotation autour de l'axe W
+    float cosW = cos(rot.w);
+    float sinW = sin(rot.w);
+    mat4 rotationW = mat4(
+    cosW, 0.0, 0.0, sinW,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    -sinW, 0.0, 0.0, cosW
+    );
 
-    t = rot.x;
-    mat4 zw = mat4(cos(t), sin(t), 0, 0,
-    -sin(t), cos(t), 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1);
+    // Combinez les rotations
+    rotationMatrix = rotationX * rotationY * rotationZ * rotationW;
+
+    // Appliquez la rotation à la position
+    return rotationMatrix * pos;
+}
 
 
-    return xy*yz*xz*xw*yw*zw * pos;
-}float opUnion( float d1, float d2 ) { return min(d1,d2); }
+
+
+
+float opUnion( float d1, float d2 ) { return min(d1,d2); }
 
 float opSubtraction( float d1, float d2 ) { return max(-d1,d2); }
 
@@ -117,20 +176,28 @@ vec3 colorOp(int type, marcher o1, marcher o2, float s) {
     }
     return vec3(0, 0, 0);
 }float sd3Box(vec3 p, vec3 b, vec4 ro) {
-    vec3 q = abs(p-ro.xyz) - b;
+    //p = (p-ro.xyz)* rotateX(sin(u_time));
+    vec3 q = abs(p) - b;
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 vec3 material0(){return vec3(.3);}vec3 material1(){return vec3(0,1,0);}
 marcher map(vec4 ro) {
-    float m=10000;vec3 color; vec3 c;
+    float m=10000;
+    vec3 color;
+    vec3 c;
     for(int i=0; i<SCENE_SIZE; i++){
         float d;
+        vec4 p = rot(objects[i].v1 - ro, vec4(0,0,1,0));
         if(objects[i].material == 0) {c = material0();}
         else if(objects[i].material == 1) {c = material1();}
         if(objects[i].shader == 0) {
-            d = sd3Box(rot(objects[i].v1, objects[i].rot).xyz, objects[i].v2.xyz, ro);
+            d = sd3Box(p.xyz, objects[i].v2.xyz, ro);
         }
-        color = colorOp(objects[i].operator, marcher(m,color), marcher(d,c), objects[i].smoothness);m = op(d, m, objects[i].operator, objects[i].smoothness);}return marcher(m, color);}
+        color = colorOp(objects[i].operator, marcher(m,color), marcher(d,c), objects[i].smoothness);
+        m = op(d, m, objects[i].operator, objects[i].smoothness);
+    }
+    return marcher(m, color);
+}
 #define MIN_DIST 1
 #define SHADOW_FALLOFF .02
 #define DRAW_DIST 500
@@ -304,3 +371,4 @@ void main() {
     outputColor = vec4(col, 1.0);
     //outputColor = vec4(vec3(instructions, 0, 0)/500, 1.0);
 }
+

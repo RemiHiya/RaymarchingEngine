@@ -10,6 +10,7 @@ float rand(vec2 coord) {
 
 in vec2 TexCoord;
 uniform vec2 u_screenSize;
+uniform float u_resolution;
 uniform vec3 camera_pos = vec3(0, 0, 0);
 uniform vec3 camera_rot = vec3(0, 0, 0);
 uniform float w = 0;
@@ -20,6 +21,7 @@ out vec4 test;
 float FOV = 110;
 
 vec3 computeDirection(vec2 coords, vec3 rotation) {
+    float r = u_resolution;
     vec2 normalizedCoords = (2.0 * coords - u_screenSize) / u_screenSize;
     float aspectRatio = u_screenSize.x / u_screenSize.y;
     float near = 0.1;
@@ -74,7 +76,7 @@ marcher castRay(vec4 ro, vec3 rd) {
 
 
 vec3 GetSurfaceNormal(in vec4 p) {
-    const float h = 0.01; // replace by an appropriate value
+    const float h = 0.00001; // replace by an appropriate value
     const vec2 k = vec2(1,-1);
     vec3 pos = p.xyz;
     return normalize( k.xyy*map( vec4(pos + k.xyy*h, p.w) ).d +

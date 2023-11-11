@@ -67,7 +67,6 @@ class SceneParser(private val scene : Scene) {
         for (i in 0 until scene.getObjects().size) {
             val obj = scene.getObjects()[i].getMaterial()
             if (obj !in materialCalls) {
-
                 materialCalls += obj
                 out += "vec3 material$index(){return ${obj};}"
                 index ++

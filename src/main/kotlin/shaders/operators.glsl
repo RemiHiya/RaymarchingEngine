@@ -5,6 +5,10 @@ float opSubtraction( float d1, float d2 ) { return max(-d1,d2); }
 float opIntersection( float d1, float d2 ) { return max(d1,d2); }
 
 float opSmoothUnion( float d1, float d2, float k ) {
+    //float h =  max( k-abs(d1-d2), 0.0 )/k;
+    //float m = h*h*h*0.5;
+    //float s = m*k*(1.0/3.0);
+    //return (d1<d2) ? d1-s : d2-s;
     float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
     return mix( d2, d1, h ) - k*h*(1.0-h); }
 

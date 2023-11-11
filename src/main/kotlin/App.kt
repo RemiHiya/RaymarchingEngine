@@ -39,20 +39,17 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         stage = Stage()
 
         val skin = Skin(Gdx.files.internal(RESOURCE_PATH + "skins/metalui/metal-ui.json")) // Utilisez un skin de votre choix
-        val table = Table()
-        table.setFillParent(true) // Le tableau remplit la scène entière
 
-        val button = TextButton("Mon Bouton", skin)
-        button.addListener { event ->
-            if (event.isCapture) {
-                // Gérez l'action de votre bouton ici
-                // Par exemple, ouvrez un menu, changez d'écran, etc.
-            }
-            false
-        }
+        val leftPanel = createCollapsiblePanel("Panel Gauche", skin)
+        leftPanel.setPosition(10f, 10f)
 
-        table.add(button).width(200f).height(60f).pad(20f) // Personnalisez les dimensions et la mise en page
-        stage?.addActor(table)
+        // Panel de droite
+        val rightPanel = createCollapsiblePanel("Panel Droit", skin)
+        rightPanel.setPosition(Gdx.graphics.width - rightPanel.width - 10f, 10f)
+
+        stage?.addActor(leftPanel)
+        stage?.addActor(rightPanel)
+
         Gdx.input.inputProcessor = stage // Définissez le Stage comme processeur d'entrée
 
 
@@ -78,7 +75,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderCode += parser.computeMaterials() + "\n"
         shaderCode += parser.computeMapper() + "\n"
         shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()
-        //println(shaderCode)
+        println(shaderCode)
 
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
         ShaderProgram.pedantic = false
@@ -88,6 +85,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         }
 
     }
+
 
     override fun render() {
         tick(Gdx.graphics.deltaTime)
@@ -112,6 +110,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram?.setUniformf("w", sin(time))
         shaderProgram?.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(),
             (Gdx.graphics.height).toFloat())
+        shaderProgram?.setUniformf("u_resolution", .5f)
 
         spriteBatch!!.shader = shaderProgram
         spriteBatch!!.draw(texture, -1f, -1f)
@@ -129,6 +128,26 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         texture?.dispose()
         shaderProgram?.dispose()
         stage?.dispose()
+    }
+
+
+
+    private fun createCollapsiblePanel(title: String, skin: Skin): Table {
+        val panel = Table()
+        panel.background = skin.getDrawable("rect")
+        panel.pad(10f).defaults().space(10f)
+
+        val titleLabel = TextButton(title, skin)
+        titleLabel.setDisabled(true)
+        panel.add(titleLabel).colspan(3).center().row()
+
+        for (i in 1..3) {
+            val button = TextButton("Button $i", skin)
+            panel.add(button).center()
+        }
+        panel.pack()
+
+        return panel
     }
 
 }

@@ -85,6 +85,21 @@ vec3 GetSurfaceNormal(in vec4 p) {
         k.xxx*map( vec4(pos + k.xxx*h, p.w) ).d );
 }
 
+float calcAO( in vec3 pos, in vec3 nor )
+{
+    float occ = 0.0;
+    float sca = 1.0;
+    for( int i=0; i<5; i++ )
+    {
+        float h = 0.01 + 0.12*float(i)/4.0;
+        float d = map( vec4(pos + h*nor, w) ).d;
+        occ += (h-d)*sca;
+        sca *= 0.95;
+        if( occ>0.35 ) break;
+    }
+    return clamp( 1.0 - 3.0*occ, 0.0, 1.0 ) * (0.5+0.5*nor.y);
+}
+
 float softshadow(in vec4 ro, in vec3 rd, float w) {
     float mint = 0.03;
     float maxt = 10;
@@ -121,6 +136,8 @@ vec3 render(vec2 coords) {
         vec3 LDirectional = vec3(0.9, 0.9, 0.8) * NoL;
         vec3 LAmbient = vec3(0.03, 0.04, 0.1);
         vec3 diffuse = objectSurfaceColour * (LDirectional + LAmbient);
+
+        diffuse *= calcAO(pos, n);
         col = vec3(diffuse);
         /*
         // Ombres projetées

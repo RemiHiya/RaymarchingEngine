@@ -1,5 +1,7 @@
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Graphics
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Pixmap.Format
@@ -11,18 +13,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.GdxRuntimeException
+import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import elements.Scene
 import elements.SceneParser
 import misc.PATH
-import misc.RESOURCE_PATH
+import misc.SKIN
+import ui.MainEditor
 import kotlin.math.sin
 
 
 class App(private val scene: Scene) : ApplicationAdapter() {
+    val config = LwjglApplicationConfiguration()
+
     private var spriteBatch: SpriteBatch? = null
     private var texture: Texture? = null
     private var shaderProgram: ShaderProgram? = null
+
     private var stage: Stage? = null
+    private lateinit var viewport: Viewport
+    private lateinit var editor: MainEditor
 
     private var time = 0f
     private val parser = SceneParser(scene)
@@ -35,10 +45,14 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     }
 
     override fun create() {
+        viewport = ScreenViewport()
 
-        stage = Stage()
+        editor = MainEditor(viewport)
+        editor.isDebugAll = true
 
-        val skin = Skin(Gdx.files.internal(RESOURCE_PATH + "skins/metalui/metal-ui.json")) // Utilisez un skin de votre choix
+        stage = Stage(viewport)
+
+        val skin = Skin(Gdx.files.internal(SKIN))
 
         val leftPanel = createCollapsiblePanel("Panel Gauche", skin)
         leftPanel.setPosition(10f, 10f)
@@ -46,6 +60,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         // Panel de droite
         val rightPanel = createCollapsiblePanel("Panel Droit", skin)
         rightPanel.setPosition(Gdx.graphics.width - rightPanel.width - 10f, 10f)
+
 
         stage?.addActor(leftPanel)
         stage?.addActor(rightPanel)
@@ -119,8 +134,10 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         /*
         Rendu de l'éditeur
          */
-        stage?.act(Gdx.graphics.deltaTime)
-        stage?.draw()
+        //stage?.act(Gdx.graphics.deltaTime)
+        //stage?.draw()
+        editor.act(Gdx.graphics.deltaTime)
+        editor.draw()
     }
 
     override fun dispose() {
@@ -128,6 +145,15 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         texture?.dispose()
         shaderProgram?.dispose()
         stage?.dispose()
+        editor.dispose()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        viewport.update(width, height)
+        editor.vp.update(width, height)
+        editor.vp.apply(true)
+        editor.update()
     }
 
 

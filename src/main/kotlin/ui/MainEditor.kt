@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.viewport.Viewport
 import misc.SKIN
 import kotlin.math.roundToInt
@@ -11,10 +12,15 @@ import kotlin.math.roundToInt
 class MainEditor(val vp: Viewport): Stage(vp) {
 
     private val skin = Skin(Gdx.files.internal(SKIN))
-    private var fpsLabel: Label = Label("test", skin)
+    private var fpsLabel: Label = Label("fps", skin)
+    private var test: Label = Label("test", skin)
+    private val t = Table()
 
     init {
-        addActor(fpsLabel)
+        t.setFillParent(true)
+        t.add(fpsLabel)
+        t.right()
+        addActor(t)
     }
 
 
@@ -28,6 +34,6 @@ class MainEditor(val vp: Viewport): Stage(vp) {
     }
 
     fun update() {
-
+        //t.top()
     }
 }

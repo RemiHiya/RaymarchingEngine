@@ -113,19 +113,19 @@ class SceneParser(private val scene : Scene) {
     private fun getShader(obj: PrimitiveObject) = shaders.indexOf("shaders/" + obj.getShader())
     private fun getMaterial(obj: PrimitiveObject) = materialCalls.indexOf(obj.getMaterial())
 
-    fun updateShaderObjects(sp: ShaderProgram?) {
+    fun updateShaderObjects(sp: ShaderProgram) {
         for ((index, i) in scene.getObjects().withIndex()) {
             val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
             val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
             val ro = floatArrayOf(i.ro.roll, i.ro.pitch, i.ro.yaw, i.ro.w)
-            sp?.setUniform4fv("objects[$index].v1", v1, 0, 4)
-            sp?.setUniform4fv("objects[$index].v2", v2, 0, 4)
-            sp?.setUniform4fv("objects[$index].rot", ro, 0, 4)
-            sp?.setUniformf("objects[$index].extra", i.extra)
-            sp?.setUniformi("objects[$index].shader", getShader(i))
-            sp?.setUniformi("objects[$index].material", getMaterial(i))
-            sp?.setUniformi("objects[$index].operator", i.operator.operator.value)
-            sp?.setUniformf("objects[$index].smoothness", i.operator.smoothness)
+            sp.setUniform4fv("objects[$index].v1", v1, 0, 4)
+            sp.setUniform4fv("objects[$index].v2", v2, 0, 4)
+            sp.setUniform4fv("objects[$index].rot", ro, 0, 4)
+            sp.setUniformf("objects[$index].extra", i.extra)
+            sp.setUniformi("objects[$index].shader", getShader(i))
+            sp.setUniformi("objects[$index].material", getMaterial(i))
+            sp.setUniformi("objects[$index].operator", i.operator.operator.value)
+            sp.setUniformf("objects[$index].smoothness", i.operator.smoothness)
         }
     }
 }

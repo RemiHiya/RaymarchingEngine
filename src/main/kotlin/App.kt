@@ -1,7 +1,5 @@
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Graphics
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Pixmap.Format
@@ -24,11 +22,9 @@ import kotlin.math.sin
 
 
 class App(private val scene: Scene) : ApplicationAdapter() {
-    val config = LwjglApplicationConfiguration()
-
     private var spriteBatch: SpriteBatch? = null
     private var texture: Texture? = null
-    private var shaderProgram: ShaderProgram? = null
+    private lateinit var shaderProgram: ShaderProgram
 
     private var stage: Stage? = null
     private lateinit var viewport: Viewport
@@ -95,8 +91,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
         ShaderProgram.pedantic = false
 
-        if (!shaderProgram!!.isCompiled) {
-            throw GdxRuntimeException("Shader compilation failed: ${shaderProgram!!.log}")
+        if (!shaderProgram.isCompiled) {
+            throw GdxRuntimeException("Shader compilation failed: ${shaderProgram.log}")
         }
 
     }
@@ -113,19 +109,19 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         spriteBatch!!.begin()
-        shaderProgram?.bind()
+        shaderProgram.bind()
         time += Gdx.graphics.deltaTime
 
         // Update la liste d'objets du shader
-        shaderProgram?.setUniformi("SCENE_SIZE", scene.getObjects().size)
+        shaderProgram.setUniformi("SCENE_SIZE", scene.getObjects().size)
         parser.updateShaderObjects(shaderProgram)
 
         // Update les input du shader
-        shaderProgram?.setUniformf("u_time", time)
-        shaderProgram?.setUniformf("w", sin(time))
-        shaderProgram?.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(),
+        shaderProgram.setUniformf("u_time", time)
+        shaderProgram.setUniformf("w", sin(time))
+        shaderProgram.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(),
             (Gdx.graphics.height).toFloat())
-        shaderProgram?.setUniformf("u_resolution", .5f)
+        shaderProgram.setUniformf("u_resolution", .5f)
 
         spriteBatch!!.shader = shaderProgram
         spriteBatch!!.draw(texture, -1f, -1f)
@@ -143,7 +139,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     override fun dispose() {
         spriteBatch?.dispose()
         texture?.dispose()
-        shaderProgram?.dispose()
+        shaderProgram.dispose()
         stage?.dispose()
         editor.dispose()
     }
@@ -164,7 +160,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         panel.pad(10f).defaults().space(10f)
 
         val titleLabel = TextButton(title, skin)
-        titleLabel.setDisabled(true)
+        titleLabel.isDisabled = true
         panel.add(titleLabel).colspan(3).center().row()
 
         for (i in 1..3) {

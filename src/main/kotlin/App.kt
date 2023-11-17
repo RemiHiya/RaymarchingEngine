@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import elements.Scene
 import elements.SceneParser
 import misc.PATH
-import misc.SKIN
+import misc.SKIN_PATH
 import ui.MainEditor
 import kotlin.math.sin
 
@@ -44,11 +44,11 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         viewport = ScreenViewport()
 
         editor = MainEditor(viewport)
-        editor.isDebugAll = true
+        //editor.isDebugAll = true
 
         stage = Stage(viewport)
 
-        val skin = Skin(Gdx.files.internal(SKIN))
+        val skin = Skin(Gdx.files.internal(SKIN_PATH))
 
         val leftPanel = createCollapsiblePanel("Panel Gauche", skin)
         leftPanel.setPosition(10f, 10f)
@@ -61,7 +61,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         stage?.addActor(leftPanel)
         stage?.addActor(rightPanel)
 
-        Gdx.input.inputProcessor = stage // Définissez le Stage comme processeur d'entrée
+        Gdx.input.inputProcessor = editor // Définissez le Stage comme processeur d'entrée
 
 
         /*

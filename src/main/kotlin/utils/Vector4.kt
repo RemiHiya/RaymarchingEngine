@@ -21,4 +21,8 @@ data class Vector4(val x: Float = 0f, val y: Float = 0f, val z: Float = 0f, val 
             max(this.w, other.w)
         )
     }
+
+    override fun toString(): String {
+        return "vec4($x, $y, $z, $w)"
+    }
 }

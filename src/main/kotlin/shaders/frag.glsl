@@ -10,7 +10,6 @@ float rand(vec2 coord) {
 
 in vec2 TexCoord;
 uniform vec2 u_screenSize;
-uniform float u_resolution;
 uniform vec3 camera_pos = vec3(0, 0, 0);
 uniform vec3 camera_rot = vec3(0, 0, 0);
 uniform float w = 0;
@@ -21,8 +20,8 @@ out vec4 test;
 float FOV = 110;
 
 vec3 computeDirection(vec2 coords, vec3 rotation) {
-    float r = u_resolution;
     vec2 normalizedCoords = (2.0 * coords - u_screenSize) / u_screenSize;
+    normalizedCoords = vec2(normalizedCoords.x, -normalizedCoords.y);
     float aspectRatio = u_screenSize.x / u_screenSize.y;
     float near = 0.1;
     float far = 100.0;
@@ -188,4 +187,5 @@ void main() {
 
     outputColor = vec4(col, 1.0);
     //outputColor = vec4(vec3(instructions, 0, 0)/500, 1.0);
+    //outputColor = vec4(gl_FragCoord.xy/u_screenSize, 0, 1);
 }

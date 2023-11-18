@@ -5,18 +5,14 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Pixmap.Format
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import elements.Scene
 import elements.SceneParser
 import misc.PATH
-import misc.SKIN_PATH
 import ui.MainEditor
 import kotlin.math.sin
 
@@ -26,11 +22,12 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private var texture: Texture? = null
     private lateinit var shaderProgram: ShaderProgram
 
-    private var stage: Stage? = null
     private lateinit var viewport: Viewport
     private lateinit var editor: MainEditor
 
     private var time = 0f
+    private var scale = 0.3f
+    private lateinit var frameBuffer: FrameBuffer
     private val parser = SceneParser(scene)
 
     private fun tick(deltaTime: Float) {
@@ -45,28 +42,19 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         editor = MainEditor(viewport)
         //editor.isDebugAll = true
-
-        stage = Stage(viewport)
-
-        val skin = Skin(Gdx.files.internal(SKIN_PATH))
-
-        val leftPanel = createCollapsiblePanel("Panel Gauche", skin)
-        leftPanel.setPosition(10f, 10f)
-
-        // Panel de droite
-        val rightPanel = createCollapsiblePanel("Panel Droit", skin)
-        rightPanel.setPosition(Gdx.graphics.width - rightPanel.width - 10f, 10f)
-
-
-        stage?.addActor(leftPanel)
-        stage?.addActor(rightPanel)
-
         Gdx.input.inputProcessor = editor // Définissez le Stage comme processeur d'entrée
 
 
         /*
         S'occupe de générer le shader
          */
+
+        frameBuffer = FrameBuffer(
+            Format.RGBA8888,
+            (Gdx.graphics.width * scale).toInt(),
+            (Gdx.graphics.height * scale).toInt(),
+            false)
+
         spriteBatch = SpriteBatch()
         val width = Gdx.graphics.width
         val height = Gdx.graphics.height
@@ -105,8 +93,13 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         S'occupe du rendu
          */
 
+        frameBuffer.begin()
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+        spriteBatch!!.projectionMatrix.setToOrtho2D(0f, 0f,
+            frameBuffer.width.toFloat()*1/scale,
+            frameBuffer.height.toFloat()*1/scale)
 
         spriteBatch!!.begin()
         shaderProgram.bind()
@@ -119,19 +112,27 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         // Update les input du shader
         shaderProgram.setUniformf("u_time", time)
         shaderProgram.setUniformf("w", sin(time))
-        shaderProgram.setUniformf("u_screenSize",(Gdx.graphics.width).toFloat(),
-            (Gdx.graphics.height).toFloat())
-        shaderProgram.setUniformf("u_resolution", .5f)
+        shaderProgram.setUniformf("u_screenSize",
+            frameBuffer.width.toFloat(),
+            frameBuffer.height.toFloat())
 
         spriteBatch!!.shader = shaderProgram
-        spriteBatch!!.draw(texture, -1f, -1f)
+        spriteBatch!!.draw(texture, -1f, -1f, 1/scale, 1/scale)
+        spriteBatch!!.end()
+
+        frameBuffer.end()
+
+        spriteBatch!!.begin()
+        spriteBatch!!.shader = null
+        texture!!.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        spriteBatch!!.draw(frameBuffer.colorBufferTexture, 0f, 0f,
+            Gdx.graphics.width.toFloat(),
+            Gdx.graphics.height.toFloat())
         spriteBatch!!.end()
 
         /*
         Rendu de l'éditeur
          */
-        //stage?.act(Gdx.graphics.deltaTime)
-        //stage?.draw()
         editor.act(Gdx.graphics.deltaTime)
         editor.draw()
     }
@@ -140,36 +141,27 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         spriteBatch?.dispose()
         texture?.dispose()
         shaderProgram.dispose()
-        stage?.dispose()
         editor.dispose()
+        frameBuffer.dispose()
     }
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         viewport.update(width, height)
+        resizeFrameBuffer(width, height)
         editor.vp.update(width, height)
         editor.vp.apply(true)
         editor.update()
     }
 
+    private fun resizeFrameBuffer(width: Int, height: Int) {
+        frameBuffer.dispose()
+        frameBuffer = FrameBuffer(
+            Format.RGBA8888,
+            (width * scale).toInt(),
+            (height * scale).toInt(),
+            false)
 
-
-    private fun createCollapsiblePanel(title: String, skin: Skin): Table {
-        val panel = Table()
-        panel.background = skin.getDrawable("rect")
-        panel.pad(10f).defaults().space(10f)
-
-        val titleLabel = TextButton(title, skin)
-        titleLabel.isDisabled = true
-        panel.add(titleLabel).colspan(3).center().row()
-
-        for (i in 1..3) {
-            val button = TextButton("Button $i", skin)
-            panel.add(button).center()
-        }
-        panel.pack()
-
-        return panel
     }
 
 }

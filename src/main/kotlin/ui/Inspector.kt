@@ -8,10 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import misc.SKIN
+import ui.core.InputFieldListener
 import ui.elements.Field
 import utils.Vector4
 
-class Inspector(title: String): Table() {
+class Inspector(title: String): Table(), InputFieldListener {
     private val contentTable: Table = Table()
     private val titleLabel: TextButton
     private var collapsed: Boolean = false
@@ -38,7 +39,10 @@ class Inspector(title: String): Table() {
                 moveBy(x - width / 2, y - height / 2)
             }
         })
-        setContent(Field("Position", Vector4(1f,2f,3f,4f)))
+        val field = Field("Position", Vector4(1f,2f,3f,4f))
+        field.addListener(this)
+
+        setContent(field)
     }
 
     private fun toggleCollapsed() {
@@ -68,4 +72,11 @@ class Inspector(title: String): Table() {
     fun unSelect() { selection = -1 }
 
     fun select(x: Int) { selection = x }
+
+    override fun onChanged() {
+        println("test")
+        /*
+        TODO: Update l'objet en question
+         */
+    }
 }

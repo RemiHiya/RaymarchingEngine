@@ -6,10 +6,12 @@ import com.badlogic.gdx.utils.Align
 import misc.SKIN
 import ui.core.InputFieldListener
 import utils.Vector4
+import java.lang.ref.WeakReference
 
 class Field(name: String, value: Vector4) : Table(), InputFieldListener {
     private val nameLabel: Label
     private val numberFields: Array<InputField>
+    private var listener = WeakReference<InputFieldListener>(null)
 
     init {
         nameLabel = Label(name, SKIN)
@@ -42,8 +44,12 @@ class Field(name: String, value: Vector4) : Table(), InputFieldListener {
         return values
     }
 
-    override fun onChanged() {
+    fun addListener(listener: InputFieldListener) {
+        this.listener = WeakReference(listener)
+    }
 
+    override fun onChanged() {
+        listener.get()?.onChanged()
     }
 
 }

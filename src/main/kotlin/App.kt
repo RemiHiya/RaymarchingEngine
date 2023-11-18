@@ -26,7 +26,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var editor: MainEditor
 
     private var time = 0f
-    private var scale = 0.5f
+    private var scale = 0.3f
     private lateinit var frameBuffer: FrameBuffer
     private val parser = SceneParser(scene)
 

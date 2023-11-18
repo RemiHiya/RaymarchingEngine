@@ -26,7 +26,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var editor: MainEditor
 
     private var time = 0f
-    private var scale = 0.3f
+    private var scale = 0.5f
     private lateinit var frameBuffer: FrameBuffer
     private val parser = SceneParser(scene)
 
@@ -98,8 +98,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         spriteBatch!!.projectionMatrix.setToOrtho2D(0f, 0f,
-            frameBuffer.width.toFloat()*1/scale,
-            frameBuffer.height.toFloat()*1/scale)
+            frameBuffer.width.toFloat()/scale,
+            frameBuffer.height.toFloat()/scale)
 
         spriteBatch!!.begin()
         shaderProgram.bind()
@@ -117,7 +117,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
             frameBuffer.height.toFloat())
 
         spriteBatch!!.shader = shaderProgram
-        spriteBatch!!.draw(texture, -1f, -1f, 1/scale, 1/scale)
+        spriteBatch!!.draw(texture, -1f, -1f, 2/scale, 2/scale)
         spriteBatch!!.end()
 
         frameBuffer.end()

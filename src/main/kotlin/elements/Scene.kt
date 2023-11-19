@@ -7,7 +7,14 @@ open class Scene {
      */
 
     private var objects: Array<PrimitiveObject> = arrayOf()
+    private var actors: Array<Actor> = arrayOf()
 
+    fun add(actor: Actor) {
+        actors += actor
+        for (i in actor.getPrimitives()) {
+            add(i)
+        }
+    }
     fun add(obj: PrimitiveObject) {
         objects += obj
     }
@@ -15,5 +22,12 @@ open class Scene {
     fun getObjects(): Array<PrimitiveObject> {
         return objects
     }
+
+    fun getActor(index: Int): Actor? {
+        return if (index in actors.indices) actors[index]
+        else null
+    }
+
+    fun getActors() = actors
 
 }

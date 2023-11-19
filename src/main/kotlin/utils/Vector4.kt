@@ -3,7 +3,7 @@ package utils
 import kotlin.math.sqrt
 import kotlin.math.max
 
-data class Vector4(val x: Float = 0f, val y: Float = 0f, val z: Float = 0f, val w: Float = 0f) {
+data class Vector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: Float = 0f) {
     operator fun plus(other: Vector4) = Vector4(x + other.x, y + other.y, z + other.z, w + other.w)
     operator fun minus(other: Vector4) = Vector4(x - other.x, y - other.y, z - other.z, w - other.w)
     operator fun times(scalar: Float) = Vector4(x * scalar, y * scalar, z * scalar, w * scalar)

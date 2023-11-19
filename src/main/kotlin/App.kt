@@ -26,12 +26,11 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var editor: MainEditor
 
     private var time = 0f
-    private var scale = 0.3f
+    private var scale = .3f
     private lateinit var frameBuffer: FrameBuffer
     private val parser = SceneParser(scene)
 
     private fun tick(deltaTime: Float) {
-        //println(1/deltaTime)
         /*
         TODO : Scene tick
          */
@@ -40,7 +39,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     override fun create() {
         viewport = ScreenViewport()
 
-        editor = MainEditor(viewport)
+        editor = MainEditor(viewport, scene)
         //editor.isDebugAll = true
         Gdx.input.inputProcessor = editor // Définissez le Stage comme processeur d'entrée
 
@@ -69,12 +68,13 @@ class App(private val scene: Scene) : ApplicationAdapter() {
             }
         """.trimIndent()
 
+        parser.rebuildObjects()
         var shaderCode = parser.initialize()
         shaderCode += parser.computeScene() + "\n"
         shaderCode += parser.computeMaterials() + "\n"
         shaderCode += parser.computeMapper() + "\n"
         shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()
-        println(shaderCode)
+        //println(shaderCode)
 
         shaderProgram = ShaderProgram(vertexShader, shaderCode)
         ShaderProgram.pedantic = false

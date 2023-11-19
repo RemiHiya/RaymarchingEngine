@@ -18,6 +18,8 @@ class SceneParser(private val scene : Scene) {
     private var materialCalls: Array<String> = arrayOf()
     private var materialMap: Map<Int, Int> = mapOf()
 
+    private var objects: Array<PrimitiveObject> = arrayOf()
+
     fun initialize() = "#version 330 core\n" +
             "#define MAX_OBJECTS ${MAX_OBJECTS}\n" +
             "uniform int SCENE_SIZE; \n" +
@@ -28,9 +30,19 @@ class SceneParser(private val scene : Scene) {
     TODO : Chercher récursivement les références de chaque shader qui va être utilisé
      */
 
+    fun rebuildObjects() {
+        objects = arrayOf()
+        for (i in scene.getActors()) {
+            for (j in i.getPrimitives()) {
+                j.v1 = i.transform.location
+                objects += j
+            }
+        }
+    }
+
     private fun getShaders() {
         var index = 0
-        for (i in scene.getObjects()) {
+        for (i in objects) {
             val s = "shaders/" + i.getShader()
             if (s !in shaders) {
 
@@ -64,8 +76,8 @@ class SceneParser(private val scene : Scene) {
     fun computeMaterials(): String {
         var out = ""
         var index = 0
-        for (i in 0 until scene.getObjects().size) {
-            val obj = scene.getObjects()[i].getMaterial()
+        for (i in 0 until objects.size) {
+            val obj = objects[i].getMaterial()
             if (obj !in materialCalls) {
                 materialCalls += obj
                 out += "vec3 material$index(){return ${obj};}"
@@ -114,7 +126,8 @@ class SceneParser(private val scene : Scene) {
     private fun getMaterial(obj: PrimitiveObject) = materialCalls.indexOf(obj.getMaterial())
 
     fun updateShaderObjects(sp: ShaderProgram) {
-        for ((index, i) in scene.getObjects().withIndex()) {
+        rebuildObjects()
+        for ((index, i) in objects.withIndex()) {
             val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
             val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
             val ro = floatArrayOf(i.ro.roll, i.ro.pitch, i.ro.yaw, i.ro.w)

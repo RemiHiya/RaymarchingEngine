@@ -8,7 +8,7 @@ import ui.core.InputFieldListener
 import utils.Vector4
 import java.lang.ref.WeakReference
 
-class Field(name: String, value: Vector4) : Table(), InputFieldListener {
+class Vector4Field(name: String, private val value: Vector4) : Table(), InputFieldListener {
     private val nameLabel: Label
     private val numberFields: Array<InputField>
     private var listener = WeakReference<InputFieldListener>(null)
@@ -49,7 +49,12 @@ class Field(name: String, value: Vector4) : Table(), InputFieldListener {
     }
 
     override fun onChanged() {
-        listener.get()?.onChanged()
+        //listener.get()?.onChanged()
+        val tmp = getValues()
+        value.x = tmp[0]
+        value.y = tmp[1]
+        value.z = tmp[2]
+        value.w = tmp[3]
     }
 
 }

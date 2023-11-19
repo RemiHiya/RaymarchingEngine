@@ -6,21 +6,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import misc.SKIN
 import ui.core.InputFieldListener
-import ui.elements.Field
+import ui.elements.Vector4Field
 import utils.Vector4
 
-class Inspector(title: String): Table(), InputFieldListener {
+class Inspector(private val selection: elements.Actor): Table(), InputFieldListener {
+
+    private val title = "Inspector"
     private val contentTable: Table = Table()
-    private val titleLabel: TextButton
+    private val titleLabel: TextButton = TextButton(title, SKIN)
     private var collapsed: Boolean = false
 
-    private var selection = -1
+    val field = Vector4Field("Position", selection.transform.location)
 
     init {
-        titleLabel = TextButton(title, SKIN)
         titleLabel.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
                 toggleCollapsed()
@@ -39,7 +39,6 @@ class Inspector(title: String): Table(), InputFieldListener {
                 moveBy(x - width / 2, y - height / 2)
             }
         })
-        val field = Field("Position", Vector4(1f,2f,3f,4f))
         field.addListener(this)
 
         setContent(field)
@@ -60,23 +59,9 @@ class Inspector(title: String): Table(), InputFieldListener {
         contentTable.add(actor).fill().expand()
     }
 
-    fun setTitleLabel(title: String) {
-        titleLabel.setText(title)
-    }
-
-    fun setResizable(drawable: Drawable) {
-        // Add code for resizing functionality
-        // You may need to implement a resize handle and handle touch events for resizing
-    }
-
-    fun unSelect() { selection = -1 }
-
-    fun select(x: Int) { selection = x }
-
     override fun onChanged() {
-        println("test")
-        /*
-        TODO: Update l'objet en question
-         */
+        val tmp = field.getValues()
+        selection.transform.location = Vector4(tmp[0], tmp[1], tmp[2], tmp[3])
+        selection.getPrimitives()[0].v1 = Vector4(tmp[0], tmp[1], tmp[2], tmp[3])
     }
 }

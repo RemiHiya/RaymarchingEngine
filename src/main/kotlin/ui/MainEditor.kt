@@ -16,6 +16,7 @@ class MainEditor(val vp: Viewport, scene: Scene): Stage(vp) {
     private val skin = Skin(Gdx.files.internal(SKIN_PATH))
     private var fpsLabel: Label = Label("fps", skin)
     private val t = Table()
+    private val fpsHolder = Table()
     private var inspector: Inspector? = null
 
 
@@ -24,10 +25,14 @@ class MainEditor(val vp: Viewport, scene: Scene): Stage(vp) {
         if (ac != null) {
             inspector = Inspector(ac)
         }
+        fpsHolder.setFillParent(true)
+        fpsHolder.add(fpsLabel)
+        fpsHolder.top()
         t.setFillParent(true)
         t.add(inspector)
         t.right()
         addActor(t)
+        addActor(fpsHolder)
     }
 
 
@@ -37,7 +42,9 @@ class MainEditor(val vp: Viewport, scene: Scene): Stage(vp) {
     }
 
     private fun updateFPS(dt: Float) {
-        fpsLabel.setText(((1/dt*100).roundToInt().toFloat()/100).toString())
+        val fps = (1/dt*100).roundToInt().toFloat()/100
+        val ms = (dt*100000).roundToInt().toFloat()/100
+        fpsLabel.setText("$fps FPS\n$ms ms")
     }
 
     fun update() {

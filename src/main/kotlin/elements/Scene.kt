@@ -10,6 +10,9 @@ open class Scene {
     private var actors: Array<Actor> = arrayOf()
 
     fun add(actor: Actor) {
+        if (actor.displayName.isEmpty()) {
+            actor.displayName = "Actor${actors.size}"
+        }
         actors += actor
         for (i in actor.getPrimitives()) {
             add(i)

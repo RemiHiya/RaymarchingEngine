@@ -3,7 +3,7 @@ package elements
 import utils.Transform4
 import misc.Property
 
-class Actor {
+open class Actor {
 
     var properties: HashMap<String, Array<Any>> = HashMap()
 
@@ -11,10 +11,8 @@ class Actor {
     private var primitives: Array<PrimitiveObject> = arrayOf()
     var displayName: String = ""
 
+    @Property("Transform")
     var transform: Transform4 = Transform4()
-
-    @Property("test")
-    var location = transform.location
 
     fun addPrimitive(p: PrimitiveObject) {
         primitives += p

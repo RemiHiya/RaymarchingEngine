@@ -1,38 +1,44 @@
 package ui
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.viewport.Viewport
 import elements.Scene
-import misc.SKIN_PATH
+import misc.SKIN
 import kotlin.math.roundToInt
 
 class MainEditor(val vp: Viewport, scene: Scene): Stage(vp) {
 
-    private val skin = Skin(Gdx.files.internal(SKIN_PATH))
-    private var fpsLabel: Label = Label("fps", skin)
-    private val t = Table()
+    private val inspectorHolder = Table()
+    private val outlinerHolder = Table()
     private val fpsHolder = Table()
+
+    private var outliner = Outliner(scene)
+    private var fpsLabel: Label = Label("fps", SKIN)
     private var inspector: Inspector? = null
 
 
     init {
-        val ac: elements.Actor? = scene.getActor(1)
+        val ac: elements.Actor? = scene.camera
         if (ac != null) {
             inspector = Inspector(ac)
         }
         fpsHolder.setFillParent(true)
         fpsHolder.add(fpsLabel)
         fpsHolder.top()
-        t.setFillParent(true)
-        t.add(inspector)
-        t.right()
-        addActor(t)
+
+        outlinerHolder.setFillParent(true)
+        outlinerHolder.add(outliner)
+        outlinerHolder.left()
+
+        inspectorHolder.setFillParent(true)
+        inspectorHolder.add(inspector)
+        inspectorHolder.right()
+
+        addActor(inspectorHolder)
         addActor(fpsHolder)
+        addActor(outlinerHolder)
     }
 
 

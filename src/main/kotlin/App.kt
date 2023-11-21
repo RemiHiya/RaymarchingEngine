@@ -13,8 +13,8 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import elements.Scene
 import elements.SceneParser
 import misc.PATH
+import misc.SKIN
 import ui.MainEditor
-import kotlin.math.sin
 
 
 class App(private val scene: Scene) : ApplicationAdapter() {
@@ -147,6 +147,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram.dispose()
         editor.dispose()
         frameBuffer.dispose()
+        SKIN.dispose()
     }
 
     override fun resize(width: Int, height: Int) {

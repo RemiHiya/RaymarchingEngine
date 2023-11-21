@@ -28,7 +28,7 @@ class Vector4Field(name: String, private val value: Vector4) : Table(), InputFie
 
             textField.addListener(this)
 
-            this.add(textField).pad(5f).width(40f)
+            this.add(textField).padRight(5f).width(40f)
             if (index < 3) {
                 this.add() // Ajoute un espace entre les champs de saisie
             }

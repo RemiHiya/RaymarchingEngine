@@ -6,11 +6,12 @@ import utils.*
 class SceneTest: Scene() {
     init {
         val cube = Actor()
-        val s = Cube4(Transform4(Vector4(4f, 0f, 0f, 0f), Rotator4(1f, 0f, 1f, 1f)))
+        val s = Cube4(Transform4(Vector4(0f, 0f, 0f, 0f), Rotator4(1f, 0f, 1f, 1f)))
         s.setPrimitiveParameters(Vector4(1f, 1f, 1f, 1f), 1f)
         s.operator = MarcherOperator(OperatorType.UNION, 0.8f)
         s.setMaterial("vec3(0,1,0)")
         cube.addPrimitive(s)
+        cube.transform.location = Vector4(5f, 0f, 0f)
 
         val sph = Actor()
         val sphere = Sphere(Transform4(Vector4(4f, 2f, 0f, 0f)))

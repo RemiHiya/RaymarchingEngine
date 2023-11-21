@@ -9,22 +9,20 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener
 import misc.Property
 import misc.SKIN
 import ui.core.InputFieldListener
-import ui.elements.Rotator4Field
+import ui.elements.Transform4Field
 import ui.elements.Vector4Field
+import utils.Transform4
 import utils.Vector4
 import kotlin.reflect.full.findAnnotation
 
-class Inspector(private val selection: elements.Actor): Table(), InputFieldListener {
 
-    private val title = "Inspector"
+class Inspector(selection: elements.Actor): Table(), InputFieldListener {
+    private val title = "Inspector : ${selection.displayName}"
     private val contentTable: Table = Table()
     private val titleLabel: TextButton = TextButton(title, SKIN)
     private var collapsed: Boolean = false
 
-    val fields = processProperties(selection)
-
-    val field = Vector4Field("Position", selection.transform.location)
-    val field2 = Rotator4Field("Rotation", selection.transform.rotation)
+    private val fields = processProperties(selection)
 
     init {
         titleLabel.addListener(object : ClickListener() {
@@ -50,6 +48,7 @@ class Inspector(private val selection: elements.Actor): Table(), InputFieldListe
             for (j in i.value) {
                 when (val tmp = j.second) {
                     is Vector4 -> setContent(Vector4Field(j.first, tmp))
+                    is Transform4 -> setContent(Transform4Field(tmp))
                 }
             }
         }
@@ -65,20 +64,17 @@ class Inspector(private val selection: elements.Actor): Table(), InputFieldListe
         contentTable.isVisible = !collapsed
     }
 
-    fun setContent(actor: Actor) {
+    private fun setContent(actor: Actor) {
         //contentTable.clear()
         contentTable.add(actor).fill().expand()
     }
 
     override fun onChanged() {
-        val tmp = field.getValues()
-        selection.transform.location = Vector4(tmp[0], tmp[1], tmp[2], tmp[3])
-        selection.getPrimitives()[0].v1 = Vector4(tmp[0], tmp[1], tmp[2], tmp[3])
+
     }
 
     private fun <T : Any> processProperties(obj: T): Map<String, Array<Pair<String, Any>>> {
         val propertyMap = mutableMapOf<String, MutableList<Pair<String, Any>>>()
-
         obj::class.members.forEach { property ->
             val propertyAnnotation = property.findAnnotation<Property>()
 
@@ -93,7 +89,6 @@ class Inspector(private val selection: elements.Actor): Table(), InputFieldListe
                 }
             }
         }
-
         return propertyMap.mapValues { it.value.toTypedArray() }
     }
 

@@ -19,6 +19,7 @@ dependencies {
     implementation("com.badlogicgames.gdx:gdx-platform:1.12.0:natives-desktop")
 
     implementation("com.kotcrab.vis:vis-ui:$visuiVersion")
+    implementation(kotlin("reflect"))
 }
 
 

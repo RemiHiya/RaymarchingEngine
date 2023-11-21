@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import misc.MAX_OBJECTS
 import misc.PATH
+import kotlin.math.PI
 
 class SceneParser(private val scene : Scene) {
 
@@ -35,6 +36,7 @@ class SceneParser(private val scene : Scene) {
         for (i in scene.getActors()) {
             for (j in i.getPrimitives()) {
                 j.v1 = i.transform.location
+                j.ro = i.transform.rotation
                 objects += j
             }
         }
@@ -130,7 +132,7 @@ class SceneParser(private val scene : Scene) {
         for ((index, i) in objects.withIndex()) {
             val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
             val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
-            val ro = floatArrayOf(i.ro.roll, i.ro.pitch, i.ro.yaw, i.ro.w)
+            val ro = floatArrayOf(i.ro.roll.toRad(), i.ro.pitch.toRad(), i.ro.yaw.toRad(), i.ro.w.toRad())
             sp.setUniform4fv("objects[$index].v1", v1, 0, 4)
             sp.setUniform4fv("objects[$index].v2", v2, 0, 4)
             sp.setUniform4fv("objects[$index].rot", ro, 0, 4)
@@ -141,4 +143,6 @@ class SceneParser(private val scene : Scene) {
             sp.setUniformf("objects[$index].smoothness", i.operator.smoothness)
         }
     }
+
+    private fun Float.toRad() = this * PI.toFloat() /180
 }

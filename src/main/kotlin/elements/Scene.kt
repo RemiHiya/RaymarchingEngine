@@ -9,6 +9,8 @@ open class Scene {
     private var objects: Array<PrimitiveObject> = arrayOf()
     private var actors: Array<Actor> = arrayOf()
 
+    val camera = CameraActor()
+
     fun add(actor: Actor) {
         if (actor.displayName.isEmpty()) {
             actor.displayName = "Actor${actors.size}"

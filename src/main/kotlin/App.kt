@@ -30,6 +30,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var frameBuffer: FrameBuffer
     private val parser = SceneParser(scene)
 
+    private val camera = scene.camera
+
     private fun tick(deltaTime: Float) {
         /*
         TODO : Scene tick
@@ -111,10 +113,12 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         // Update les input du shader
         shaderProgram.setUniformf("u_time", time)
-        shaderProgram.setUniformf("w", sin(time))
-        shaderProgram.setUniformf("u_screenSize",
-            frameBuffer.width.toFloat(),
-            frameBuffer.height.toFloat())
+        val l = camera.transform.location
+        val r = camera.transform.rotation.toRadian()
+        shaderProgram.setUniformf("camera_pos", l.x, l.y, l.z)
+        shaderProgram.setUniformf("w", l.w)
+        shaderProgram.setUniformf("camera_rot", r.roll, r.pitch, r.yaw)
+        shaderProgram.setUniformf("u_screenSize", frameBuffer.width.toFloat(), frameBuffer.height.toFloat())
 
         spriteBatch!!.shader = shaderProgram
         spriteBatch!!.draw(texture, -1f, -1f, 2/scale, 2/scale)

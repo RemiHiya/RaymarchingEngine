@@ -3,7 +3,8 @@ package utils
 import kotlin.math.PI
 
 data class Rotator3(var roll: Float, var pitch: Float, var yaw: Float) {
-    fun toRadian() = Rotator3(roll*PI.toFloat()/180,
+    fun toRadians() = Rotator3(
+        roll*PI.toFloat()/180,
         pitch*PI.toFloat()/180,
         yaw*PI.toFloat()/180)
 }

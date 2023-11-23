@@ -52,7 +52,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
             camera.transform.rotation.pitch += deltaY * rotationSpeed
 
             // Input pour déplacement
-            val cameraSpeed = deltaTime * 3f
+            val cameraSpeed = deltaTime * 3
             var dir = Vector4()
             if (Gdx.input.isKeyPressed(Input.Keys.Z))
                 dir += camera.transform.rotation.toRotator3().getForwardVector().toVector4()

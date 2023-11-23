@@ -5,6 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.viewport.Viewport
 import elements.Scene
+import events.EventListener
+import events.events.SelectionChanged
 import misc.SKIN
 import kotlin.math.roundToInt
 
@@ -24,6 +26,17 @@ class MainEditor(val vp: Viewport, scene: Scene): Stage(vp) {
         if (ac != null) {
             inspector = Inspector(ac)
         }
+
+        // Récupère la notification de quand un nouvel Actor est sélectionné depuis l'outliner
+        outliner.getDispatcher().addListener(object : EventListener<SelectionChanged> {
+            override fun onEventReceived(event: SelectionChanged) {
+                inspectorHolder.removeActor(inspector)
+                inspector = Inspector(event.new)
+                inspectorHolder.add(inspector)
+            }
+        })
+
+        // Ajoute les différents panneaux à l'UI principale
         fpsHolder.setFillParent(true)
         fpsHolder.add(fpsLabel)
         fpsHolder.top()

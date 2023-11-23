@@ -1,5 +1,8 @@
+import api.math.getForwardVector
+import api.math.getRightVector
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Pixmap.Format
@@ -15,6 +18,7 @@ import elements.SceneParser
 import misc.PATH
 import misc.SKIN
 import ui.MainEditor
+import utils.Vector4
 
 
 class App(private val scene: Scene) : ApplicationAdapter() {
@@ -33,6 +37,44 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private val camera = scene.camera
 
     private fun tick(deltaTime: Float) {
+
+        // Déplacements de caméra
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+            // Lock la souris
+            if (!Gdx.input.isCursorCatched)
+                Gdx.input.isCursorCatched = true
+
+            // Input pour rotation
+            val deltaX = -Gdx.input.deltaX.toFloat()
+            val deltaY = -Gdx.input.deltaY.toFloat()
+            val rotationSpeed = 0.2f
+            camera.transform.rotation.yaw += deltaX * rotationSpeed
+            camera.transform.rotation.pitch += deltaY * rotationSpeed
+
+            // Input pour déplacement
+            val cameraSpeed = deltaTime * 3f
+            var dir = Vector4()
+            if (Gdx.input.isKeyPressed(Input.Keys.Z))
+                dir += camera.transform.rotation.toRotator3().getForwardVector().toVector4()
+            if (Gdx.input.isKeyPressed(Input.Keys.S))
+                dir += camera.transform.rotation.toRotator3().getForwardVector().toVector4() * -1f
+            if (Gdx.input.isKeyPressed(Input.Keys.Q))
+                dir += camera.transform.rotation.toRotator3().getRightVector().toVector4() * -1f
+            if (Gdx.input.isKeyPressed(Input.Keys.D))
+                dir += camera.transform.rotation.toRotator3().getRightVector().toVector4()
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
+                dir += Vector4(0f, 0f, 1f, 0f)
+            if (Gdx.input.isKeyPressed(Input.Keys.F))
+                dir += Vector4(0f, 0f, -1f, 0f)
+
+            camera.transform.location.x += dir.x*cameraSpeed
+            camera.transform.location.y += dir.y*cameraSpeed
+            camera.transform.location.z += dir.z*cameraSpeed
+
+        } else {
+            if (Gdx.input.isCursorCatched)
+                Gdx.input.isCursorCatched = false
+        }
         /*
         TODO : Scene tick
          */
@@ -114,7 +156,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         // Update les input du shader
         shaderProgram.setUniformf("u_time", time)
         val l = camera.transform.location
-        val r = camera.transform.rotation.toRadian()
+        val r = camera.transform.rotation.toRadians()
         shaderProgram.setUniformf("camera_pos", l.x, l.y, l.z)
         shaderProgram.setUniformf("w", l.w)
         shaderProgram.setUniformf("camera_rot", r.roll, r.pitch, r.yaw)
@@ -142,6 +184,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     }
 
     override fun dispose() {
+        super.dispose()
         spriteBatch?.dispose()
         texture?.dispose()
         shaderProgram.dispose()
@@ -161,11 +204,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
     private fun resizeFrameBuffer(width: Int, height: Int) {
         frameBuffer.dispose()
-        frameBuffer = FrameBuffer(
-            Format.RGBA8888,
-            (width * scale).toInt(),
-            (height * scale).toInt(),
-            false)
+        frameBuffer = FrameBuffer(Format.RGBA8888, (width*scale).toInt(), (height*scale).toInt(), false)
 
     }
 

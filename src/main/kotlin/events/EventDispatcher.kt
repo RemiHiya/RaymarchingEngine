@@ -1,14 +1,15 @@
 package events
 
-class EventDispatcher<T: Event> {
 
-    private val listeners = mutableListOf<EventListener<out Event>>()
+class EventDispatcher {
 
-    fun addListener(listener: EventListener<out Event>) {
+    private val listeners = mutableListOf<EventListener<Event>>()
+
+    fun addListener(listener: EventListener<Event>) {
         listeners.add(listener)
     }
 
-    fun removeListener(listener: EventListener<out Event>) {
+    fun removeListener(listener: EventListener<Event>) {
         listeners.remove(listener)
     }
 

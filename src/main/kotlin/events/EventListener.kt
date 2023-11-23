@@ -1,6 +1,6 @@
 package events
 
-interface EventListener<T: Event> {
+interface EventListener<out T : Event> {
 
-    fun <T: Event> onEventReceived(event: T)
+    fun onEventReceived(event: @UnsafeVariance T)
 }

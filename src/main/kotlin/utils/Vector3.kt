@@ -21,4 +21,6 @@ data class Vector3(val x: Float=0f, val y: Float=0f, val z: Float=0f) {
             max(this.z, other.z)
         )
     }
+
+    fun toVector4() = Vector4(x, y, z, 0f)
 }

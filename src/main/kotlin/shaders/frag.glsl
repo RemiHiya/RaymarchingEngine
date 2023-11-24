@@ -61,7 +61,7 @@ marcher castRay(vec4 ro, vec3 rd) {
         instructions++;
         vec3 p = ro.xyz + rd * distance;
         marcher objectDistance = map(vec4(p, ro.w));
-        distance += objectDistance.d;
+        distance += abs(objectDistance.d);
         if (abs(objectDistance.d) < epsilon) {
             return marcher(distance, objectDistance.color);
         }

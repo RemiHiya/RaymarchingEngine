@@ -46,13 +46,14 @@ float sminCubic( float a, float b, float k ) {
 }
 
 vec3 colorOp(int type, marcher o1, marcher o2, float s) {
+    vec3 c = (o1.d<o2.d) ? o1.color : o2.color;
     if(type == 0) {
         if(s == 0) return (o1.d<o2.d) ? o1.color : o2.color;
         else return mix(o1.color, o2.color, sminCubic(o1.d, o2.d, s));
 
     } else if (type == 1) {
-        if(s == 0) return o2.color;
-        else return o2.color;
+        if(s == 0) return c;
+        else return c;
 
     } else if(type == 2) {
         if(s == 0) return o1.color;

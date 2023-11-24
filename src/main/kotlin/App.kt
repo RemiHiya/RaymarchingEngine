@@ -30,7 +30,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var editor: MainEditor
 
     private var time = 0f
-    private var scale = .3f
+    private var scale = .1f
     private lateinit var frameBuffer: FrameBuffer
     private val parser = SceneParser(scene)
 
@@ -55,13 +55,13 @@ class App(private val scene: Scene) : ApplicationAdapter() {
             val cameraSpeed = deltaTime * 3
             var dir = Vector4()
             if (Gdx.input.isKeyPressed(Input.Keys.Z))
-                dir += camera.transform.rotation.toRotator3().getForwardVector().toVector4()
+                dir += camera.transform.rotation.getForwardVector()
             if (Gdx.input.isKeyPressed(Input.Keys.S))
-                dir += camera.transform.rotation.toRotator3().getForwardVector().toVector4() * -1f
+                dir += camera.transform.rotation.getForwardVector() * -1f
             if (Gdx.input.isKeyPressed(Input.Keys.Q))
-                dir += camera.transform.rotation.toRotator3().getRightVector().toVector4() * -1f
+                dir += camera.transform.rotation.getRightVector() * -1f
             if (Gdx.input.isKeyPressed(Input.Keys.D))
-                dir += camera.transform.rotation.toRotator3().getRightVector().toVector4()
+                dir += camera.transform.rotation.getRightVector()
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
                 dir += Vector4(0f, 0f, 1f, 0f)
             if (Gdx.input.isKeyPressed(Input.Keys.F))
@@ -70,6 +70,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
             camera.transform.location.x += dir.x*cameraSpeed
             camera.transform.location.y += dir.y*cameraSpeed
             camera.transform.location.z += dir.z*cameraSpeed
+            camera.transform.location.w += dir.w*cameraSpeed
 
         } else {
             if (Gdx.input.isCursorCatched)

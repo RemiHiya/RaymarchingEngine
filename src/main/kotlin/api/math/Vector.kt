@@ -18,11 +18,12 @@ fun Rotator4.getForwardVector(): Vector4 {
 }
 
 fun Rotator4.getRightVector(): Vector4 {
-    val r = toRadians()
+    /*val r = toRadians()
     val x = sin(r.yaw) * cos(r.pitch)
     val y = cos(r.roll) * cos(r.yaw) + sin(r.roll) * sin(r.yaw) * sin(r.pitch)
     val z = -sin(r.roll) * cos(r.yaw) + cos(r.roll) * sin(r.yaw) * sin(r.pitch)
-    return Vector4(x, y, z, 0f)
+    return Vector4(x, y, z, 0f)*/
+    return toRotator3().getRightVector().toVector4()
 }
 
 fun Rotator4.getUpVector(): Vector4 {
@@ -55,8 +56,8 @@ fun Rotator3.getRightVector(): Vector3 {
     val x = sin(r.yaw) * cos(r.pitch)
     val y = cos(r.roll) * cos(r.yaw) + sin(r.roll) * sin(r.yaw) * sin(r.pitch)
     val z = -sin(r.roll) * cos(r.yaw) + cos(r.roll) * sin(r.yaw) * sin(r.pitch)
-    return Vector3(x, y, z)
-    //return getForwardVector().cross(getUpVector())
+    //return Vector3(x, y, z)
+    return getForwardVector().cross(getUpVector()) * -1f
 }
 
 fun Rotator3.getUpVector(): Vector3 {
@@ -66,27 +67,4 @@ fun Rotator3.getUpVector(): Vector3 {
     val z = cos(radians.pitch) * cos(radians.roll)
     return Vector3(x, y, z)
 }
-/*
-fun Rotator3.getForwardVector(): Vector3 {
-    val rot = this.toRadians()
-    val x =  cos(rot.pitch) * sin(rot.yaw)
-    val y = -sin(rot.pitch)
-    val z =  cos(rot.pitch) * cos(rot.yaw)
-    return Vector3(z, y, x)
-}
 
-fun Rotator3.getRightVector(): Vector3 {
-    val rot = this.toRadians()
-    val x =  cos(rot.yaw)
-    val y =  0f
-    val z = -sin(rot.yaw)
-    return Vector3(z, y, x)
-}
-
-fun Rotator3.getUpVector(): Vector3 {
-    val rot = this.toRadians()
-    val x = sin(rot.pitch) * sin(rot.yaw)
-    val y = cos(rot.pitch)
-    val z = sin(rot.pitch) * cos(rot.yaw)
-    return Vector3(x, y, z)
-}*/

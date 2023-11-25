@@ -11,8 +11,8 @@ import kotlin.math.sin
 fun Rotator4.getForwardVector(): Vector4 {
     val r = toRadians()
     val x = cos(r.yaw) * cos(r.w) * cos(r.pitch)
-    val y = -sin(r.yaw) * cos(r.w) * cos(r.roll) + cos(r.yaw) * cos(r.w) * sin(r.pitch) * sin(r.roll)
-    val z = -sin(r.yaw) * cos(r.w) * sin(r.roll) + cos(r.yaw) * cos(r.w) * cos(r.roll) * sin(r.pitch)
+    val y = -sin(r.yaw) * cos(r.pitch) * cos(r.roll) - cos(r.yaw) * sin(r.pitch) * sin(r.roll)
+    val z = -sin(r.yaw) * cos(r.w) * sin(r.roll) + cos(r.w) * cos(r.roll) * sin(r.pitch)
     val w = sin(r.w)
     return Vector4(x, y, z, w)
 }

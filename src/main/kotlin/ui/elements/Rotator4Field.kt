@@ -28,7 +28,7 @@ class Rotator4Field(name: String, private val value: Rotator4) : Table(), InputF
 
             textField.addListener(this)
 
-            this.add(textField).pad(5f).width(40f)
+            this.add(textField).space(5f).width(40f)
             if (index < 3) {
                 this.add() // Ajoute un espace entre les champs de saisie
             }

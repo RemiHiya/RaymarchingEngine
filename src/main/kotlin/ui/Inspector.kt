@@ -1,6 +1,5 @@
 package ui
 
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -8,11 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener
 import misc.Property
 import misc.SKIN
 import ui.core.InputFieldListener
+import ui.core.Helper
 import ui.elements.Dropdown
-import ui.elements.Transform4Field
-import ui.elements.Vector4Field
-import utils.Transform4
-import utils.Vector4
 import kotlin.reflect.full.findAnnotation
 
 
@@ -46,10 +42,12 @@ class Inspector(selection: elements.Actor): Dropdown("Inspector : ${selection.di
 
         for (i in fields) {
             for (j in i.value) {
-                when (val tmp = j.second) {
+                Helper().mapObject(j.second, j.first)?.let { addContent(it) }
+                /*when (val tmp = j.second) {
                     is Vector4 -> addContent(Vector4Field(j.first, tmp))
                     is Transform4 -> addContent(Transform4Field(tmp))
-                }
+                    is Array<*> -> addContent(InputArray(j.first, tmp))
+                }*/
             }
         }
     }

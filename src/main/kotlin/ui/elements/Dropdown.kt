@@ -44,7 +44,8 @@ open class Dropdown(private val title: String) : Table() {
     }
 
     fun addContent(actor: Actor) {
-        contentTable.add(actor).expand().fill().row()
+        contentTable.add(actor).expand().fill()
+        contentTable.row()
     }
 
 }

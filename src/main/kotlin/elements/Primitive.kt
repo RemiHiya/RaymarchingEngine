@@ -2,16 +2,17 @@ package elements
 
 import com.badlogic.gdx.Gdx
 import misc.PATH
+import misc.Property
 import utils.MarcherOperator
 import utils.Rotator4
 import utils.Vector4
 
 abstract class Primitive() {
     private var material: String = "vec3(.3)"
-    lateinit var v1: Vector4
-    lateinit var v2: Vector4
-    lateinit var ro: Rotator4
-    var extra: Float = 0.0f
+    @Property("Relative location") lateinit var v1: Vector4
+    @Property("Bounds") lateinit var v2: Vector4
+    @Property("Relative rotation") lateinit var ro: Rotator4
+    @Property("Extra") var extra: Float = 0.0f
 
     var index = 0
     lateinit var operator: MarcherOperator

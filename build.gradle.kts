@@ -12,6 +12,8 @@ repositories {
 }
 
 dependencies {
+    implementation("junit:junit:4.13.1")
+    implementation("junit:junit:4.13.1")
     testImplementation(kotlin("test"))
 
     implementation("com.badlogicgames.gdx:gdx:1.12.0")
@@ -20,6 +22,7 @@ dependencies {
 
     implementation("com.kotcrab.vis:vis-ui:$visuiVersion")
     implementation(kotlin("reflect"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
 

@@ -2,6 +2,7 @@ package utils
 
 import kotlin.math.sqrt
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 data class Vector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: Float = 0f) {
     operator fun plus(other: Vector4) = Vector4(x + other.x, y + other.y, z + other.z, w + other.w)
@@ -25,5 +26,13 @@ data class Vector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var 
 
     override fun toString(): String {
         return "vec4($x, $y, $z, $w)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is Vector4) {
+            x==other.x && y==other.y && z==other.z && w==other.w
+        } else {
+            false
+        }
     }
 }

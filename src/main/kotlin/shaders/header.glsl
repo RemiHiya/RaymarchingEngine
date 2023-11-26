@@ -62,8 +62,23 @@ vec4 rot(vec4 pos, vec4 rot) {
     -sinW, 0.0, 0.0, cosW
     );
 
+    mat4 rotationW2 = mat4(
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, cosW, -sinW,
+    0.0, 0.0, sinW, cosW
+    );
+
+    mat4 rotationW3 = mat4(
+    1.0, 0.0, 0.0, 0.0,
+    0.0, cosW, 0.0, -sinW,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, sinW, 0.0, cosW
+    );
+
+
     // Combinez les rotations
-    rotationMatrix = rotationX * rotationY * rotationZ * rotationW;
+    rotationMatrix = rotationX * rotationY * rotationZ * rotationW * rotationW2 * rotationW3;
 
     // Appliquez la rotation à la position
     return rotationMatrix * pos;

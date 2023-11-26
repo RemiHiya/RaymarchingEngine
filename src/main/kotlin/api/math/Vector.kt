@@ -8,39 +8,24 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
+fun Vector4.rotate(rotator: Rotator4): Vector4 {
+    return rotation(rotator.toRadians()) * this
+}
+
 fun Rotator4.getForwardVector(): Vector4 {
-    val r = toRadians()
-    val x = cos(r.yaw) * cos(r.w) * cos(r.pitch)
-    val y = -sin(r.yaw) * cos(r.pitch) * cos(r.roll) - cos(r.yaw) * sin(r.pitch) * sin(r.roll)
-    val z = -sin(r.yaw) * cos(r.w) * sin(r.roll) + cos(r.w) * cos(r.roll) * sin(r.pitch)
-    val w = sin(r.w)
-    return Vector4(x, y, z, w)
+    return Vector4(1f, 0f, 0f, 0f).rotate(this)
 }
 
 fun Rotator4.getRightVector(): Vector4 {
-    /*val r = toRadians()
-    val x = sin(r.yaw) * cos(r.pitch)
-    val y = cos(r.roll) * cos(r.yaw) + sin(r.roll) * sin(r.yaw) * sin(r.pitch)
-    val z = -sin(r.roll) * cos(r.yaw) + cos(r.roll) * sin(r.yaw) * sin(r.pitch)
-    return Vector4(x, y, z, 0f)*/
-    return toRotator3().getRightVector().toVector4()
+    return Vector4(0f, 1f, 0f, 0f).rotate(this)
 }
 
 fun Rotator4.getUpVector(): Vector4 {
-    val r = toRadians()
-    val x = -sin(r.pitch)
-    val y = sin(r.roll) * cos(r.pitch)
-    val z = cos(r.roll) * cos(r.pitch)
-    return Vector4(x, y, z, 0f)
+    return Vector4(0f, 0f, 1f, 0f).rotate(this)
 }
 
 fun Rotator4.getWVector(): Vector4 {
-    val r = toRadians()
-    val x = -cos(r.yaw) * sin(r.w) * cos(r.pitch)
-    val y = cos(r.roll) * sin(r.yaw) * sin(r.w) - sin(r.roll) * cos(r.yaw) * sin(r.w) * sin(r.pitch)
-    val z = -sin(r.roll) * sin(r.yaw) * sin(r.w) - cos(r.roll) * cos(r.yaw) * sin(r.w) * sin(r.pitch)
-    val w = cos(r.w)
-    return Vector4(x, y, z, w)
+    return Vector4(0f, 0f, 0f, 1f).rotate(this)
 }
 
 fun Rotator3.getForwardVector(): Vector3 {

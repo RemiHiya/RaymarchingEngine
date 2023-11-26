@@ -42,8 +42,8 @@ vec3 computeDirection(vec2 coords, vec3 rotation) {
     -sin(rotation.y), 0.0, cos(rotation.y));
     mat3 rollMatrix = mat3(
     1.0, 0.0, 0.0,
-    0.0, cos(rotation.x), -sin(rotation.x),
-    0.0, sin(rotation.x), cos(rotation.x));
+    0.0, cos(rotation.x), sin(rotation.x),
+    0.0, -sin(rotation.x), cos(rotation.x));
     direction = yawMatrix * pitchMatrix * rollMatrix * direction;
 
     return direction;

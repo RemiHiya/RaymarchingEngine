@@ -36,9 +36,9 @@ vec4 rot(vec4 pos, vec4 rot) {
     float cosY = cos(rot.y);
     float sinY = sin(rot.y);
     mat4 rotationY = mat4(
-    cosY, 0.0, sinY, 0.0,
+    cosY, 0.0, -sinY, 0.0,
     0.0, 1.0, 0.0, 0.0,
-    -sinY, 0.0, cosY, 0.0,
+    sinY, 0.0, cosY, 0.0,
     0.0, 0.0, 0.0, 1.0
     );
 
@@ -46,8 +46,8 @@ vec4 rot(vec4 pos, vec4 rot) {
     float cosZ = cos(rot.z);
     float sinZ = sin(rot.z);
     mat4 rotationZ = mat4(
-    cosZ, -sinZ, 0.0, 0.0,
-    sinZ, cosZ, 0.0, 0.0,
+    cosZ, sinZ, 0.0, 0.0,
+    -sinZ, cosZ, 0.0, 0.0,
     0.0, 0.0, 1.0, 0.0,
     0.0, 0.0, 0.0, 1.0
     );
@@ -56,10 +56,10 @@ vec4 rot(vec4 pos, vec4 rot) {
     float cosW = cos(rot.w);
     float sinW = sin(rot.w);
     mat4 rotationW = mat4(
-    cosW, 0.0, 0.0, sinW,
+    cosW, 0.0, 0.0, -sinW,
     0.0, 1.0, 0.0, 0.0,
     0.0, 0.0, 1.0, 0.0,
-    -sinW, 0.0, 0.0, cosW
+    sinW, 0.0, 0.0, cosW
     );
 
     mat4 rotationW2 = mat4(

@@ -11,6 +11,10 @@ open class Scene {
 
     val camera = CameraActor()
 
+    fun update(dt: Float) {
+
+    }
+
     fun add(actor: Actor) {
         if (actor.displayName.isEmpty()) {
             actor.displayName = "Actor${actors.size}"

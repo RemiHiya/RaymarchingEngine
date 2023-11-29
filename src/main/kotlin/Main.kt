@@ -1,13 +1,11 @@
 //import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 //import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import editor.Window
 
 fun main(args: Array<String>) {
-    val config = Lwjgl3ApplicationConfiguration()
-    //config.setWindowSizeLimits()
-    //config.width = 800
-    //config.height = 600
-    val s = SceneTest()
-    Lwjgl3Application(App(s), config)
+    //val config = Lwjgl3ApplicationConfiguration()
+    //val s = SceneTest()
+    //Lwjgl3Application(App(s), config)
+    val window = Window.get()
+    window?.run()
 }

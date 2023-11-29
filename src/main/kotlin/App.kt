@@ -18,6 +18,7 @@ import elements.SceneParser
 import misc.PATH
 import misc.SKIN
 import ui.MainEditor
+import utils.RmFloat
 import utils.Vector4
 
 
@@ -30,7 +31,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var editor: MainEditor
 
     private var time = 0f
-    private var scale = .3f
+    var scale = RmFloat(0.3f)
     private lateinit var frameBuffer: FrameBuffer
     private val parser = SceneParser(scene)
 
@@ -84,7 +85,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     override fun create() {
         viewport = ScreenViewport()
 
-        editor = MainEditor(viewport, scene)
+        editor = MainEditor(viewport, scene, this)
         //editor.isDebugAll = true
         Gdx.input.inputProcessor = editor // Définissez le Stage comme processeur d'entrée
 
@@ -95,8 +96,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         frameBuffer = FrameBuffer(
             Format.RGBA8888,
-            (Gdx.graphics.width * scale).toInt(),
-            (Gdx.graphics.height * scale).toInt(),
+            (Gdx.graphics.width * scale.value).toInt(),
+            (Gdx.graphics.height * scale.value).toInt(),
             false)
 
         spriteBatch = SpriteBatch()
@@ -143,8 +144,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         spriteBatch!!.projectionMatrix.setToOrtho2D(0f, 0f,
-            frameBuffer.width.toFloat()/scale,
-            frameBuffer.height.toFloat()/scale)
+            frameBuffer.width.toFloat()/scale.value,
+            frameBuffer.height.toFloat()/scale.value)
 
         spriteBatch!!.begin()
         shaderProgram.bind()
@@ -164,7 +165,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram.setUniformf("u_screenSize", frameBuffer.width.toFloat(), frameBuffer.height.toFloat())
 
         spriteBatch!!.shader = shaderProgram
-        spriteBatch!!.draw(texture, -1f, -1f, 2/scale, 2/scale)
+        spriteBatch!!.draw(texture, -1f, -1f, 2/scale.value, 2/scale.value)
         spriteBatch!!.end()
 
         frameBuffer.end()
@@ -203,9 +204,9 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         editor.update()
     }
 
-    private fun resizeFrameBuffer(width: Int, height: Int) {
+    fun resizeFrameBuffer(width: Int, height: Int) {
         frameBuffer.dispose()
-        frameBuffer = FrameBuffer(Format.RGBA8888, (width*scale).toInt(), (height*scale).toInt(), false)
+        frameBuffer = FrameBuffer(Format.RGBA8888, (width*scale.value).toInt(), (height*scale.value).toInt(), false)
 
     }
 

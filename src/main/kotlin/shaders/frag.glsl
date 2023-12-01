@@ -8,14 +8,13 @@ float rand(vec2 coord) {
 } // Fonction pseudo random
 
 
-in vec2 TexCoord;
+in vec4 fColor;
 uniform vec2 u_screenSize;
 uniform vec3 camera_pos = vec3(0, 0, 0);
 uniform vec3 camera_rot = vec3(0, 0, 0);
 uniform float w = 0;
 uniform vec3 light = normalize(vec3(0, 2, 1));
 out vec4 outputColor;
-out vec4 test;
 
 float FOV = 110;
 
@@ -168,7 +167,6 @@ vec3 render(vec2 coords) {
 
 
 void main() {
-    //objects
     vec3 col;
 
     // Anti aliasing

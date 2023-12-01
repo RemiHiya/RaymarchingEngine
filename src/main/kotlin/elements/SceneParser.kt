@@ -4,7 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import misc.MAX_OBJECTS
 import misc.PATH
+import org.lwjgl.opengl.GL20
+import java.io.File
 import kotlin.math.PI
+
+fun readFile(path: String) = File(path).readText()
 
 class SceneParser(private val scene : Scene) {
 
@@ -24,8 +28,8 @@ class SceneParser(private val scene : Scene) {
     fun initialize() = "#version 330 core\n" +
             "#define MAX_OBJECTS ${MAX_OBJECTS}\n" +
             "uniform int SCENE_SIZE; \n" +
-            Gdx.files.internal(PATH + "shaders/header.glsl").readString() +
-            Gdx.files.internal(PATH + "shaders/operators.glsl").readString()
+            readFile(PATH + "shaders/header.glsl") +
+            readFile(PATH + "shaders/operators.glsl")
 
     /*
     TODO : Chercher récursivement les références de chaque shader qui va être utilisé
@@ -68,7 +72,7 @@ class SceneParser(private val scene : Scene) {
         getShaders()
         var out = ""
         for (i in shaders) {
-            out += Gdx.files.internal(PATH + i).readString()
+            out += readFile(PATH + i)
         }
         return out
     }
@@ -141,6 +145,25 @@ class SceneParser(private val scene : Scene) {
             sp.setUniformi("objects[$index].material", getMaterial(i))
             sp.setUniformi("objects[$index].operator", i.operator.operator.value)
             sp.setUniformf("objects[$index].smoothness", i.operator.smoothness)
+        }
+    }
+
+    fun updateShaderObjects(program: Int) {
+        rebuildObjects()
+        fun loc(loc: String) = GL20.glGetUniformLocation(program, loc)
+
+        for ((index, i) in objects.withIndex()) {
+            val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
+            val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
+            val ro = floatArrayOf(i.ro.roll.toRad(), i.ro.pitch.toRad(), i.ro.yaw.toRad(), i.ro.w.toRad())
+            GL20.glUniform4fv(loc("objects[$index].v1"), v1)
+            GL20.glUniform4fv(loc("objects[$index].v2"), v2)
+            GL20.glUniform4fv(loc("objects[$index].rot"), ro)
+            GL20.glUniform1f(loc("objects[$index].extra"), i.extra)
+            GL20.glUniform1i(loc("objects[$index].shader"), getShader(i))
+            GL20.glUniform1i(loc("objects[$index].material"), getMaterial(i))
+            GL20.glUniform1i(loc("objects[$index].operator"), i.operator.operator.value)
+            GL20.glUniform1f(loc("objects[$index].smoothness"), i.operator.smoothness)
         }
     }
 

@@ -1,16 +1,22 @@
 package ui
 
+import App
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.viewport.Viewport
 import elements.Scene
 import events.EventListener
+import events.events.FloatValueUpdated
 import events.events.SelectionChanged
 import misc.SKIN
+import ui.elements.FloatField
+import ui.elements.InputField
+import utils.RmFloat
 import kotlin.math.roundToInt
 
-class MainEditor(val vp: Viewport, scene: Scene): Stage(vp) {
+class MainEditor(val vp: Viewport, scene: Scene, app: App): Stage(vp) {
 
     private val inspectorHolder = Table()
     private val outlinerHolder = Table()
@@ -38,6 +44,14 @@ class MainEditor(val vp: Viewport, scene: Scene): Stage(vp) {
 
         // Ajoute les différents panneaux à l'UI principale
         fpsHolder.setFillParent(true)
+        val scaleField = FloatField(app.scale)
+        scaleField.getDispatcher().addListener(object : EventListener<FloatValueUpdated> {
+            override fun onEventReceived(event: FloatValueUpdated) {
+                app.resizeFrameBuffer(Gdx.graphics.width, Gdx.graphics.height)
+            }
+        })
+        fpsHolder.add(scaleField)
+        fpsHolder.row()
         fpsHolder.add(fpsLabel)
         fpsHolder.top()
 

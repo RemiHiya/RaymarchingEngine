@@ -3,7 +3,6 @@ import api.math.getRightVector
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Pixmap.Format
@@ -14,11 +13,10 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import editor.ImGuiLayer
 import elements.Scene
 import elements.SceneParser
 import imgui.ImGui
-import imgui.flag.ImGuiConfigFlags
-import imgui.flag.ImGuiKey
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
 import misc.PATH
@@ -43,13 +41,12 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
     private val camera = scene.camera
 
-    private lateinit var imGuiGlfw: ImGuiImplGlfw
-    private lateinit var imGuiGl3: ImGuiImplGl3
+    private val layer = ImGuiLayer()
 
     private fun tick(deltaTime: Float) {
 
         // Déplacements de caméra
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && !ImGui.isWindowHovered()) {
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && !ImGui.getIO().wantCaptureMouse) {
             // Lock la souris
             if (!Gdx.input.isCursorCatched)
                 Gdx.input.isCursorCatched = true
@@ -92,17 +89,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     }
 
     override fun create() {
-        imGuiGlfw = ImGuiImplGlfw()
-        imGuiGl3 = ImGuiImplGl3()
-        val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
-        ImGui.createContext()
-        val io = ImGui.getIO()
-        io.iniFilename = null
-        io.getFonts().addFontDefault()
-        io.getFonts().build()
-        io.configFlags = ImGuiConfigFlags.NavEnableKeyboard
-        imGuiGlfw.init(windowHandle, true)
-        imGuiGl3.init("#version 150")
+        layer.init()
+
         viewport = ScreenViewport()
 
         editor = MainEditor(viewport, scene, this)
@@ -153,8 +141,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
 
     override fun render() {
-        imGuiGlfw.newFrame();
-        ImGui.newFrame();
         tick(Gdx.graphics.deltaTime)
 
         /*
@@ -206,9 +192,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         editor.act(Gdx.graphics.deltaTime)
         editor.draw()
 
-        ImGui.button("I'm a Button!")
-        ImGui.render()
-        imGuiGl3.renderDrawData(ImGui.getDrawData())
+        layer.update(Gdx.graphics.deltaTime)
     }
 
     override fun dispose() {
@@ -219,11 +203,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         editor.dispose()
         frameBuffer.dispose()
         SKIN.dispose()
-        imGuiGl3.dispose();
-        //imGuiGl3 = null;
-        imGuiGlfw.dispose();
-        //imGuiGlfw = null;
-        ImGui.destroyContext();
+        layer.dispose()
     }
 
     override fun resize(width: Int, height: Int) {

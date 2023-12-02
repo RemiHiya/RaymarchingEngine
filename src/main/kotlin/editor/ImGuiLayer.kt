@@ -2,6 +2,7 @@ package editor
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
+import elements.Scene
 import imgui.ImGui
 import imgui.ImGuiIO
 import imgui.flag.ImGuiBackendFlags
@@ -33,7 +34,7 @@ import org.lwjgl.glfw.GLFW.GLFW_KEY_Y
 import org.lwjgl.glfw.GLFW.GLFW_KEY_Z
 
 
-class ImGuiLayer {
+class ImGuiLayer(private val scene: Scene) {
 
     private var imGuiGlfw = ImGuiImplGlfw()
     private var imGuiGl3 = ImGuiImplGl3()
@@ -142,7 +143,12 @@ class ImGuiLayer {
 
         ImGui.newFrame()
         ImGui.showDemoWindow()
+
+        ImGui.begin("Inspector")
+        scene.getActor(1)?.display()
         ImGui.end()
+
+
         ImGui.render()
 
         endFrame()

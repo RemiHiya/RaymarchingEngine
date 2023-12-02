@@ -32,7 +32,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var shaderProgram: ShaderProgram
 
     private lateinit var viewport: Viewport
-    private lateinit var editor: MainEditor
 
     private var time = 0f
     var scale = RmFloat(0.3f)
@@ -41,7 +40,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
     private val camera = scene.camera
 
-    private val layer = ImGuiLayer()
+    private val layer = ImGuiLayer(scene)
 
     private fun tick(deltaTime: Float) {
 
@@ -92,11 +91,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         layer.init()
 
         viewport = ScreenViewport()
-
-        editor = MainEditor(viewport, scene, this)
-        //editor.isDebugAll = true
-        Gdx.input.inputProcessor = editor // Définissez le Stage comme processeur d'entrée
-
 
         /*
         S'occupe de générer le shader
@@ -189,9 +183,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         /*
         Rendu de l'éditeur
          */
-        editor.act(Gdx.graphics.deltaTime)
-        editor.draw()
-
         layer.update(Gdx.graphics.deltaTime)
     }
 
@@ -200,7 +191,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         spriteBatch?.dispose()
         texture?.dispose()
         shaderProgram.dispose()
-        editor.dispose()
         frameBuffer.dispose()
         SKIN.dispose()
         layer.dispose()
@@ -210,9 +200,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         super.resize(width, height)
         viewport.update(width, height)
         resizeFrameBuffer(width, height)
-        editor.vp.update(width, height)
-        editor.vp.apply(true)
-        editor.update()
         ImGui.getIO().setDisplaySize(width.toFloat(), height.toFloat())
     }
 

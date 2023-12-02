@@ -4,34 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import elements.Scene
 import imgui.ImGui
-import imgui.ImGuiIO
-import imgui.flag.ImGuiBackendFlags
-import imgui.flag.ImGuiConfigFlags
-import imgui.flag.ImGuiKey
+import imgui.flag.*
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
-import org.lwjgl.glfw.GLFW.GLFW_KEY_A
-import org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE
-import org.lwjgl.glfw.GLFW.GLFW_KEY_C
-import org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE
-import org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN
-import org.lwjgl.glfw.GLFW.GLFW_KEY_END
-import org.lwjgl.glfw.GLFW.GLFW_KEY_ENTER
-import org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE
-import org.lwjgl.glfw.GLFW.GLFW_KEY_HOME
-import org.lwjgl.glfw.GLFW.GLFW_KEY_INSERT
-import org.lwjgl.glfw.GLFW.GLFW_KEY_KP_ENTER
-import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT
-import org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_DOWN
-import org.lwjgl.glfw.GLFW.GLFW_KEY_PAGE_UP
-import org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT
-import org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE
-import org.lwjgl.glfw.GLFW.GLFW_KEY_TAB
-import org.lwjgl.glfw.GLFW.GLFW_KEY_UP
-import org.lwjgl.glfw.GLFW.GLFW_KEY_V
-import org.lwjgl.glfw.GLFW.GLFW_KEY_X
-import org.lwjgl.glfw.GLFW.GLFW_KEY_Y
-import org.lwjgl.glfw.GLFW.GLFW_KEY_Z
+import imgui.type.ImBoolean
+import org.lwjgl.glfw.GLFW.*
 
 
 class ImGuiLayer(private val scene: Scene) {
@@ -39,22 +16,29 @@ class ImGuiLayer(private val scene: Scene) {
     private var imGuiGlfw = ImGuiImplGlfw()
     private var imGuiGl3 = ImGuiImplGl3()
 
+    var viewportX = 100f
+    var viewportY = 100f
+    var resized = false
+    var focused = false
+
     fun init() {
         ImGui.createContext()
 
         // ------------------------------------------------------------
         // Initialize ImGuiIO config
-        val io: ImGuiIO = ImGui.getIO()
+        val io = ImGui.getIO()
         io.iniFilename = "imgui.ini" // Save la position des fenêtres
-        io.configFlags = ImGuiConfigFlags.NavEnableKeyboard // Navigation with keyboard
+        io.configFlags = ImGuiConfigFlags.NavEnableKeyboard or ImGuiConfigFlags.DockingEnable
+        ImGui.loadIniSettingsFromDisk(io.iniFilename)
         io.backendFlags = ImGuiBackendFlags.HasMouseCursors // Mouse cursors to display while resizing windows etc.
         io.backendPlatformName = "imgui_java_impl_glfw"
+        io.configWindowsMoveFromTitleBarOnly = true
 
         val windowHandle = (Gdx.graphics as Lwjgl3Graphics).window.windowHandle
         io.iniFilename = null
         io.getFonts().addFontDefault()
         io.getFonts().build()
-        io.configFlags = ImGuiConfigFlags.NavEnableKeyboard
+        //io.configFlags = io.configFlags or ImGuiConfigFlags.NavEnableKeyboard
 
         // ------------------------------------------------------------
         // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
@@ -138,10 +122,11 @@ class ImGuiLayer(private val scene: Scene) {
         ImGui.destroyContext()
     }
 
-    fun update(dt: Float) {
+    fun update(dt: Float, textureID: Int) {
         startFrame(dt)
 
         ImGui.newFrame()
+        setupDockspace()
         ImGui.showDemoWindow()
 
         ImGui.begin("Inspector")
@@ -149,9 +134,45 @@ class ImGuiLayer(private val scene: Scene) {
         ImGui.end()
 
 
+        val flags = ImGuiWindowFlags.NoScrollbar or ImGuiWindowFlags.NoScrollWithMouse
+
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0f, 0f)
+        ImGui.begin("Your ImGui Window Title", flags)
+        ImGui.popStyleVar(1)
+
+        ImGui.image(textureID, ImGui.getWindowSizeX(), ImGui.getWindowSizeY())
+        resized = ImGui.getWindowSizeX() != viewportX || ImGui.getWindowSizeY() != viewportY
+        viewportX = ImGui.getWindowSizeX()
+        viewportY = ImGui.getWindowSizeY()
+        focused = ImGui.isWindowHovered(ImGuiWindowFlags.NoTitleBar)
+
+
+        ImGui.end()
+
+
+        ImGui.end()
         ImGui.render()
 
         endFrame()
+    }
+
+    private fun setupDockspace() {
+        var windowFlags = ImGuiWindowFlags.MenuBar or ImGuiWindowFlags.NoDocking
+
+        ImGui.setNextWindowPos(0.0f, 0.0f, ImGuiCond.Always)
+        ImGui.setNextWindowSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0f)
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f)
+        windowFlags = windowFlags or (ImGuiWindowFlags.NoTitleBar or ImGuiWindowFlags.NoCollapse or
+                ImGuiWindowFlags.NoResize or ImGuiWindowFlags.NoMove or
+                ImGuiWindowFlags.NoBringToFrontOnFocus or ImGuiWindowFlags.NoNavFocus)
+
+        ImGui.begin("Dockspace Demo", ImBoolean(true), windowFlags)
+        ImGui.popStyleVar(2)
+
+        //val dockspaceFlags = ImGuiDockNodeFlags.PassthruCentralNode or ImGuiDockNodeFlags.NoDockingInCentralNode
+        //ImGui.dockSpace(ImGui.getID("Dockspace"), 0f, 0f, dockspaceFlags)
+        ImGui.dockSpace(ImGui.getID("Dockspace"))
     }
 
 

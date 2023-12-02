@@ -17,11 +17,8 @@ import editor.ImGuiLayer
 import elements.Scene
 import elements.SceneParser
 import imgui.ImGui
-import imgui.gl3.ImGuiImplGl3
-import imgui.glfw.ImGuiImplGlfw
 import misc.PATH
 import misc.SKIN
-import ui.MainEditor
 import utils.RmFloat
 import utils.Vector4
 
@@ -45,10 +42,10 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private fun tick(deltaTime: Float) {
 
         // Déplacements de caméra
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && !ImGui.getIO().wantCaptureMouse) {
+        if (layer.focused && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             // Lock la souris
-            if (!Gdx.input.isCursorCatched)
-                Gdx.input.isCursorCatched = true
+            /*if (!Gdx.input.isCursorCatched)
+                Gdx.input.isCursorCatched = true*/
 
             // Input pour rotation
             val deltaX = -Gdx.input.deltaX.toFloat()
@@ -98,13 +95,13 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         frameBuffer = FrameBuffer(
             Format.RGBA8888,
-            (Gdx.graphics.width * scale.value).toInt(),
-            (Gdx.graphics.height * scale.value).toInt(),
+            (layer.viewportX * scale.value).toInt(),
+            (layer.viewportY * scale.value).toInt(),
             false)
 
         spriteBatch = SpriteBatch()
-        val width = Gdx.graphics.width
-        val height = Gdx.graphics.height
+        val width = layer.viewportX.toInt()
+        val height = layer.viewportY.toInt()
 
         val pixmap = Pixmap(width, height, Format.RGBA8888)
         texture = Texture(pixmap)
@@ -176,14 +173,17 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         spriteBatch!!.shader = null
         texture!!.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
         spriteBatch!!.draw(frameBuffer.colorBufferTexture, 0f, 0f,
-            Gdx.graphics.width.toFloat(),
-            Gdx.graphics.height.toFloat())
+            layer.viewportX,
+            layer.viewportY)
         spriteBatch!!.end()
 
         /*
         Rendu de l'éditeur
          */
-        layer.update(Gdx.graphics.deltaTime)
+        layer.update(Gdx.graphics.deltaTime, frameBuffer.colorBufferTexture.textureObjectHandle)
+        if (layer.resized)
+            resizeFrameBuffer(layer.viewportX.toInt(), layer.viewportY.toInt())
+
     }
 
     override fun dispose() {
@@ -193,20 +193,20 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram.dispose()
         frameBuffer.dispose()
         SKIN.dispose()
+        ImGui.saveIniSettingsToDisk("imgui.ini")
         layer.dispose()
     }
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         viewport.update(width, height)
-        resizeFrameBuffer(width, height)
+        //resizeFrameBuffer(width, height)
         ImGui.getIO().setDisplaySize(width.toFloat(), height.toFloat())
     }
 
     fun resizeFrameBuffer(width: Int, height: Int) {
         frameBuffer.dispose()
         frameBuffer = FrameBuffer(Format.RGBA8888, (width*scale.value).toInt(), (height*scale.value).toInt(), false)
-
     }
 
 }

@@ -5,11 +5,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import elements.Actor
 import elements.Scene
+import imgui.ImFontConfig
 import imgui.ImGui
 import imgui.flag.*
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
 import imgui.type.ImBoolean
+import misc.PATH
+import misc.RESOURCE_PATH
 import org.lwjgl.glfw.GLFW.*
 
 
@@ -76,11 +79,11 @@ class ImGuiLayer(private val scene: Scene) {
         // Fonts configuration
         // Read: https://raw.githubusercontent.com/ocornut/imgui/master/docs/FONTS.txt
 
-        //val fontAtlas = io.getFonts()
-        //val fontConfig = ImFontConfig() // Natively allocated object, should be explicitly destroyed
+        val fontAtlas = io.getFonts()
+        val fontConfig = ImFontConfig() // Natively allocated object, should be explicitly destroyed
 
         // Glyphs could be added per-font as well as per config used globally like here
-        //fontConfig.setGlyphRanges(fontAtlas.glyphRangesDefault)
+        fontConfig.setGlyphRanges(fontAtlas.glyphRangesDefault)
 
         // Add a default font, which is 'ProggyClean.ttf, 13px'
         //fontAtlas.addFontDefault()
@@ -89,13 +92,14 @@ class ImGuiLayer(private val scene: Scene) {
         //fontConfig.mergeMode = true // When enabled, all fonts added with this config would be merged with the previously added font
         //fontConfig.pixelSnapH = true
 
-        //fontAtlas.addFontFromFileTTF("${PATH}resources/fonts/segoeui.ttf", 32f, fontConfig)
+        val customFont = fontAtlas.addFontFromFileTTF("${RESOURCE_PATH}/fonts/segoeui.ttf", 20f, fontConfig)
+        io.setFontDefault(customFont)
 
 
         //fontConfig.mergeMode = false
         //fontConfig.pixelSnapH = false
 
-        //fontConfig.destroy(); // After all fonts were added we don't need this config more
+        fontConfig.destroy() // After all fonts were added we don't need this config more
 
         // ------------------------------------------------------------
         // Use freetype instead of stb_truetype to build a fonts texture

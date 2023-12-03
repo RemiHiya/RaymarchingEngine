@@ -34,7 +34,9 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         fun resizeFrameBuffer(width: Int, height: Int) {
             frameBuffer.dispose()
-            frameBuffer = FrameBuffer(Format.RGBA8888, (width*scale).toInt(), (height*scale).toInt(), false)
+            val newX = if ((width*scale).toInt()>1) (width*scale).toInt() else 1
+            val newY = if ((height*scale).toInt()>1) (height*scale).toInt() else 1
+            frameBuffer = FrameBuffer(Format.RGBA8888, newX, newY, false)
         }
     }
 

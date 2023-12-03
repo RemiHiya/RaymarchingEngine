@@ -1,5 +1,6 @@
 package editor
 
+import App
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import elements.Actor
@@ -201,6 +202,17 @@ class ImGuiLayer(private val scene: Scene) {
         if (ImGui.collapsingHeader("Camera", ImGuiTreeNodeFlags.DefaultOpen)) {
             UiElements.vector4Field(scene.camera.transform.location, "Location")
             UiElements.rotator4Field(scene.camera.transform.rotation, "Rotation")
+        }
+
+        if (ImGui.collapsingHeader("Viewport", ImGuiTreeNodeFlags.DefaultOpen)) {
+            val value = floatArrayOf(App.getRenderScale()*100f)
+            if (ImGui.sliderFloat("Render scale", value, 5f, 100f, "%.0f%%")) {
+                if (App.getRenderScale() != value[0]/100f) {
+                    App.setRenderScale(value[0]/100f)
+                    App.resizeFrameBuffer(viewportX.toInt(), viewportY.toInt())
+                }
+
+            }
         }
 
         ImGui.end()

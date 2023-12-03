@@ -19,11 +19,25 @@ import elements.SceneParser
 import imgui.ImGui
 import misc.PATH
 import misc.SKIN
-import utils.RmFloat
 import utils.Vector4
 
 
 class App(private val scene: Scene) : ApplicationAdapter() {
+
+    companion object {
+        private var scale = 0.3f
+        private lateinit var frameBuffer: FrameBuffer
+        fun setRenderScale(new: Float) {
+            scale = new
+        }
+        fun getRenderScale() = scale
+
+        fun resizeFrameBuffer(width: Int, height: Int) {
+            frameBuffer.dispose()
+            frameBuffer = FrameBuffer(Format.RGBA8888, (width*scale).toInt(), (height*scale).toInt(), false)
+        }
+    }
+
     private var spriteBatch: SpriteBatch? = null
     private var texture: Texture? = null
     private lateinit var shaderProgram: ShaderProgram
@@ -31,8 +45,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private lateinit var viewport: Viewport
 
     private var time = 0f
-    var scale = RmFloat(0.3f)
-    private lateinit var frameBuffer: FrameBuffer
+
     private val parser = SceneParser(scene)
 
     private val camera = scene.camera
@@ -95,8 +108,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         frameBuffer = FrameBuffer(
             Format.RGBA8888,
-            (layer.viewportX * scale.value).toInt(),
-            (layer.viewportY * scale.value).toInt(),
+            (layer.viewportX * scale).toInt(),
+            (layer.viewportY * scale).toInt(),
             false)
 
         spriteBatch = SpriteBatch()
@@ -143,8 +156,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         spriteBatch!!.projectionMatrix.setToOrtho2D(0f, 0f,
-            frameBuffer.width.toFloat()/scale.value,
-            frameBuffer.height.toFloat()/scale.value)
+            frameBuffer.width.toFloat()/scale,
+            frameBuffer.height.toFloat()/scale)
 
         spriteBatch!!.begin()
         shaderProgram.bind()
@@ -164,7 +177,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         shaderProgram.setUniformf("u_screenSize", frameBuffer.width.toFloat(), frameBuffer.height.toFloat())
 
         spriteBatch!!.shader = shaderProgram
-        spriteBatch!!.draw(texture, -1f, -1f, 2/scale.value, 2/scale.value)
+        spriteBatch!!.draw(texture, -1f, -1f, 2/scale, 2/scale)
         spriteBatch!!.end()
 
         frameBuffer.end()
@@ -204,9 +217,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         ImGui.getIO().setDisplaySize(width.toFloat(), height.toFloat())
     }
 
-    fun resizeFrameBuffer(width: Int, height: Int) {
-        frameBuffer.dispose()
-        frameBuffer = FrameBuffer(Format.RGBA8888, (width*scale.value).toInt(), (height*scale.value).toInt(), false)
-    }
+
 
 }

@@ -11,9 +11,9 @@ import imgui.flag.*
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
 import imgui.type.ImBoolean
-import misc.PATH
 import misc.RESOURCE_PATH
 import org.lwjgl.glfw.GLFW.*
+import java.io.File
 
 
 class ImGuiLayer(private val scene: Scene) {
@@ -22,6 +22,9 @@ class ImGuiLayer(private val scene: Scene) {
     private var imGuiGl3 = ImGuiImplGl3()
 
     private var selection: Actor? = null
+
+    private var layout = ""
+    private var reloadLayout = false
 
     var viewportX = 100f
     var viewportY = 100f
@@ -114,6 +117,10 @@ class ImGuiLayer(private val scene: Scene) {
 
     private fun startFrame(dt: Float) {
         val io = ImGui.getIO()
+        if (reloadLayout) {
+            ImGui.loadIniSettingsFromDisk(layout)
+            reloadLayout = false
+        }
         io.setDisplaySize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         io.setDisplayFramebufferScale(1f, 1f)
         io.setMousePos(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
@@ -133,8 +140,10 @@ class ImGuiLayer(private val scene: Scene) {
     fun update(dt: Float, textureID: Int) {
         startFrame(dt)
 
+
         ImGui.newFrame()
         setupDockspace()
+        menuBar()
         ImGui.showDemoWindow()
 
         ImGui.begin("Inspector")
@@ -175,10 +184,61 @@ class ImGuiLayer(private val scene: Scene) {
                 ImGuiWindowFlags.NoResize or ImGuiWindowFlags.NoMove or
                 ImGuiWindowFlags.NoBringToFrontOnFocus or ImGuiWindowFlags.NoNavFocus)
 
-        ImGui.begin("Dockspace Demo", ImBoolean(true), windowFlags)
+        ImGui.begin("Dockspace", ImBoolean(true), windowFlags)
         ImGui.popStyleVar(2)
 
         ImGui.dockSpace(ImGui.getID("Dockspace"))
+    }
+
+    private fun menuBar() {
+        if (ImGui.beginMenuBar()) {
+            if (ImGui.beginMenu("File")) {
+                if (ImGui.menuItem("Ouvrir")) {
+                    // Traitement pour l'option "Ouvrir"
+                }
+                if (ImGui.menuItem("Enregistrer")) {
+                    // Traitement pour l'option "Enregistrer"
+                }
+                if (ImGui.menuItem("Quit", "Alt+F4")) {
+                }
+                ImGui.endMenu()
+            }
+
+            if (ImGui.beginMenu("Window")) {
+                if (ImGui.beginMenu("Layout")) {
+                    if (ImGui.beginMenu("Load")) {
+                        // Récupère les fichiers présents dans le dossier layout
+                        val files = File(RESOURCE_PATH + "layouts").listFiles()
+                        if (files != null) {
+                            if (files.isEmpty()) {
+                                ImGui.menuItem("No layout found.", "", false, false)
+                            } else {
+                                for (i in files) {
+                                    if (ImGui.menuItem(i.name)) {
+                                        layout = RESOURCE_PATH + "layouts/" + i.name
+                                        // Flag pour que la layout soit chargée à la prochaine frame
+                                        reloadLayout = true
+                                    }
+                                }
+                            }
+
+                        }
+
+                        ImGui.endMenu()
+                    }
+                    if (ImGui.menuItem("Option 2")) {
+                        // Traitement pour l'option "Option 2" dans le sous-menu
+                    }
+                    ImGui.endMenu()
+                }
+                ImGui.endMenu()
+            }
+
+
+
+
+            ImGui.endMenuBar()
+        }
     }
 
     private fun outliner(actors: Array<Actor>) {

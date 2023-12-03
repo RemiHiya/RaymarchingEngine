@@ -2,6 +2,7 @@ package editor
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
+import elements.Actor
 import elements.Scene
 import imgui.ImGui
 import imgui.flag.*
@@ -15,6 +16,8 @@ class ImGuiLayer(private val scene: Scene) {
 
     private var imGuiGlfw = ImGuiImplGlfw()
     private var imGuiGl3 = ImGuiImplGl3()
+
+    private var selection: Actor? = null
 
     var viewportX = 100f
     var viewportY = 100f
@@ -130,24 +133,24 @@ class ImGuiLayer(private val scene: Scene) {
         ImGui.showDemoWindow()
 
         ImGui.begin("Inspector")
-        scene.getActor(1)?.display()
+        selection?.display()
         ImGui.end()
 
+        worldSettings()
 
         val flags = ImGuiWindowFlags.NoScrollbar or ImGuiWindowFlags.NoScrollWithMouse
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0f, 0f)
-        ImGui.begin("Your ImGui Window Title", flags)
+        ImGui.begin("Viewport", flags)
         ImGui.popStyleVar(1)
-
         ImGui.image(textureID, ImGui.getWindowSizeX(), ImGui.getWindowSizeY())
         resized = ImGui.getWindowSizeX() != viewportX || ImGui.getWindowSizeY() != viewportY
         viewportX = ImGui.getWindowSizeX()
         viewportY = ImGui.getWindowSizeY()
         focused = ImGui.isWindowHovered(ImGuiWindowFlags.NoTitleBar)
-
-
         ImGui.end()
+
+        outliner(scene.getActors())
 
 
         ImGui.end()
@@ -170,9 +173,37 @@ class ImGuiLayer(private val scene: Scene) {
         ImGui.begin("Dockspace Demo", ImBoolean(true), windowFlags)
         ImGui.popStyleVar(2)
 
-        //val dockspaceFlags = ImGuiDockNodeFlags.PassthruCentralNode or ImGuiDockNodeFlags.NoDockingInCentralNode
-        //ImGui.dockSpace(ImGui.getID("Dockspace"), 0f, 0f, dockspaceFlags)
         ImGui.dockSpace(ImGui.getID("Dockspace"))
+    }
+
+    private fun outliner(actors: Array<Actor>) {
+        ImGui.begin("Outliner")
+        for (actor in actors) {
+            //val flags = if (actor.children.isNotEmpty()) ImGuiTreeNodeFlags.OpenOnArrow else ImGuiTreeNodeFlags.Leaf
+            var flags = if (actor==selection) ImGuiTreeNodeFlags.Selected else ImGuiTreeNodeFlags.None
+            flags = flags or ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow
+            val isOpen = ImGui.treeNodeEx(actor.displayName, flags)
+
+            if (ImGui.isItemClicked()) {
+                selection = actor
+            }
+            if (isOpen) {
+                //renderActorTree(actor.children)
+                ImGui.text(actor.displayName)
+                ImGui.treePop()
+            }
+        }
+        ImGui.end()
+    }
+
+    private fun worldSettings() {
+        ImGui.begin("World Settings")
+        if (ImGui.collapsingHeader("Camera", ImGuiTreeNodeFlags.DefaultOpen)) {
+            UiElements.vector4Field(scene.camera.transform.location, "Location")
+            UiElements.rotator4Field(scene.camera.transform.rotation, "Rotation")
+        }
+
+        ImGui.end()
     }
 
 

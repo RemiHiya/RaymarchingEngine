@@ -28,8 +28,8 @@ class UiElements {
                 value.w = tmp[3]
             }
         }
-        fun transform4Field(value: Transform4) {
-            val isTransformOpen = ImGui.treeNodeEx("Transform 4", ImGuiTreeNodeFlags.DefaultOpen)
+        fun transform4Field(value: Transform4, name: String) {
+            val isTransformOpen = ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.DefaultOpen)
 
             if (isTransformOpen) {
                 vector4Field(value.location, "Location")
@@ -68,7 +68,7 @@ class UiElements {
         fun switcherInput(value: Any, name: String) {
             when (value) {
                 is Vector4 -> vector4Field(value, name)
-                is Transform4 -> transform4Field(value)
+                is Transform4 -> transform4Field(value, name)
                 is Rotator4 -> rotator4Field(value, name)
                 //is Array<*> -> arrayField(value)
                 else -> structInput(value, name)

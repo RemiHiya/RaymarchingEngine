@@ -21,7 +21,7 @@ class ImGuiLayer(private val scene: Scene) {
     private var imGuiGlfw = ImGuiImplGlfw()
     private var imGuiGl3 = ImGuiImplGl3()
 
-    private var selection: Actor? = null
+    private var selection: EditorElement? = null
 
     private var layout = ""
     private var reloadLayout = false
@@ -246,26 +246,37 @@ class ImGuiLayer(private val scene: Scene) {
         for (actor in actors) {
             //val flags = if (actor.children.isNotEmpty()) ImGuiTreeNodeFlags.OpenOnArrow else ImGuiTreeNodeFlags.Leaf
             var flags = if (actor==selection) ImGuiTreeNodeFlags.Selected else ImGuiTreeNodeFlags.None
-            flags = flags or ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow
+            flags = flags or ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow or ImGuiTreeNodeFlags.SpanAvailWidth
             val isOpen = ImGui.treeNodeEx(actor.displayName, flags)
 
-            if (ImGui.isItemClicked()) {
+            if (ImGui.isItemClicked() && !ImGui.isItemToggledOpen()) {
                 selection = actor
             }
             if (isOpen) {
-                //renderActorTree(actor.children)
-                ImGui.text(actor.displayName)
+                actorTree(actor)
                 ImGui.treePop()
             }
         }
         ImGui.end()
     }
 
+    private fun actorTree(actor: Actor) {
+        for (i in actor.components) {
+            var flags = if (i==selection) ImGuiTreeNodeFlags.Selected else ImGuiTreeNodeFlags.None
+            flags = flags or ImGuiTreeNodeFlags.Leaf or ImGuiTreeNodeFlags.SpanAvailWidth
+            ImGui.treeNodeEx(i.displayName, flags)
+            if (ImGui.isItemClicked()) {
+                selection = i
+            }
+            ImGui.treePop()
+        }
+    }
+
     private fun worldSettings() {
         ImGui.begin("World Settings")
         if (ImGui.collapsingHeader("Camera", ImGuiTreeNodeFlags.DefaultOpen)) {
-            UiElements.vector4Field(scene.camera.transform.location, "Location")
-            UiElements.rotator4Field(scene.camera.transform.rotation, "Rotation")
+            Gui.vector4Field(scene.camera.transform.location, "Location")
+            Gui.rotator4Field(scene.camera.transform.rotation, "Rotation")
         }
 
         if (ImGui.collapsingHeader("Viewport", ImGuiTreeNodeFlags.DefaultOpen)) {

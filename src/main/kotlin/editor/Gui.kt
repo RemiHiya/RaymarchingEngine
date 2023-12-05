@@ -1,15 +1,20 @@
 package editor
 
 import imgui.ImGui
+import imgui.flag.ImGuiInputTextFlags
 import imgui.flag.ImGuiTreeNodeFlags
+import imgui.type.ImString
 import utils.Rotator4
 import utils.Transform4
 import utils.Vector4
 import kotlin.reflect.KProperty1
 
-class UiElements {
+class Gui {
 
     companion object {
+        fun textField(label: String, value: ImString): Boolean {
+            return ImGui.inputText(label, value, ImGuiInputTextFlags.AutoSelectAll or ImGuiInputTextFlags.EnterReturnsTrue)
+        }
         fun vector4Field(value: Vector4, name: String) {
             val tmp = floatArrayOf(value.x, value.y, value.z, value.w)
             if (ImGui.inputFloat4(name, tmp)) {

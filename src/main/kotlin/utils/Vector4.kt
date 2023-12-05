@@ -24,6 +24,8 @@ data class Vector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var 
         )
     }
 
+    fun copy() = Vector4(x, y, z, w)
+
     override fun toString(): String {
         return "vec4($x, $y, $z, $w)"
     }

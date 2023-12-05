@@ -1,7 +1,9 @@
 package elements
 
 import editor.EditorElement
-import editor.UiElements
+import editor.Gui
+import elements.components.Component
+import elements.components.PrimitiveComponent
 import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
 import imgui.flag.ImGuiTreeNodeFlags
@@ -15,31 +17,41 @@ open class Actor: EditorElement {
     var transform: Transform4 = Transform4()
 
     var primitiveObjects: Array<PrimitiveObject> = arrayOf()
+    var components: Array<Component> = arrayOf()
     var displayName: String = ""
 
 
 
     fun addPrimitive(p: PrimitiveObject) {
-        primitiveObjects += p
+        val tmp = PrimitiveComponent(p)
+        tmp.parent = this
+        components += tmp
     }
-    fun getPrimitives() = primitiveObjects
+    fun getPrimitives(): Array<PrimitiveObject> {
+        var tmp: Array<PrimitiveObject> = arrayOf()
+        for (i in components) {
+            if (i is PrimitiveComponent) {
+                tmp += i.p
+            }
+        }
+        return tmp
+    }
 
 
 
     override fun display() {
 
-        val name = ImString(displayName, 16)
+        val name = ImString(displayName, 32)
         if (ImGui.inputText("##", name, ImGuiInputTextFlags.AutoSelectAll)) {
             displayName = name.get()
         }
-        //ImGui.text(displayName)
+        ImGui.spacing()
         if (ImGui.collapsingHeader("Transform", ImGuiTreeNodeFlags.DefaultOpen)) {
-            UiElements.vector4Field(transform.location, "Location")
-            UiElements.rotator4Field(transform.rotation, "Rotation")
-            UiElements.vector4Field(transform.scale, "Scale")
+            Gui.vector4Field(transform.location, "Location")
+            Gui.rotator4Field(transform.rotation, "Rotation")
+            Gui.vector4Field(transform.scale, "Scale")
         }
 
-        UiElements.arrayField(primitiveObjects)
     }
 
 

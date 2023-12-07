@@ -275,11 +275,14 @@ class ImGuiLayer(private val scene: Scene) {
     private fun worldSettings() {
         ImGui.begin("World Settings")
         if (ImGui.collapsingHeader("Camera", ImGuiTreeNodeFlags.DefaultOpen)) {
+            Gui.useColumn()
             Gui.vector4Field(scene.camera.transform.location, "Location")
             Gui.rotator4Field(scene.camera.transform.rotation, "Rotation")
+            Gui.stopColumn()
         }
 
         if (ImGui.collapsingHeader("Viewport", ImGuiTreeNodeFlags.DefaultOpen)) {
+            Gui.useColumn()
             val value = floatArrayOf(App.getRenderScale()*100f)
             if (ImGui.sliderFloat("Render scale", value, 5f, 100f, "%.0f%%")) {
                 if (App.getRenderScale() != value[0]/100f) {
@@ -288,6 +291,7 @@ class ImGuiLayer(private val scene: Scene) {
                 }
 
             }
+            Gui.stopColumn()
         }
 
         ImGui.end()

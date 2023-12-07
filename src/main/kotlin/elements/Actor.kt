@@ -47,9 +47,13 @@ open class Actor: EditorElement {
         }
         ImGui.spacing()
         if (ImGui.collapsingHeader("Transform", ImGuiTreeNodeFlags.DefaultOpen)) {
+            ImGui.indent()
+            Gui.useColumn()
             Gui.vector4Field(transform.location, "Location")
             Gui.rotator4Field(transform.rotation, "Rotation")
             Gui.vector4Field(transform.scale, "Scale")
+            Gui.stopColumn()
+            ImGui.unindent()
         }
 
     }

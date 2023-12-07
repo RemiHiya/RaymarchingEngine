@@ -1,6 +1,6 @@
 package elements
 
-import com.badlogic.gdx.Gdx
+import api.getPrimitives
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import misc.MAX_OBJECTS
 import misc.PATH
@@ -148,24 +148,6 @@ class SceneParser(private val scene : Scene) {
         }
     }
 
-    fun updateShaderObjects(program: Int) {
-        rebuildObjects()
-        fun loc(loc: String) = GL20.glGetUniformLocation(program, loc)
-
-        for ((index, i) in objects.withIndex()) {
-            val v1 = floatArrayOf(i.v1.x, i.v1.y, i.v1.z, i.v1.w)
-            val v2 = floatArrayOf(i.v2.x, i.v2.y, i.v2.z, i.v2.w)
-            val ro = floatArrayOf(i.ro.roll.toRad(), i.ro.pitch.toRad(), i.ro.yaw.toRad(), i.ro.w.toRad())
-            GL20.glUniform4fv(loc("objects[$index].v1"), v1)
-            GL20.glUniform4fv(loc("objects[$index].v2"), v2)
-            GL20.glUniform4fv(loc("objects[$index].rot"), ro)
-            GL20.glUniform1f(loc("objects[$index].extra"), i.extra)
-            GL20.glUniform1i(loc("objects[$index].shader"), getShader(i))
-            GL20.glUniform1i(loc("objects[$index].material"), getMaterial(i))
-            GL20.glUniform1i(loc("objects[$index].operator"), i.operator.operator.value)
-            GL20.glUniform1f(loc("objects[$index].smoothness"), i.operator.smoothness)
-        }
-    }
 
     private fun Float.toRad() = this * PI.toFloat() /180
 }

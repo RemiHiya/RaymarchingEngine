@@ -1,5 +1,7 @@
 package elements
 
+import api.getPrimitives
+
 open class Scene {
 
     /*

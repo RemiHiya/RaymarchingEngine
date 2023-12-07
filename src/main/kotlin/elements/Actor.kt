@@ -3,7 +3,6 @@ package elements
 import editor.EditorElement
 import editor.Gui
 import elements.components.Component
-import elements.components.PrimitiveComponent
 import imgui.ImGui
 import imgui.flag.ImGuiInputTextFlags
 import imgui.flag.ImGuiTreeNodeFlags
@@ -24,17 +23,6 @@ open class Actor: EditorElement {
         components += component
         return component
     }
-
-    fun getPrimitives(): Array<PrimitiveObject> {
-        var tmp: Array<PrimitiveObject> = arrayOf()
-        for (i in components) {
-            if (i is PrimitiveComponent) {
-                tmp += i.p
-            }
-        }
-        return tmp
-    }
-
 
 
     override fun display() {

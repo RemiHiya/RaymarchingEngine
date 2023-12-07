@@ -50,6 +50,13 @@ class Gui {
         fun textField(label: String, value: ImString): Boolean {
             return ImGui.inputText(label, value, ImGuiInputTextFlags.AutoSelectAll or ImGuiInputTextFlags.EnterReturnsTrue)
         }
+        fun stringField(value: ImString, name: String): Boolean {
+            ImGui.text(name)
+            startInput(name)
+            val out = ImGui.inputText("##", value)
+            endInput()
+            return out
+        }
         fun vector4Field(value: Vector4, name: String) {
             ImGui.text(name)
             startInput(name)

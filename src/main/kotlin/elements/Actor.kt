@@ -16,17 +16,15 @@ open class Actor: EditorElement {
 
     var transform: Transform4 = Transform4()
 
-    var primitiveObjects: Array<PrimitiveObject> = arrayOf()
     var components: Array<Component> = arrayOf()
     var displayName: String = ""
 
-
-
-    fun addPrimitive(p: PrimitiveObject) {
-        val tmp = PrimitiveComponent(p)
-        tmp.parent = this
-        components += tmp
+    fun addComponent(component: Component): Component {
+        component.parent = this
+        components += component
+        return component
     }
+
     fun getPrimitives(): Array<PrimitiveObject> {
         var tmp: Array<PrimitiveObject> = arrayOf()
         for (i in components) {

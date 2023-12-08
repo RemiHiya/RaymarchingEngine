@@ -18,6 +18,9 @@ sealed class Component: EditorElement {
         if (Gui.textField("##", name)) {
             displayName = name.get()
         }
+        ImGui.sameLine()
+        Gui.helpMarker("Instance of ${this::class.simpleName} \nFrom ${this::class.qualifiedName}")
+        javaClass.canonicalName
         ImGui.spacing()
     }
 }

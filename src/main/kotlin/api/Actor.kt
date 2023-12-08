@@ -7,8 +7,8 @@ import elements.components.PrimitiveComponent
 fun Actor.getPrimitives(): Array<PrimitiveObject> {
     var tmp: Array<PrimitiveObject> = arrayOf()
     for (i in components) {
-        if (i is PrimitiveComponent) {
-            tmp += i.p
+        if (i is PrimitiveComponent && i.primitive != null) {
+            tmp += i.primitive!!
         }
     }
     return tmp

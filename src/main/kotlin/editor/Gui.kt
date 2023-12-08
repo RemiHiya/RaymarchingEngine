@@ -40,6 +40,11 @@ class Gui {
             ImGui.nextColumn()
         }
 
+        fun helpMarker(desc: String) {
+            ImGui.textDisabled("(?)")
+            if (ImGui.isItemHovered())
+                ImGui.setTooltip(desc)
+        }
         fun floatField(value: ImFloat, name: String): Boolean {
             ImGui.text(name)
             startInput(name)

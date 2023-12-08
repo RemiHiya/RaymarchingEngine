@@ -28,19 +28,7 @@ class AdderWidget<T : Any>(
 
                 ImGui.text("Parent selection:")
                 ImGui.indent()
-                for (elem in U::class.sealedSubclasses) {
-                    /*
-                    TODO : Affichage récursif
-                     */
-                    val className = elem.simpleName
-                    val flag = if (elem == selected) ImGuiTreeNodeFlags.Selected else ImGuiTreeNodeFlags.None
-                    if (ImGui.treeNodeEx(className, ImGuiTreeNodeFlags.Leaf or flag)) {
-                        if (ImGui.isItemClicked()) {
-                            selected = elem
-                        }
-                        ImGui.treePop()
-                    }
-                }
+                displaySubclasses(U::class.sealedSubclasses)
                 ImGui.unindent()
 
                 ImGui.separator()
@@ -57,6 +45,25 @@ class AdderWidget<T : Any>(
                 windowOpen.set(false)
             }
             ImGui.end()
+        }
+    }
+
+    fun displaySubclasses(subclasses: List<KClass<out T>>) {
+        val sortedSubclasses = subclasses.sortedByDescending { it.sealedSubclasses.isNotEmpty() }
+        for (elem in sortedSubclasses) {
+            val className = elem.simpleName
+            val flag = if (elem == selected) ImGuiTreeNodeFlags.Selected else 0
+            val type = if (elem.sealedSubclasses.isEmpty()) ImGuiTreeNodeFlags.Leaf else 0
+
+            if (ImGui.treeNodeEx(className, type or flag or ImGuiTreeNodeFlags.SpanAvailWidth)) {
+                if (ImGui.isItemClicked() && elem.sealedSubclasses.isEmpty()) {
+                    selected = elem
+                }
+
+                displaySubclasses(elem.sealedSubclasses)
+
+                ImGui.treePop()
+            }
         }
     }
 }

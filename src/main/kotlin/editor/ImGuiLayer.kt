@@ -275,13 +275,14 @@ class ImGuiLayer(private val scene: Scene) {
             ImGui.beginDisabled()
         if (ImGui.button("Add Component")) {
             addComponentName.set("Component Name")
+            addComponent.build<Component>()
             addComponentWindowOpen.set(true)
         }
         if (selection !is Actor)
             ImGui.endDisabled()
 
         addActorWindow()
-        addComponent.update<Component>()
+        addComponent.update()
 
         ImGui.separator()
         for (actor in actors) {

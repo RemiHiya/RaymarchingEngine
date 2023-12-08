@@ -6,6 +6,7 @@ import imgui.flag.ImGuiTreeNodeFlags
 import imgui.flag.ImGuiWindowFlags
 import imgui.type.ImBoolean
 import imgui.type.ImString
+import org.reflections.Reflections
 import kotlin.reflect.KClass
 
 class AdderWidget<T : Any>(
@@ -15,10 +16,29 @@ class AdderWidget<T : Any>(
     val createCallback: (KClass<out T>) -> Unit
 ) {
 
+    data class TreeNode<T: Any>(val clazz: KClass<out T>, val children: List<TreeNode<T>>)
+    lateinit var classHierarchy: List<TreeNode<T>>
+
+    inline fun <reified U: T> build() {
+        classHierarchy = buildClassHierarchy(U::class)
+    }
+
+    fun buildClassHierarchy(parentClass: KClass<out T>): List<TreeNode<T>> {
+        return getDirectSubclasses(parentClass).map { subclass ->
+            TreeNode(subclass, buildClassHierarchy(subclass))
+        }
+    }
+
+    private fun getDirectSubclasses(parentClass: KClass<out T>): List<KClass<out T>> {
+        val reflections = Reflections(parentClass.java.`package`.name)
+        val subclasses = reflections.getSubTypesOf(parentClass.java).map { it.kotlin }
+        return subclasses.filter { it.java.superclass == parentClass.java }
+    }
+
     var selected: KClass<out T>? = null
 
 
-    inline fun <reified U: T> update() {
+    fun update() {
         if (windowOpen.get()) {
             if (ImGui.begin(windowName, windowOpen, ImGuiWindowFlags.NoDocking)) {
                 ImGui.text("Component name")
@@ -28,7 +48,7 @@ class AdderWidget<T : Any>(
 
                 ImGui.text("Parent selection:")
                 ImGui.indent()
-                displaySubclasses(U::class.sealedSubclasses)
+                displaySubclasses(classHierarchy)
                 ImGui.unindent()
 
                 ImGui.separator()
@@ -48,22 +68,24 @@ class AdderWidget<T : Any>(
         }
     }
 
-    fun displaySubclasses(subclasses: List<KClass<out T>>) {
-        val sortedSubclasses = subclasses.sortedByDescending { it.sealedSubclasses.isNotEmpty() }
-        for (elem in sortedSubclasses) {
-            val className = elem.simpleName
-            val flag = if (elem == selected) ImGuiTreeNodeFlags.Selected else 0
-            val type = if (elem.sealedSubclasses.isEmpty()) ImGuiTreeNodeFlags.Leaf else 0
+    fun displaySubclasses(nodes: List<TreeNode<T>>) {
+        for (node in nodes) {
+            val className = node.clazz.simpleName
+            val flag = if (node.clazz == selected) ImGuiTreeNodeFlags.Selected else 0
+            val type = if (node.children.isEmpty()) ImGuiTreeNodeFlags.Leaf else ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow
 
             if (ImGui.treeNodeEx(className, type or flag or ImGuiTreeNodeFlags.SpanAvailWidth)) {
-                if (ImGui.isItemClicked() && elem.sealedSubclasses.isEmpty()) {
-                    selected = elem
+                if (ImGui.isItemClicked()) {
+                    selected = node.clazz
                 }
 
-                displaySubclasses(elem.sealedSubclasses)
+                displaySubclasses(node.children)
 
                 ImGui.treePop()
             }
         }
     }
+
+
+
 }

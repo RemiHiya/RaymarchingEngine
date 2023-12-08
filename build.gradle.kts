@@ -34,6 +34,7 @@ dependencies {
 
     implementation("com.kotcrab.vis:vis-ui:$visuiVersion")
     implementation(kotlin("reflect"))
+    implementation("org.reflections:reflections:0.9.12")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
 

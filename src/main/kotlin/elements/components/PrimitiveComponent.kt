@@ -6,7 +6,6 @@ import imgui.ImGui
 import imgui.flag.ImGuiTreeNodeFlags
 import imgui.type.ImFloat
 import imgui.type.ImInt
-import imgui.type.ImString
 import utils.OperatorType
 
 class PrimitiveComponent(): Component() {
@@ -21,13 +20,7 @@ class PrimitiveComponent(): Component() {
 
 
     override fun display() {
-        val name = ImString(displayName, 32)
-        ImGui.text("${parent.displayName} :")
-        ImGui.sameLine()
-        if (Gui.textField("##", name)) {
-            displayName = name.get()
-        }
-        ImGui.spacing()
+        super.display()
         val p = primitive
         if (p != null) {
             if (ImGui.collapsingHeader("Transform", ImGuiTreeNodeFlags.DefaultOpen)) {
@@ -56,7 +49,6 @@ class PrimitiveComponent(): Component() {
                 ImGui.unindent()
             }
         }
-
 
 
     }

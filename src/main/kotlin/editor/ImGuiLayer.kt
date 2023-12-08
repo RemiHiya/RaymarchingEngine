@@ -5,12 +5,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import elements.Actor
 import elements.Scene
+import elements.components.Component
 import imgui.ImFontConfig
 import imgui.ImGui
 import imgui.flag.*
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
 import imgui.type.ImBoolean
+import imgui.type.ImString
 import misc.RESOURCE_PATH
 import org.lwjgl.glfw.GLFW.*
 import java.io.File
@@ -25,6 +27,24 @@ class ImGuiLayer(private val scene: Scene) {
 
     private var layout = ""
     private var reloadLayout = false
+    private val addActorWindowOpen = ImBoolean(false)
+    private val addActorName = ImString("", 16)
+    private val addComponentWindowOpen = ImBoolean(false)
+    private val addComponentName = ImString("", 16)
+    private val addComponent = AdderWidget<Component>("Add Component", addComponentWindowOpen, addComponentName)
+    { selected ->
+        // Appelé quand le bouton "Create" du widget est pressé
+        // Cherche un constructeur qui n'attend pas de paramètres, sinon ne crée pas d'instance
+        for (i in selected.constructors) {
+            if (i.parameters.isEmpty()) {
+                val tmp = i.call()
+                tmp.displayName = addComponentName.get()
+                (selection as? Actor)?.addComponent(tmp)
+                break
+            }
+        }
+    }
+
 
     var viewportX = 100f
     var viewportY = 100f
@@ -193,6 +213,7 @@ class ImGuiLayer(private val scene: Scene) {
     private fun menuBar() {
         if (ImGui.beginMenuBar()) {
             if (ImGui.beginMenu("File")) {
+                /*
                 if (ImGui.menuItem("Ouvrir")) {
                     // Traitement pour l'option "Ouvrir"
                 }
@@ -200,7 +221,7 @@ class ImGuiLayer(private val scene: Scene) {
                     // Traitement pour l'option "Enregistrer"
                 }
                 if (ImGui.menuItem("Quit", "Alt+F4")) {
-                }
+                }*/
                 ImGui.endMenu()
             }
 
@@ -243,6 +264,26 @@ class ImGuiLayer(private val scene: Scene) {
 
     private fun outliner(actors: Array<Actor>) {
         ImGui.begin("Outliner")
+
+        if (ImGui.button("Add Actor")) {
+            addActorName.set("Actor Name")
+            addActorWindowOpen.set(true)
+        }
+        ImGui.sameLine()
+        // Désactive le bouton si la sélection n'est pas un Actor
+        if (selection !is Actor)
+            ImGui.beginDisabled()
+        if (ImGui.button("Add Component")) {
+            addComponentName.set("Component Name")
+            addComponentWindowOpen.set(true)
+        }
+        if (selection !is Actor)
+            ImGui.endDisabled()
+
+        addActorWindow()
+        addComponent.update<Component>()
+
+        ImGui.separator()
         for (actor in actors) {
             //val flags = if (actor.children.isNotEmpty()) ImGuiTreeNodeFlags.OpenOnArrow else ImGuiTreeNodeFlags.Leaf
             var flags = if (actor==selection) ImGuiTreeNodeFlags.Selected else ImGuiTreeNodeFlags.None
@@ -296,6 +337,30 @@ class ImGuiLayer(private val scene: Scene) {
 
         ImGui.end()
     }
+
+    private fun addActorWindow() {
+        if (addActorWindowOpen.get()) {
+            if (ImGui.begin("Add Actor", addActorWindowOpen, ImGuiWindowFlags.NoDocking)) {
+                ImGui.text("Actor name")
+                ImGui.sameLine()
+                ImGui.inputText("##", addActorName, ImGuiInputTextFlags.AutoSelectAll)
+                ImGui.separator()
+                ImGui.text("Parent selection, soon.")
+                ImGui.separator()
+                ImGui.spacing()
+                if (ImGui.button("Create")) {
+                    val tmp = Actor()
+                    tmp.displayName = addActorName.get()
+                    scene.add(tmp)
+                    addActorWindowOpen.set(false)
+                }
+            } else {
+                addActorWindowOpen.set(false)
+            }
+            ImGui.end()
+        }
+    }
+
 
 
 }

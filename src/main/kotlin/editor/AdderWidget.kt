@@ -40,7 +40,8 @@ class AdderWidget<T : Any>(
 
     fun update() {
         if (windowOpen.get()) {
-            if (ImGui.begin(windowName, windowOpen, ImGuiWindowFlags.NoDocking)) {
+            ImGui.setNextWindowFocus()
+            if (ImGui.begin(windowName, windowOpen, ImGuiWindowFlags.NoDocking or ImGuiWindowFlags.NoCollapse)) {
                 ImGui.text("Component name")
                 ImGui.sameLine()
                 ImGui.inputText("##", name, ImGuiInputTextFlags.AutoSelectAll)
@@ -54,6 +55,8 @@ class AdderWidget<T : Any>(
                 ImGui.separator()
                 ImGui.spacing()
 
+                if (selected == null)
+                    ImGui.beginDisabled()
                 if (ImGui.button("Create")) {
                     val tmp = selected
                     if (tmp != null) {
@@ -61,6 +64,8 @@ class AdderWidget<T : Any>(
                         windowOpen.set(false)
                     }
                 }
+                if (selected == null)
+                    ImGui.endDisabled()
             } else {
                 windowOpen.set(false)
             }

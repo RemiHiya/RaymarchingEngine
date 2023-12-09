@@ -1,10 +1,7 @@
 package elements.primitives
 
-import elements.Primitive
 import elements.PrimitiveObject
 import utils.Transform4
-import utils.Vector3
-import utils.Vector4
 
 class Cube(transform: Transform4) : PrimitiveObject(transform) {
 
@@ -20,7 +17,7 @@ class Cube(transform: Transform4) : PrimitiveObject(transform) {
     }
 }
 
-class Cube4(transform: Transform4, material: String = "") : PrimitiveObject(transform) {
+class Cube4(transform: Transform4) : PrimitiveObject(transform) {
 
     override fun getShaderCall(v1: String, v2: String, extra: String): String {
         val a = "$v1.xyzw"

@@ -10,8 +10,8 @@ import org.reflections.Reflections
 import kotlin.reflect.KClass
 
 class AdderWidget<T : Any>(
-    val windowName: String,
-    val windowOpen: ImBoolean,
+    private val windowName: String,
+    private val windowOpen: ImBoolean,
     val name: ImString,
     val createCallback: (KClass<out T>) -> Unit
 ) {
@@ -35,7 +35,7 @@ class AdderWidget<T : Any>(
         return subclasses.filter { it.java.superclass == parentClass.java }
     }
 
-    var selected: KClass<out T>? = null
+    private var selected: KClass<out T>? = null
 
 
     fun update() {
@@ -68,14 +68,14 @@ class AdderWidget<T : Any>(
         }
     }
 
-    fun displaySubclasses(nodes: List<TreeNode<T>>) {
+    private fun displaySubclasses(nodes: List<TreeNode<T>>) {
         for (node in nodes) {
             val className = node.clazz.simpleName
             val flag = if (node.clazz == selected) ImGuiTreeNodeFlags.Selected else 0
             val type = if (node.children.isEmpty()) ImGuiTreeNodeFlags.Leaf else ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow
 
             if (ImGui.treeNodeEx(className, type or flag or ImGuiTreeNodeFlags.SpanAvailWidth)) {
-                if (ImGui.isItemClicked()) {
+                if (ImGui.isItemClicked() && !node.clazz.isAbstract) {
                     selected = node.clazz
                 }
 

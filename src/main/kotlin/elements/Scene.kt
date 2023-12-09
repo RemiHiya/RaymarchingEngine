@@ -30,8 +30,8 @@ open class Scene {
         objects += obj
     }
 
-    fun getObjects(): Array<PrimitiveObject> {
-        return objects
+    fun getObjects(): List<PrimitiveObject> {
+        return actors.flatMap { it.getPrimitives().asIterable() }
     }
 
     fun getActor(index: Int): Actor? {

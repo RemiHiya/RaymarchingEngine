@@ -1,10 +1,12 @@
 package elements
 
 import api.getPrimitives
+import api.math.transformBy
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import misc.MAX_OBJECTS
 import misc.PATH
-import org.lwjgl.opengl.GL20
+import utils.Transform4
+import utils.Vector4
 import java.io.File
 import kotlin.math.PI
 
@@ -39,9 +41,17 @@ class SceneParser(private val scene : Scene) {
         objects = arrayOf()
         for (i in scene.getActors()) {
             for (j in i.getPrimitives()) {
-                j.v1 = i.transform.location
-                j.ro = i.transform.rotation
-                objects += j
+                val relative = Transform4(j.v1, j.ro, Vector4(1f,1f,1f,1f))
+                val new = relative.transformBy(i.transform)
+                val clone = j::class.java.constructors[0].newInstance(new) as PrimitiveObject
+
+                clone.v2 = j.v2
+                clone.setShader(j.getShader())
+                clone.setMaterial(j.getMaterial())
+                clone.extra = j.extra
+                clone.operator = j.operator
+
+                objects += clone
             }
         }
     }

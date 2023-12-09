@@ -158,6 +158,31 @@ class Gui {
             endInput()
             return false
         }
+
+        fun listField(label: String, selection: ImInt, list: List<String>): Boolean {
+            val selectedIndex = selection.get()
+
+            ImGui.text(label)
+            startInput(label)
+
+            if (ImGui.beginCombo("##", list[selectedIndex])) {
+                for (i in list.indices) {
+                    val isSelected = selectedIndex == i
+                    if (ImGui.selectable(list[i], isSelected)) {
+                        selection.set(i)
+                        ImGui.endCombo()
+                        endInput()
+                        return true
+                    }
+                    if (isSelected) {
+                        ImGui.setItemDefaultFocus()
+                    }
+                }
+                ImGui.endCombo()
+            }
+            endInput()
+            return false
+        }
     }
 
 }

@@ -1,12 +1,18 @@
 package elements.primitives
 
-import elements.Primitive
 import elements.PrimitiveObject
 import utils.Transform4
-import utils.Vector3
 import utils.Vector4
 
 class Mandelbulb(transform: Transform4) : PrimitiveObject(transform) {
+
+    override fun collider(pos: Vector4): Float {
+        return pos.toVector3().length() - extra
+    }
+
+    override fun simplifiedCollider(pos: Vector4): Float {
+        return collider(pos)
+    }
 
     override fun getShaderCall(v1: String, v2: String, extra: String): String {
         val a = "$v1.xyz"

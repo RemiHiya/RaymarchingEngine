@@ -1,10 +1,11 @@
 package elements
 
-import utils.*
+import utils.MarcherOperator
+import utils.OperatorType
+import utils.Transform4
+import utils.Vector4
 
-abstract class PrimitiveObject(private var transform: Transform4): Primitive() {
-
-    fun getTransform() = transform
+abstract class PrimitiveObject(transform: Transform4): Primitive() {
 
     init {
         v1 = transform.location

@@ -24,7 +24,8 @@ abstract class Primitive {
 
     /**
      * Calcule la distance signée entre la position spécifiée [pos] et l'objet.
-     * @param pos La position pour laquelle calculer la distance.
+     * Le collider est calculé dans un espace local.
+     * @param pos La position locale pour laquelle calculer la distance.
      * @return La distance signée entre [pos] et l'objet.
      */
     abstract fun collider(pos: Vector4): Float
@@ -32,7 +33,8 @@ abstract class Primitive {
     /**
      * Calcule une version simplifiée de la distance signée entre
      * la position spécifiée [pos] et l'objet.
-     * @param pos La position pour laquelle calculer la distance.
+     * Le collider est calculé dans un espace local.
+     * @param pos La position locale pour laquelle calculer la distance.
      * @return La distance signée entre [pos] et l'objet.
      */
     abstract fun simplifiedCollider(pos: Vector4): Float

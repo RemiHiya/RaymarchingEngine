@@ -6,7 +6,43 @@ import utils.Vector3
 import utils.Vector4
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.max
+import kotlin.math.min
 
+
+fun max(a: Vector4, b: Vector4): Vector4 {
+    return Vector4(
+        max(a.x, b.x),
+        max(a.y, b.y),
+        max(a.z, b.z),
+        max(a.w, b.w)
+    )
+}
+
+fun min(a: Vector4, b: Vector4): Vector4 {
+    return Vector4(
+        min(a.x, b.x),
+        min(a.y, b.y),
+        min(a.z, b.z),
+        min(a.w, b.w)
+    )
+}
+
+fun max(a: Vector3, b: Vector3): Vector3 {
+    return Vector3(
+        max(a.x, b.x),
+        max(a.y, b.y),
+        max(a.z, b.z)
+    )
+}
+
+fun min(a: Vector3, b: Vector3): Vector3 {
+    return Vector3(
+        min(a.x, b.x),
+        min(a.y, b.y),
+        min(a.z, b.z)
+    )
+}
 
 fun Vector4.rotate(rotator: Rotator4): Vector4 {
     return rotation(rotator.toRadians()) * this

@@ -1,7 +1,6 @@
 package utils
 
 import kotlin.math.sqrt
-import kotlin.math.max
 
 data class Vector3(val x: Float=0f, val y: Float=0f, val z: Float=0f) {
     operator fun plus(other: Vector3) = Vector3(x + other.x, y + other.y, z + other.z)
@@ -14,13 +13,6 @@ data class Vector3(val x: Float=0f, val y: Float=0f, val z: Float=0f) {
     fun dot(other: Vector3) = x * other.x + y * other.y + z * other.z
     fun cross(other: Vector3) = Vector3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x)
     fun abs() = Vector3(kotlin.math.abs(x), kotlin.math.abs(y), kotlin.math.abs(z))
-    fun max(other: Vector3): Vector3 {
-        return Vector3(
-            max(this.x, other.x),
-            max(this.y, other.y),
-            max(this.z, other.z)
-        )
-    }
 
     fun toVector4() = Vector4(x, y, z, 0f)
 }

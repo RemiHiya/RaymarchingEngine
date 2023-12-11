@@ -115,9 +115,17 @@ class SceneParser(private val scene : Scene) {
                 "vec4 p = rot(objects[i].v1 - ro, objects[i].rot);"
 
         // Loop des materials
-        for (i in 0 until materialMap.size) {
-            val switcher = if(i==0) "if" else "else if"
-            out += "$switcher(objects[i].material == ${i}) {c = material$i();}"
+        /*
+        TODO : optimiser cette merde
+         */
+        val tmp: MutableList<Int> = mutableListOf()
+        for (i in materialMap) {
+            if (i.value-1 !in tmp){
+                val switcher = if(i.key==0) "if" else "else if"
+                out += "$switcher(objects[i].material == ${i.value-1}) {c = material${i.value-1}();}\n"
+                tmp += i.value-1
+            }
+
         }
 
         // Switch (tout les else if) en fonction du type

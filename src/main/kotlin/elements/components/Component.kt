@@ -6,7 +6,7 @@ import elements.Actor
 import imgui.ImGui
 import imgui.type.ImString
 
-sealed class Component: EditorElement {
+abstract class Component: EditorElement {
 
     lateinit var parent: Actor
     abstract var displayName: String

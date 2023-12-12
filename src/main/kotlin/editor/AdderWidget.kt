@@ -17,16 +17,16 @@ class AdderWidget<T : Any>(
 ) {
 
     data class TreeNode<T: Any>(val clazz: KClass<out T>, val children: List<TreeNode<T>>)
-    lateinit var classHierarchy: List<TreeNode<T>>
+    lateinit var classHierarchy: TreeNode<T>
 
     inline fun <reified U: T> build() {
         classHierarchy = buildClassHierarchy(U::class)
     }
 
-    fun buildClassHierarchy(parentClass: KClass<out T>): List<TreeNode<T>> {
-        return getDirectSubclasses(parentClass).map { subclass ->
-            TreeNode(subclass, buildClassHierarchy(subclass))
-        }
+    fun buildClassHierarchy(parentClass: KClass<out T>): TreeNode<T> {
+        return TreeNode(parentClass, getDirectSubclasses(parentClass).map { subclass ->
+            buildClassHierarchy(subclass)
+        })
     }
 
     private fun getDirectSubclasses(parentClass: KClass<out T>): List<KClass<out T>> {
@@ -49,7 +49,7 @@ class AdderWidget<T : Any>(
 
                 ImGui.text("Parent selection:")
                 ImGui.indent()
-                displaySubclasses(classHierarchy)
+                displaySubclasses(classHierarchy, true)
                 ImGui.unindent()
 
                 ImGui.separator()
@@ -73,21 +73,22 @@ class AdderWidget<T : Any>(
         }
     }
 
-    private fun displaySubclasses(nodes: List<TreeNode<T>>) {
-        for (node in nodes) {
-            val className = node.clazz.simpleName
-            val flag = if (node.clazz == selected) ImGuiTreeNodeFlags.Selected else 0
-            val type = if (node.children.isEmpty()) ImGuiTreeNodeFlags.Leaf else ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow
+    private fun displaySubclasses(node: TreeNode<T>, opened: Boolean = false) {
+        val className = node.clazz.simpleName
+        val flag = if (node.clazz == selected) ImGuiTreeNodeFlags.Selected else 0
+        val type = if (node.children.isEmpty()) ImGuiTreeNodeFlags.Leaf else ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow
+        val open = if (opened) ImGuiTreeNodeFlags.DefaultOpen else 0
 
-            if (ImGui.treeNodeEx(className, type or flag or ImGuiTreeNodeFlags.SpanAvailWidth)) {
-                if (ImGui.isItemClicked() && !node.clazz.isAbstract) {
-                    selected = node.clazz
-                }
-
-                displaySubclasses(node.children)
-
-                ImGui.treePop()
+        if (ImGui.treeNodeEx(className, type or flag or open or ImGuiTreeNodeFlags.SpanAvailWidth)) {
+            if (ImGui.isItemClicked() && !node.clazz.isAbstract) {
+                selected = node.clazz
             }
+
+            node.children.forEach { childNode ->
+                displaySubclasses(childNode)
+            }
+
+            ImGui.treePop()
         }
     }
 

@@ -15,6 +15,7 @@ import imgui.type.ImBoolean
 import imgui.type.ImString
 import misc.RESOURCE_PATH
 import org.lwjgl.glfw.GLFW.*
+import utils.Vector4
 import java.io.File
 
 
@@ -27,8 +28,6 @@ class ImGuiLayer(private val scene: Scene) {
 
     private var layout = ""
     private var reloadLayout = false
-    private val addActorWindowOpen = ImBoolean(false)
-    private val addActorName = ImString("", 16)
     private val addComponentWindowOpen = ImBoolean(false)
     private val addComponentName = ImString("", 16)
     private val addComponent = AdderWidget<Component>("Add Component", addComponentWindowOpen, addComponentName)
@@ -40,6 +39,21 @@ class ImGuiLayer(private val scene: Scene) {
                 val tmp = i.call()
                 tmp.displayName = addComponentName.get()
                 (selection as? Actor)?.addComponent(tmp)
+                break
+            }
+        }
+    }
+    private val addActorWindowOpen = ImBoolean(false)
+    private val addActorName = ImString("", 16)
+    private val addActor = AdderWidget<Actor>("Add Actor", addActorWindowOpen, addActorName)
+    { selected ->
+        // Appelé quand le bouton "Create" du widget est pressé
+        // Cherche un constructeur qui n'attend pas de paramètres, sinon ne crée pas d'instance
+        for (i in selected.constructors) {
+            if (i.parameters.isEmpty()) {
+                val tmp = i.call()
+                tmp.displayName = addActorName.get()
+                scene.add(tmp)
                 break
             }
         }
@@ -182,6 +196,11 @@ class ImGuiLayer(private val scene: Scene) {
         viewportX = ImGui.getWindowSizeX()
         viewportY = ImGui.getWindowSizeY()
         focused = ImGui.isWindowHovered(ImGuiWindowFlags.NoTitleBar)
+        Debug.viewportX = viewportX
+        Debug.viewportY = viewportY
+        Debug.viewportPosX = ImGui.getWindowPosX()
+        Debug.viewportPosY = ImGui.getWindowPosY()
+        Debug.drawPoint(Vector4(1f))
         ImGui.end()
 
         outliner(scene.getActors())
@@ -267,6 +286,7 @@ class ImGuiLayer(private val scene: Scene) {
 
         if (ImGui.button("Add Actor")) {
             addActorName.set("Actor Name")
+            addActor.build<Actor>()
             addActorWindowOpen.set(true)
         }
         ImGui.sameLine()
@@ -281,8 +301,8 @@ class ImGuiLayer(private val scene: Scene) {
         if (selection !is Actor)
             ImGui.endDisabled()
 
-        addActorWindow()
         addComponent.update()
+        addActor.update()
 
         ImGui.separator()
         for (actor in actors) {
@@ -338,30 +358,6 @@ class ImGuiLayer(private val scene: Scene) {
 
         ImGui.end()
     }
-
-    private fun addActorWindow() {
-        if (addActorWindowOpen.get()) {
-            if (ImGui.begin("Add Actor", addActorWindowOpen, ImGuiWindowFlags.NoDocking)) {
-                ImGui.text("Actor name")
-                ImGui.sameLine()
-                ImGui.inputText("##", addActorName, ImGuiInputTextFlags.AutoSelectAll)
-                ImGui.separator()
-                ImGui.text("Parent selection, soon.")
-                ImGui.separator()
-                ImGui.spacing()
-                if (ImGui.button("Create")) {
-                    val tmp = Actor()
-                    tmp.displayName = addActorName.get()
-                    scene.add(tmp)
-                    addActorWindowOpen.set(false)
-                }
-            } else {
-                addActorWindowOpen.set(false)
-            }
-            ImGui.end()
-        }
-    }
-
 
 
 }

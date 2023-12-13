@@ -1,6 +1,7 @@
 package elements
 
 import api.getPrimitives
+import editor.Debug
 
 open class Scene {
 
@@ -12,6 +13,10 @@ open class Scene {
     private var actors: Array<Actor> = arrayOf()
 
     val camera = CameraActor()
+
+    init {
+        Debug.camera = camera
+    }
 
     fun update(dt: Float) {
 

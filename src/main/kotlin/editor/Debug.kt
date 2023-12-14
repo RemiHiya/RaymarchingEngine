@@ -16,6 +16,12 @@ class Debug {
         var viewportPosY = 0f
         lateinit var camera: CameraActor
         var FOV = 110f.toRadians()
+        private var objects: MutableList<() -> Unit> = mutableListOf()
+
+        fun debugAll() {
+            objects.forEach { obj -> obj.invoke() }
+            objects.clear()
+        }
 
         private fun Vector2.toScreen(): Vector2 {
             return (this*0.5f + Vector2(0.5f, 0.5f)) * Vector2(viewportX, viewportY) + Vector2(viewportPosX, viewportPosY)
@@ -33,7 +39,8 @@ class Debug {
         }
         fun Vector3.project(): Vector2 {
             val relativePosition = this.toVector4() - camera.transform.location
-            val transformed = rotation(camera.transform.rotation.toRadians()).inverse() * relativePosition
+            val ro = Rotator4(camera.transform.rotation.roll, camera.transform.rotation.pitch, camera.transform.rotation.yaw, 0f)
+            val transformed = rotation(ro.toRadians()).inverse() * relativePosition
             val dist = transformed.x
             val aspectRatio = viewportX / viewportY
             val tanHalfFOV = tan(FOV / 2f)
@@ -51,19 +58,30 @@ class Debug {
         }
 
         fun drawPoint(pos: Vector4) {
-            val t = pos.project().project().toScreen()
-            val dist = (pos - camera.transform.location).length()
-            val size = -dist/10f + 1f
-            ImGui.getForegroundDrawList().addCircleFilled(t.x, t.y, size*5f, 0xFF0000FF.toInt(), 10)
-            //ImGui.getForegroundDrawList().addLine(0f, 0f, t.x, t.y, 0xFFFFFFFF.toInt(), 2f)
+            objects.add {
+                val t = pos.project().project().toScreen()
+                val dist = (pos - camera.transform.location).length()
+                val size = -dist/10f + 1f
+                ImGui.getForegroundDrawList().addCircleFilled(t.x, t.y, size*5f, 0xFF0000FF.toInt(), 10)
+            }
+
         }
         fun drawLine(a: Vector4, b: Vector4, thickness: Float = 2f, center: Vector4) {
-            val a1 = a.project(center).project().toScreen()
-            val b1 = b.project(center).project().toScreen()
-            ImGui.getForegroundDrawList().addLine(a1.x, a1.y, b1.x, b1.y, 0xFF0000FF.toInt(), thickness)
+            objects.add {
+                val a1 = a.project(center).project().toScreen()
+                val b1 = b.project(center).project().toScreen()
+                ImGui.getForegroundDrawList().addLine(a1.x, a1.y, b1.x, b1.y, 0xFF0000FF.toInt(), thickness)
+            }
+        }
+        fun drawLine(a: Vector3, b: Vector3, thickness: Float = 2f) {
+            objects.add {
+                val a1 = a.project().toScreen()
+                val b1 = b.project().toScreen()
+                ImGui.getForegroundDrawList().addLine(a1.x, a1.y, b1.x, b1.y, 0xFF0000FF.toInt(), thickness)
+            }
         }
 
-        fun drawCube(center: Vector4, bounds: Vector4, rotation: Rotator4) {
+        fun drawHyperCube(center: Vector4, bounds: Vector4, rotation: Rotator4) {
             val rom = listOf(
                 Vector4(-1f, -1f, -1f, 1f), Vector4(1f, -1f, -1f, 1f),
                 Vector4(-1f, 1f, -1f, 1f), Vector4(1f, 1f, -1f, 1f),
@@ -86,11 +104,33 @@ class Debug {
             )
 
             for ((index1, index2) in anglePairs) {
-                var pos1 = rom[index1]*bounds + center
-                var pos2 = rom[index2]*bounds + center
+                var pos1 = rom[index1] * bounds + center
+                var pos2 = rom[index2] * bounds + center
                 pos1 = rotation(rotation.toRadians()) * pos1
                 pos2 = rotation(rotation.toRadians()) * pos2
                 drawLine(pos1, pos2, center=center)
+            }
+        }
+        fun drawCube(center: Vector3, bounds: Vector3, rotation: Rotator3) {
+            val rom = listOf(
+                Vector3(-1f, -1f, -1f), Vector3(1f, -1f, -1f),
+                Vector3(-1f, 1f, -1f), Vector3(1f, 1f, -1f),
+                Vector3(-1f, -1f, 1f), Vector3(1f, -1f, 1f),
+                Vector3(-1f, 1f, 1f), Vector3(1f, 1f, 1f)
+            )
+            val anglePairs = listOf(
+                Pair(0, 1), Pair(0, 2), Pair(1, 3), Pair(2, 3),
+                Pair(4, 5), Pair(4, 6), Pair(5, 7), Pair(6, 7),
+                Pair(0, 4), Pair(1, 5), Pair(2, 6), Pair(3, 7)
+            )
+
+            for ((index1, index2) in anglePairs) {
+                var pos1 = (rom[index1] * bounds).toVector4()
+                var pos2 = (rom[index2] * bounds).toVector4()
+                val ro = Rotator4(rotation.roll, rotation.pitch, rotation.yaw, 0f)
+                pos1 = rotation(ro.toRadians()) * pos1 + center.toVector4()
+                pos2 = rotation(ro.toRadians()) * pos2 + center.toVector4()
+                drawLine(pos1.toVector3(), pos2.toVector3())
             }
         }
     }

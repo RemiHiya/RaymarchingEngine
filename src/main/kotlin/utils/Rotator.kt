@@ -8,6 +8,8 @@ data class Rotator3(var roll: Float, var pitch: Float, var yaw: Float) {
         pitch*PI.toFloat()/180,
         yaw*PI.toFloat()/180)
 
+    operator fun plus(other: Rotator3) = Rotator3(roll+other.roll, pitch+other.pitch, yaw+other.yaw)
+    operator fun minus(other: Rotator3) = Rotator3(roll-other.roll, pitch-other.pitch, yaw-other.yaw)
     operator fun rem(mod: Float) = Rotator3(roll%mod, pitch%mod, yaw%mod)
 }
 

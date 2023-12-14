@@ -1,7 +1,10 @@
 package elements.primitives
 
 import api.math.max
+import api.math.transformBy
+import editor.Debug
 import elements.PrimitiveObject
+import utils.Rotator3
 import utils.Transform4
 import utils.Vector3
 import utils.Vector4
@@ -24,6 +27,11 @@ class Cube(transform: Transform4) : PrimitiveObject(transform) {
         val a = "$v1.xyz"
         val b = "$v2.xyz"
         return shaderCall.replace("v1", a).replace("v2", b)
+    }
+
+    override fun debug(transform: Transform4) {
+        val tmp = Transform4(v1, ro).transformBy(transform)
+        Debug.drawCube(tmp.location.toVector3(), v2.toVector3(), tmp.rotation.toRotator3())
     }
 
     init {

@@ -1,5 +1,6 @@
 package elements.components
 
+import editor.Debuggable
 import editor.Gui
 import elements.PrimitiveObject
 import elements.primitives.Cube
@@ -11,7 +12,7 @@ import org.reflections.Reflections
 import utils.OperatorType
 import utils.Transform4
 
-open class PrimitiveComponent(): Component() {
+open class PrimitiveComponent(): Component(), Debuggable {
 
     // Valeur par défaut
     var primitive: PrimitiveObject = Cube(Transform4())
@@ -83,4 +84,13 @@ open class PrimitiveComponent(): Component() {
 
 
     }
+
+    override fun debug(transform: Transform4) {
+        primitive.debug(transform)
+    }
+
+    override fun debug() {
+        debug(parent.transform)
+    }
+
 }

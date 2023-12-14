@@ -1,5 +1,6 @@
 package elements
 
+import editor.Debuggable
 import editor.EditorElement
 import editor.Gui
 import elements.components.Component
@@ -9,7 +10,7 @@ import imgui.flag.ImGuiTreeNodeFlags
 import imgui.type.ImString
 import utils.Transform4
 
-open class Actor: EditorElement {
+open class Actor: EditorElement, Debuggable {
 
     var properties: HashMap<String, Array<Any>> = HashMap()
 
@@ -26,7 +27,6 @@ open class Actor: EditorElement {
 
 
     override fun display() {
-
         val name = ImString(displayName, 32)
         if (ImGui.inputText("##", name, ImGuiInputTextFlags.AutoSelectAll)) {
             displayName = name.get()
@@ -41,7 +41,10 @@ open class Actor: EditorElement {
             Gui.stopColumn()
             ImGui.unindent()
         }
+    }
 
+    override fun debug() {
+        components.forEach { (it as? Debuggable)?.debug(transform) }
     }
 
 

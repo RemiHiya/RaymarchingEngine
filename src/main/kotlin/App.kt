@@ -19,6 +19,7 @@ import elements.SceneParser
 import imgui.ImGui
 import misc.PATH
 import misc.SKIN
+import utils.Time
 import utils.Vector4
 
 
@@ -195,6 +196,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         /*
         Rendu de l'éditeur
          */
+        Time.time = time
         layer.update(Gdx.graphics.deltaTime, frameBuffer.colorBufferTexture.textureObjectHandle)
         if (layer.resized)
             resizeFrameBuffer(layer.viewportX.toInt(), layer.viewportY.toInt())

@@ -1,11 +1,12 @@
 package elements
 
+import editor.Debuggable
 import utils.MarcherOperator
 import utils.OperatorType
 import utils.Transform4
 import utils.Vector4
 
-abstract class PrimitiveObject(transform: Transform4): Primitive() {
+abstract class PrimitiveObject(transform: Transform4): Primitive(), Debuggable {
 
     init {
         v1 = transform.location

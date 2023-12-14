@@ -207,8 +207,10 @@ class ImGuiLayer(private val scene: Scene) {
         test.objects = listOf(scene.getActor(1)?.components?.get(0) as PrimitiveComponent)
         test.discretize()
         //test.points.forEach { point -> Debug.drawPoint(point+Vector4(5f)) }
-        Debug.drawCube(Vector4(5f,0f,0f,0f), Vector4(1f,1f,1f,1f), Rotator4(0f,0f,0f,0f))
+        //Debug.drawCube(Vector4(5f,0f,0f,0f), Vector4(1f,1f,1f,1f), Rotator4(0f,0f,0f,0f))
         //Debug.drawPoint(Vector4(1f))
+        (selection as? Debuggable)?.debug()
+        Debug.debugAll()
         ImGui.end()
 
         outliner(scene.getActors())

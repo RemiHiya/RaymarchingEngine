@@ -185,14 +185,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
         frameBuffer.end()
 
-        spriteBatch!!.begin()
-        spriteBatch!!.shader = null
-        texture!!.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        spriteBatch!!.draw(frameBuffer.colorBufferTexture, 0f, 0f,
-            layer.viewportX,
-            layer.viewportY)
-        spriteBatch!!.end()
-
         /*
         Rendu de l'éditeur
          */
@@ -220,7 +212,5 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         //resizeFrameBuffer(width, height)
         ImGui.getIO().setDisplaySize(width.toFloat(), height.toFloat())
     }
-
-
 
 }

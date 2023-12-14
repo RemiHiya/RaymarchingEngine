@@ -63,8 +63,8 @@ fun rotationYZ(angle: Float): Matrix4 {
 
     return Matrix4(
         1f, 0f, 0f, 0f,
-        0f, cosA, sinA, 0f,
-        0f, -sinA, cosA, 0f,
+        0f, cosA, -sinA, 0f,
+        0f, sinA, cosA, 0f,
         0f, 0f, 0f, 1f
     )
 }

@@ -6,7 +6,7 @@ import api.math.toRadians
 import elements.CameraActor
 import imgui.ImGui
 import utils.*
-import kotlin.math.tan
+import kotlin.math.atan
 
 class Debug {
     companion object {
@@ -15,7 +15,6 @@ class Debug {
         var viewportPosX = 0f
         var viewportPosY = 0f
         lateinit var camera: CameraActor
-        var FOV = 110f.toRadians()
         private var objects: MutableList<() -> Unit> = mutableListOf()
 
         fun debugAll() {
@@ -41,20 +40,28 @@ class Debug {
             val relativePosition = this.toVector4() - camera.transform.location
             val ro = Rotator4(camera.transform.rotation.roll, camera.transform.rotation.pitch, camera.transform.rotation.yaw, 0f)
             val transformed = rotation(ro.toRadians()).inverse() * relativePosition
-            val dist = transformed.x
-            val aspectRatio = viewportX / viewportY
-            val tanHalfFOV = tan(FOV / 2f)
-            // TODO : Utiliser la FOV dans la projection
+
+            val near = camera.nearClip
+            val far = camera.farClip
+            val fov = camera.fov.toRadians()
+            val aspectRatio = viewportX / (viewportY)
+            val atanHalfFOV = atan(fov / 2f)
+            val scaleY = 1f / atanHalfFOV
+            val scaleX = (1f/ atanHalfFOV) / aspectRatio
+            val scaleZ = -(far + near) / (far - near)
+            val offsetZ = -2f * far * near / (far - near)
+
+            val dist = transformed.x - (offsetZ * scaleZ)
             val projection = Matrix4(
-                0f, 1f / dist, 0f, 0f,
-                0f, 0f, -1f / dist, 0f,
+                0f, 1f / dist*scaleX, 0f, 0f,
+                0f, 0f, -1f / dist*scaleY, 0f,
                 0f, 0f, 0f, 0f,
                 0f, 0f, 0f, 0f
             )
             val new = projection * transformed
-            //if (transformed.dot(Vector4(1f)) > 0)
-            //    return Vector2(-1f, -1f)
-            return Vector2(new.x, new.y)
+            if (transformed.dot(Vector4(1f)) < 0)
+                return Vector2(-1f, -1f)
+            return Vector2(new.x, new.y+.07f)
         }
 
         fun drawPoint(pos: Vector4) {

@@ -44,14 +44,14 @@ class Debug {
             val near = camera.nearClip
             val far = camera.farClip
             val fov = camera.fov.toRadians()
-            val aspectRatio = viewportX / (viewportY)
+            val aspectRatio = viewportX / viewportY
             val atanHalfFOV = atan(fov / 2f)
             val scaleY = 1f / atanHalfFOV
             val scaleX = (1f/ atanHalfFOV) / aspectRatio
-            val scaleZ = -(far + near) / (far - near)
-            val offsetZ = -2f * far * near / (far - near)
+            val scaleZ = -(near-far) / (near-far)
+            val offsetZ = -2f * far * near / (near-far)
 
-            val dist = transformed.x - (offsetZ * scaleZ)
+            val dist = transformed.x + (offsetZ * scaleZ)
             val projection = Matrix4(
                 0f, 1f / dist*scaleX, 0f, 0f,
                 0f, 0f, -1f / dist*scaleY, 0f,
@@ -73,18 +73,21 @@ class Debug {
             }
 
         }
+        fun drawScreenLine(a: Vector2, b: Vector2, thickness: Float) {
+            ImGui.getWindowDrawList().addLine(a.x, a.y, b.x, b.y, 0xFF0000FF.toInt(), thickness)
+        }
         fun drawLine(a: Vector4, b: Vector4, thickness: Float = 2f, center: Vector4) {
             objects.add {
                 val a1 = a.project(center).project().toScreen()
                 val b1 = b.project(center).project().toScreen()
-                ImGui.getForegroundDrawList().addLine(a1.x, a1.y, b1.x, b1.y, 0xFF0000FF.toInt(), thickness)
+                drawScreenLine(a1, b1, thickness)
             }
         }
         fun drawLine(a: Vector3, b: Vector3, thickness: Float = 2f) {
             objects.add {
                 val a1 = a.project().toScreen()
                 val b1 = b.project().toScreen()
-                ImGui.getForegroundDrawList().addLine(a1.x, a1.y, b1.x, b1.y, 0xFF0000FF.toInt(), thickness)
+                drawScreenLine(a1, b1, thickness)
             }
         }
 

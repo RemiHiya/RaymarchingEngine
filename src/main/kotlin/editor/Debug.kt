@@ -7,6 +7,7 @@ import elements.CameraActor
 import imgui.ImGui
 import utils.*
 import kotlin.math.atan
+import kotlin.math.pow
 
 class Debug {
     companion object {
@@ -80,68 +81,36 @@ class Debug {
             objects.add {
                 val a1 = a.project(center).project().toScreen()
                 val b1 = b.project(center).project().toScreen()
-                drawScreenLine(a1, b1, thickness)
+                val dist = ((a+b)/2f - camera.transform.location).toVector3().length()
+                val size = -(dist/2f).pow(7f) / 1f + 1
+                drawScreenLine(a1, b1, thickness*size)
             }
         }
-        fun drawLine(a: Vector3, b: Vector3, thickness: Float = 2f) {
+        fun drawLine(a: Vector3, b: Vector3, thickness: Float = 5f) {
             objects.add {
                 val a1 = a.project().toScreen()
                 val b1 = b.project().toScreen()
-                drawScreenLine(a1, b1, thickness)
+                val dist = ((a+b)/2f - camera.transform.location.toVector3()).length()
+                val size = -(dist/2f).pow(7f) / 1f + 1
+                drawScreenLine(a1, b1, thickness*size)
             }
         }
 
         fun drawHyperCube(center: Vector4, bounds: Vector4, rotation: Rotator4) {
-            val rom = listOf(
-                Vector4(-1f, -1f, -1f, 1f), Vector4(1f, -1f, -1f, 1f),
-                Vector4(-1f, 1f, -1f, 1f), Vector4(1f, 1f, -1f, 1f),
-                Vector4(-1f, -1f, 1f, 1f), Vector4(1f, -1f, 1f, 1f),
-                Vector4(-1f, 1f, 1f, 1f), Vector4(1f, 1f, 1f, 1f),
-                Vector4(-1f, -1f, -1f, -1f), Vector4(1f, -1f, -1f, -1f),
-                Vector4(-1f, 1f, -1f, -1f), Vector4(1f, 1f, -1f, -1f),
-                Vector4(-1f, -1f, 1f, -1f), Vector4(1f, -1f, 1f, -1f),
-                Vector4(-1f, 1f, 1f, -1f), Vector4(1f, 1f, 1f, -1f)
-            )
-            val anglePairs = listOf(
-                Pair(0, 1), Pair(0, 2), Pair(1, 3), Pair(2, 3),
-                Pair(4, 5), Pair(4, 6), Pair(5, 7), Pair(6, 7),
-                Pair(0, 4), Pair(1, 5), Pair(2, 6), Pair(3, 7),
-                Pair(0, 8), Pair(1, 9), Pair(2, 10), Pair(3, 11),
-                Pair(4, 12), Pair(5, 13), Pair(6, 14), Pair(7, 15),
-                Pair(8, 9), Pair(8, 10), Pair(9, 11), Pair(10, 11),
-                Pair(12, 13), Pair(12, 14), Pair(13, 15), Pair(14, 15),
-                Pair(8, 12), Pair(9, 13), Pair(10, 14), Pair(11, 15)
-            )
-
-            for ((index1, index2) in anglePairs) {
-                var pos1 = rom[index1] * bounds + center
-                var pos2 = rom[index2] * bounds + center
-                pos1 = rotation(rotation.toRadians()) * pos1
-                pos2 = rotation(rotation.toRadians()) * pos2
-                drawLine(pos1, pos2, center=center)
-            }
+            DebugShapes.draw4D(DebugShapes.hyperCube, center, bounds, rotation)
+            { pos1, pos2 -> drawLine(pos1, pos2, center = center) }
         }
         fun drawCube(center: Vector3, bounds: Vector3, rotation: Rotator3) {
-            val rom = listOf(
-                Vector3(-1f, -1f, -1f), Vector3(1f, -1f, -1f),
-                Vector3(-1f, 1f, -1f), Vector3(1f, 1f, -1f),
-                Vector3(-1f, -1f, 1f), Vector3(1f, -1f, 1f),
-                Vector3(-1f, 1f, 1f), Vector3(1f, 1f, 1f)
-            )
-            val anglePairs = listOf(
-                Pair(0, 1), Pair(0, 2), Pair(1, 3), Pair(2, 3),
-                Pair(4, 5), Pair(4, 6), Pair(5, 7), Pair(6, 7),
-                Pair(0, 4), Pair(1, 5), Pair(2, 6), Pair(3, 7)
-            )
-
-            for ((index1, index2) in anglePairs) {
-                var pos1 = (rom[index1] * bounds).toVector4()
-                var pos2 = (rom[index2] * bounds).toVector4()
-                val ro = Rotator4(rotation.roll, rotation.pitch, rotation.yaw, 0f)
-                pos1 = rotation(ro.toRadians()) * pos1 + center.toVector4()
-                pos2 = rotation(ro.toRadians()) * pos2 + center.toVector4()
-                drawLine(pos1.toVector3(), pos2.toVector3())
-            }
+            DebugShapes.draw3D(DebugShapes.cube, center, bounds, rotation)
+            { pos1, pos2 -> drawLine(pos1, pos2) }
+        }
+        fun drawSphere(center: Vector3, bounds: Vector3, rotation: Rotator3) {
+            DebugShapes.draw3D(DebugShapes.sphere, center, bounds, rotation)
+            { pos1, pos2 -> drawLine(pos1, pos2) }
+        }
+        fun drawHyperSphere(center: Vector4, bounds: Vector4, rotation: Rotator4) {
+            DebugShapes.draw4D(DebugShapes.hyperSphere, center, bounds, rotation)
+            { pos1, pos2 -> drawLine(pos1, pos2, center=center) }
         }
     }
 }

@@ -11,6 +11,7 @@ data class Rotator3(var roll: Float, var pitch: Float, var yaw: Float) {
     operator fun plus(other: Rotator3) = Rotator3(roll+other.roll, pitch+other.pitch, yaw+other.yaw)
     operator fun minus(other: Rotator3) = Rotator3(roll-other.roll, pitch-other.pitch, yaw-other.yaw)
     operator fun rem(mod: Float) = Rotator3(roll%mod, pitch%mod, yaw%mod)
+    fun toRotator4() = Rotator4(roll, pitch, yaw, 0f)
 }
 
 data class Rotator4(var roll: Float, var pitch: Float, var yaw: Float, var w: Float) {

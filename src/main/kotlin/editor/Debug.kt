@@ -70,7 +70,7 @@ class Debug {
                 val t = pos.project().project().toScreen()
                 val dist = (pos - camera.transform.location).length()
                 val size = -dist/10f + 1f
-                ImGui.getForegroundDrawList().addCircleFilled(t.x, t.y, size*5f, 0xFF0000FF.toInt(), 10)
+                ImGui.getWindowDrawList().addCircleFilled(t.x, t.y, size*5f, 0xFF0000FF.toInt(), 10)
             }
 
         }

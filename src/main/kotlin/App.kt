@@ -18,7 +18,6 @@ import elements.Scene
 import elements.SceneParser
 import imgui.ImGui
 import misc.PATH
-import misc.SKIN
 import utils.Time
 import utils.Vector4
 
@@ -201,7 +200,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         texture?.dispose()
         shaderProgram.dispose()
         frameBuffer.dispose()
-        SKIN.dispose()
         ImGui.saveIniSettingsToDisk("imgui.ini")
         layer.dispose()
     }

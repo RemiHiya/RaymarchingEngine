@@ -11,5 +11,5 @@ fun Actor.getPrimitives(): Array<PrimitiveObject> {
             tmp += i.primitive
         }
     }
-    return (tmp.sortedBy { it.operator.operator }).toTypedArray()
+    return tmp.sortedWith(compareBy({ it.operator.operator }, { it.operator.smoothness })).toTypedArray()
 }

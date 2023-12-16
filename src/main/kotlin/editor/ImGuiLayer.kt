@@ -211,7 +211,7 @@ class ImGuiLayer(private val scene: Scene) {
         Debug.debugAll()
         ImGui.end()
 
-        outliner(scene.getActors())
+        outliner(scene.actors)
 
 
         ImGui.end()

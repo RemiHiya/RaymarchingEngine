@@ -39,7 +39,7 @@ class SceneParser(private val scene : Scene) {
 
     fun rebuildObjects() {
         objects = arrayOf()
-        for (i in scene.getActors()) {
+        for (i in scene.actors) {
             for (j in i.getPrimitives()) {
                 val relative = Transform4(j.v1, j.ro, Vector4(1f,1f,1f,1f))
                 val new = relative.transformBy(i.transform)

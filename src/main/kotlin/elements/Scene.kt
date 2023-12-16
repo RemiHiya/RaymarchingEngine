@@ -9,8 +9,7 @@ open class Scene {
     TODO : Tri des objets : non smooth en premier
      */
 
-    private var objects: Array<PrimitiveObject> = arrayOf()
-    private var actors: Array<Actor> = arrayOf()
+    var actors: Array<Actor> = arrayOf()
 
     val camera = CameraActor()
 
@@ -27,12 +26,6 @@ open class Scene {
             actor.displayName = "Actor${actors.size}"
         }
         actors += actor
-        for (i in actor.getPrimitives()) {
-            add(i)
-        }
-    }
-    fun add(obj: PrimitiveObject) {
-        objects += obj
     }
 
     fun getObjects(): List<PrimitiveObject> {
@@ -44,6 +37,6 @@ open class Scene {
         else null
     }
 
-    fun getActors() = actors
+    //fun getActors() = actors
 
 }

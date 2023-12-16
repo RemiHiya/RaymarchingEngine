@@ -6,8 +6,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
 import elements.Actor
 import elements.Scene
 import elements.components.Component
-import elements.components.PhysicsComponent
-import elements.components.PrimitiveComponent
 import imgui.ImFontConfig
 import imgui.ImGui
 import imgui.flag.*
@@ -17,8 +15,6 @@ import imgui.type.ImBoolean
 import imgui.type.ImString
 import misc.RESOURCE_PATH
 import org.lwjgl.glfw.GLFW.*
-import utils.Rotator4
-import utils.Vector4
 import java.io.File
 
 
@@ -203,12 +199,14 @@ class ImGuiLayer(private val scene: Scene) {
         Debug.viewportY = viewportY
         Debug.viewportPosX = ImGui.getWindowPosX()
         Debug.viewportPosY = ImGui.getWindowPosY()
+        /*
         val test = PhysicsComponent()
-        test.objects = listOf(scene.getActor(1)?.components?.get(0) as PrimitiveComponent)
+        val tmp = mutableListOf<PrimitiveComponent>()
+        scene.getActor(1)?.components?.forEach { tmp += (it as PrimitiveComponent) }
+        test.objects = tmp
         test.discretize()
-        //test.points.forEach { point -> Debug.drawPoint(point+Vector4(5f)) }
-        //Debug.drawCube(Vector4(5f,0f,0f,0f), Vector4(1f,1f,1f,1f), Rotator4(0f,0f,0f,0f))
-        //Debug.drawPoint(Vector4(1f))
+        test.points.forEach { point -> Debug.drawPoint(point) }
+        */
         (selection as? Debuggable)?.debug()
         Debug.debugAll()
         ImGui.end()

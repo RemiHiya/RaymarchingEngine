@@ -5,3 +5,9 @@ enum class OperatorType(val value: Int) {
     SUBTRACTION(1),
     INTERSECTION(2)
 }
+
+enum class ColliderType {
+    STATIC,
+    DYNAMIC,
+    KINEMATIC
+}

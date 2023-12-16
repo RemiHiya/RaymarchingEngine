@@ -23,6 +23,7 @@ open class PrimitiveComponent(): Component(), Debuggable {
     }
 
     override var displayName = "Primitive Component"
+    override val singleton = false
 
     private var subClasses: MutableSet<Class<out PrimitiveObject>> = mutableSetOf()
     private val selection = ImInt(0)

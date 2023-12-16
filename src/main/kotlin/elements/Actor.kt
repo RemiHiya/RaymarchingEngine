@@ -27,7 +27,11 @@ open class Actor: EditorElement, Debuggable {
         components.forEach { it.construct() }
     }
 
-    fun addComponent(component: Component): Component {
+    fun addComponent(component: Component): Component? {
+        if (component.singleton) {
+            if (components.any { it::class == component::class })
+                return null
+        }
         component.parent = this
         components += component
         construct()

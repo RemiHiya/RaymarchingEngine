@@ -17,8 +17,9 @@ import kotlin.math.min
 
 class PhysicsComponent: Component(), Debuggable {
     override var displayName = "Physics Component"
+    override val singleton = true
 
-    var points: MutableList<Vector4> = mutableListOf()
+    var points: MutableList<Pair<Vector4, Float>> = mutableListOf()
     var type: ColliderType = ColliderType.DYNAMIC
     var dynamicRebuild = false
     private var objects: List<PrimitiveComponent> = listOf()
@@ -45,7 +46,8 @@ class PhysicsComponent: Component(), Debuggable {
     }
 
     /**
-     * Génère le nuage de point représentant la suface de la SDF associée.
+     * Génère le nuage de point [points] représentant la suface de la SDF associée.
+     * Chaque point est associé à une distance signée.
      * @param center Le centre autour duquel générer le nuage de points.
      * @param distance La distance maximale par rapport au centre pour générer des points.
      * @param step Le pas utilisé lors de la génération des points (par défaut: 0.5f).
@@ -68,7 +70,7 @@ class PhysicsComponent: Component(), Debuggable {
                             continue
                         }
                         if (abs(dist) < threshold)
-                            points += point
+                            points += Pair(point, dist)
                         w++
                     }
                     z++
@@ -116,7 +118,7 @@ class PhysicsComponent: Component(), Debuggable {
 
     override fun debug() {
         points.forEach {
-            Debug.drawPoint(Transform4(it).transformBy(Transform4(parent.transform.location*2f)).location)
+            Debug.drawPoint(Transform4(it.first).transformBy(Transform4(parent.transform.location*2f)).location)
         }
     }
 }

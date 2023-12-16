@@ -10,6 +10,7 @@ abstract class Component: EditorElement {
 
     lateinit var parent: Actor
     abstract var displayName: String
+    abstract val singleton: Boolean
 
     abstract fun construct()
 

@@ -48,7 +48,7 @@ class Gui {
         fun floatField(value: ImFloat, name: String): Boolean {
             ImGui.text(name)
             startInput(name)
-            val out = ImGui.inputFloat("##", value)
+            val out = ImGui.inputFloat("##", value, 0f, 0f, "%g")
             endInput()
             return out
         }
@@ -66,7 +66,7 @@ class Gui {
             ImGui.text(name)
             startInput(name)
             val tmp = floatArrayOf(value.x, value.y, value.z, value.w)
-            if (ImGui.inputFloat4("##", tmp)) {
+            if (ImGui.inputFloat4("##", tmp, "%g")) {
                 value.x = tmp[0]
                 value.y = tmp[1]
                 value.z = tmp[2]
@@ -78,7 +78,7 @@ class Gui {
             ImGui.text(name)
             startInput(name)
             val tmp = floatArrayOf(value.roll, value.pitch, value.yaw, value.w)
-            if (ImGui.inputFloat4("##", tmp)) {
+            if (ImGui.inputFloat4("##", tmp, "%g")) {
                 value.roll = tmp[0]
                 value.pitch = tmp[1]
                 value.yaw = tmp[2]

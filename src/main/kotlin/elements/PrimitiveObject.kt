@@ -12,7 +12,7 @@ abstract class PrimitiveObject(transform: Transform4): Primitive(), Debuggable {
         v1 = transform.location
         v2 = Vector4(1f, 1f, 1f, 1f)
         ro = transform.rotation
-        extra = 0f
+        extra = 1f
         operator = MarcherOperator(OperatorType.UNION, 0f)
     }
 

@@ -48,7 +48,7 @@ open class PrimitiveComponent(): Component(), Debuggable {
         Gui.useColumn()
         if (Gui.listField("Type", selection, subClasses.map { it.simpleName })) {
             val new = subClasses.toList()[selection.get()].constructors.first().newInstance(Transform4()) as PrimitiveObject
-            new.v1 = this.primitive.v1
+            new.v1 = primitive.v1
             new.v2 = primitive.v2
             new.ro = primitive.ro
             new.extra = primitive.extra

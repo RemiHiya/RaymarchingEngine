@@ -4,7 +4,6 @@ import api.math.max
 import api.math.transformBy
 import editor.Debug
 import elements.PrimitiveObject
-import utils.Rotator3
 import utils.Transform4
 import utils.Vector3
 import utils.Vector4

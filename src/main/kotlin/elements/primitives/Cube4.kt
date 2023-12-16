@@ -6,7 +6,6 @@ import editor.Debug
 import editor.Debuggable
 import elements.PrimitiveObject
 import utils.Transform4
-import utils.Vector3
 import utils.Vector4
 import kotlin.math.min
 import kotlin.math.max

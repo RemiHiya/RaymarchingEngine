@@ -11,6 +11,12 @@ abstract class Component: EditorElement {
     lateinit var parent: Actor
     abstract var displayName: String
 
+    init {
+        this.construct()
+    }
+
+    abstract fun construct()
+
     override fun display() {
         val name = ImString(displayName, 32)
         ImGui.text("${parent.displayName} :")

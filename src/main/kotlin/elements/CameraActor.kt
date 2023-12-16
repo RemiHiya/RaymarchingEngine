@@ -6,7 +6,8 @@ class CameraActor: Actor() {
     var nearClip = 0.1f
     var farClip = 100f
 
-    init {
+    override fun construct() {
+        super.construct()
         displayName = "Camera"
     }
 }

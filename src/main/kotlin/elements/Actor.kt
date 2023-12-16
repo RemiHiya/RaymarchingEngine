@@ -19,12 +19,20 @@ open class Actor: EditorElement, Debuggable {
     var components: Array<Component> = arrayOf()
     var displayName: String = ""
 
+    init {
+        this.construct()
+    }
+
+    open fun construct() {
+        components.forEach { it.construct() }
+    }
+
     fun addComponent(component: Component): Component {
         component.parent = this
         components += component
+        construct()
         return component
     }
-
 
     override fun display() {
         val name = ImString(displayName, 32)

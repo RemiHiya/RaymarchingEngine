@@ -27,6 +27,10 @@ open class PrimitiveComponent(): Component(), Debuggable {
     private var subClasses: MutableSet<Class<out PrimitiveObject>> = mutableSetOf()
     private val selection = ImInt(0)
 
+    override fun construct() {
+
+    }
+
     init {
         rebuildSubClasses()
         selection.set(subClasses.toList().indexOf(primitive::class.java))

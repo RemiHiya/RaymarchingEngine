@@ -19,6 +19,9 @@ class PhysicsComponent: Component() {
     var points: List<Vector4> = listOf()
     private var gridSize = 0f
 
+    override fun construct() {
+        discretize()
+    }
 
     fun discretize() {
         description = getDesc()

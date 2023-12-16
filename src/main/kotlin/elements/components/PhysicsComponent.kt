@@ -1,11 +1,15 @@
 package elements.components
 
+import api.math.rotation
+import api.math.times
+import api.math.transformBy
 import editor.Debug
 import editor.Debuggable
 import editor.Gui
 import imgui.type.ImInt
 import utils.ColliderType
 import utils.OperatorType
+import utils.Transform4
 import utils.Vector4
 import kotlin.math.abs
 import kotlin.math.max
@@ -14,19 +18,22 @@ import kotlin.math.min
 class PhysicsComponent: Component(), Debuggable {
     override var displayName = "Physics Component"
 
-    var objects: List<PrimitiveComponent> = listOf()
+    var points: MutableList<Vector4> = mutableListOf()
     var type: ColliderType = ColliderType.DYNAMIC
     var dynamicRebuild = false
+    private var objects: List<PrimitiveComponent> = listOf()
     private lateinit var description: (Vector4) -> Float
-    var points: List<Vector4> = listOf()
-    private var gridSize = 0f
 
     override fun construct() {
         objects = parent.components.filterIsInstance<PrimitiveComponent>()
-        points = listOf()
+        points.clear()
         discretize()
     }
 
+    /**
+     * Prend en entrée [objects] les objets présents, en détermine le centre moyen et les bounds.
+     * Appelle la fonction [generate].
+     */
     fun discretize() {
         description = getDesc()
         var center = Vector4()
@@ -34,7 +41,6 @@ class PhysicsComponent: Component(), Debuggable {
         center /= objects.size.toFloat()
         val dist = objects.maxOf { obj -> (obj.primitive.v1 - center).length() +
                 abs(obj.primitive.simplifiedCollider(Vector4())) }
-        gridSize = dist
         generate(center, dist)
     }
 
@@ -55,7 +61,7 @@ class PhysicsComponent: Component(), Debuggable {
                 while (z <= steps) {
                     var w = -steps
                     while (w <= steps) {
-                        val point = center + Vector4(x*step, y*step, z*step, w*step)
+                        val point = center * 2f + Vector4(x*step, y*step, z*step, w*step)
                         val dist = description(point/2f)
                         if (abs(dist) > step) {
                             w += (step + abs(dist)/step).toInt()
@@ -82,15 +88,16 @@ class PhysicsComponent: Component(), Debuggable {
         return { pos: Vector4 ->
             var dist = 1000f
             for (i in objs.map { it.primitive }) {
+                val tmp = rotation(i.ro.toRadians())
                 dist = when (i.operator.operator) {
                     OperatorType.UNION -> {
-                        min(dist, i.collider(pos-i.v1))
+                        min(dist, i.collider(tmp*(pos-i.v1)))
                     }
                     OperatorType.SUBTRACTION -> {
-                        max(dist, -i.collider(pos-i.v1))
+                        max(dist, -i.collider(tmp*(pos-i.v1)))
                     }
                     OperatorType.INTERSECTION -> {
-                        max(dist, i.collider(pos-i.v1))
+                        max(dist, i.collider(tmp*(pos-i.v1)))
                     }
                 }
             }
@@ -108,6 +115,8 @@ class PhysicsComponent: Component(), Debuggable {
     }
 
     override fun debug() {
-        points.forEach { Debug.drawPoint(it) }
+        points.forEach {
+            Debug.drawPoint(Transform4(it).transformBy(Transform4(parent.transform.location*2f)).location)
+        }
     }
 }

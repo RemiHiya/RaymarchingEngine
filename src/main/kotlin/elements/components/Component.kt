@@ -23,6 +23,8 @@ abstract class Component: EditorElement {
         ImGui.sameLine()
         Gui.helpMarker("Instance of ${this::class.simpleName} \nFrom ${this::class.qualifiedName}")
         javaClass.canonicalName
+        if (ImGui.button("Reconstruct"))
+            construct()
         ImGui.spacing()
     }
 }

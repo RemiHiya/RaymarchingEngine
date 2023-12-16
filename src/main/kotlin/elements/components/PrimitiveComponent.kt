@@ -40,6 +40,7 @@ open class PrimitiveComponent(): Component(), Debuggable {
     override fun display() {
         super.display()
 
+        ImGui.indent()
         Gui.useColumn()
         if (Gui.listField("Type", selection, subClasses.map { it.simpleName })) {
             val new = subClasses.toList()[selection.get()].constructors.first().newInstance(Transform4()) as PrimitiveObject
@@ -54,34 +55,44 @@ open class PrimitiveComponent(): Component(), Debuggable {
 
         }
         Gui.stopColumn()
-
+        ImGui.unindent()
 
         if (ImGui.collapsingHeader("Transform", ImGuiTreeNodeFlags.DefaultOpen)) {
             ImGui.indent()
             Gui.useColumn()
             Gui.vector4Field(primitive.v1, "Location")
-            Gui.vector4Field(primitive.v2, "Bounds")
             Gui.rotator4Field(primitive.ro, "Rotation")
             Gui.stopColumn()
             ImGui.unindent()
         }
         ImGui.spacing()
-        if (ImGui.collapsingHeader("Operator", ImGuiTreeNodeFlags.DefaultOpen)) {
+        if (ImGui.collapsingHeader("Parameters", ImGuiTreeNodeFlags.DefaultOpen)) {
             ImGui.indent()
             Gui.useColumn()
-            val op = ImInt(primitive.operator.operator.ordinal)
-            if (Gui.enumField<OperatorType>("Operator", op)) {
-                primitive.operator.operator = OperatorType.values()[op.get()]
-            }
-
-            val smooth = ImFloat(primitive.operator.smoothness)
-            if (Gui.floatField(smooth, "Smoothness")) {
-                primitive.operator.smoothness = smooth.get()
+            Gui.vector4Field(primitive.v2, "Bounds")
+            val extra = ImFloat(primitive.extra)
+            if (Gui.floatField(extra, "Extra")) {
+                primitive.extra = extra.get()
             }
             Gui.stopColumn()
             ImGui.unindent()
-        }
 
+            if (ImGui.treeNodeEx("Operator", ImGuiTreeNodeFlags.DefaultOpen or ImGuiTreeNodeFlags.SpanAvailWidth)) {
+                ImGui.indent()
+                Gui.useColumn()
+                val op = ImInt(primitive.operator.operator.ordinal)
+                if (Gui.enumField<OperatorType>("Type", op)) {
+                    primitive.operator.operator = OperatorType.values()[op.get()]
+                }
+                val smooth = ImFloat(primitive.operator.smoothness)
+                if (Gui.floatField(smooth, "Smoothness")) {
+                    primitive.operator.smoothness = smooth.get()
+                }
+                Gui.stopColumn()
+                ImGui.unindent()
+                ImGui.treePop()
+            }
+        }
 
     }
 

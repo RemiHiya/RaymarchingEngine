@@ -1,5 +1,7 @@
 package elements.components
 
+import editor.Debug
+import editor.Debuggable
 import editor.Gui
 import imgui.type.ImInt
 import utils.ColliderType
@@ -9,17 +11,19 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class PhysicsComponent: Component() {
+class PhysicsComponent: Component(), Debuggable {
     override var displayName = "Physics Component"
 
     var objects: List<PrimitiveComponent> = listOf()
     var type: ColliderType = ColliderType.DYNAMIC
     var dynamicRebuild = false
-    private var description = getDesc()
+    private lateinit var description: (Vector4) -> Float
     var points: List<Vector4> = listOf()
     private var gridSize = 0f
 
     override fun construct() {
+        objects = parent.components.filterIsInstance<PrimitiveComponent>()
+        points = listOf()
         discretize()
     }
 
@@ -101,5 +105,9 @@ class PhysicsComponent: Component() {
         if (Gui.enumField<ColliderType>("Collider", op)) {
             type = ColliderType.values()[op.get()]
         }
+    }
+
+    override fun debug() {
+        points.forEach { Debug.drawPoint(it) }
     }
 }

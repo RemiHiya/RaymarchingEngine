@@ -56,7 +56,7 @@ open class PrimitiveComponent(): Component(), Debuggable {
             new.setMaterial(primitive.getMaterial())
 
             this.primitive = new
-
+            parent.construct()
         }
         Gui.stopColumn()
         ImGui.unindent()

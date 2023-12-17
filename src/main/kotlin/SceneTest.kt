@@ -26,7 +26,7 @@ class SceneTest: Scene() {
         val c = Cube(Transform4(Vector4()))
         c.setPrimitiveParameters(Vector4(4f, 4f, 4f, 4f), 0f)
         val physics = PhysicsComponent()
-        physics.gravity = Vector4()
+        physics.type = ColliderType.STATIC
         floor.addComponent(PrimitiveComponent(c))
         floor.addComponent(physics)
         floor.transform.location = Vector4(5f, 0f, -5f)

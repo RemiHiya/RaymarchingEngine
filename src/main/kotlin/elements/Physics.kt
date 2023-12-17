@@ -2,6 +2,7 @@ package elements
 
 import api.math.transformBy
 import elements.components.PhysicsComponent
+import utils.ColliderType
 
 class Physics {
     companion object {
@@ -24,11 +25,13 @@ class Physics {
         }
 
         private fun updatePositions(dt: Float) {
-            objects.forEach {
-                it.linearVelocity *= it.friction
-                it.angularVelocity *= it.friction
-                it.linearVelocity += (it.gravity) * dt
-                it.parent.transform.location += it.linearVelocity
+            for (i in objects) {
+                if (i.type == ColliderType.STATIC)
+                    continue
+                i.linearVelocity *= i.friction
+                i.angularVelocity *= i.friction
+                i.linearVelocity += (i.gravity) * dt * .981f
+                i.parent.transform.location += i.linearVelocity
             }
         }
 

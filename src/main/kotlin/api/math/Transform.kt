@@ -18,5 +18,8 @@ fun Transform4.transformBy(other: Transform4): Transform4 {
     )
 
     return Transform4(newLocation, relativeRotation, relativeScale)
+}
 
+fun Vector4.transformBy(other: Transform4): Vector4 {
+    return other.location + this.rotate(other.rotation)
 }

@@ -7,10 +7,7 @@ import editor.Debug
 import editor.Debuggable
 import editor.Gui
 import imgui.type.ImInt
-import utils.ColliderType
-import utils.OperatorType
-import utils.Transform4
-import utils.Vector4
+import utils.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -22,13 +19,21 @@ class PhysicsComponent: Component(), Debuggable {
     var points: MutableList<Pair<Vector4, Float>> = mutableListOf()
     var type: ColliderType = ColliderType.DYNAMIC
     var dynamicRebuild = false
+    var gravity = Vector4(0f, 0f, -1f, 0f)
+    var friction = 0.8f
     private var objects: List<PrimitiveComponent> = listOf()
     private lateinit var description: (Vector4) -> Float
+    var linearVelocity = Vector4()
+    var angularVelocity = Rotator4(0f, 0f, 0f, 0f)
 
     override fun construct() {
         objects = parent.components.filterIsInstance<PrimitiveComponent>()
         points.clear()
         discretize()
+    }
+
+    override fun update(dt: Float) {
+
     }
 
     /**

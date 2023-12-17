@@ -55,7 +55,7 @@ class App(private val scene: Scene) : ApplicationAdapter() {
     private val layer = ImGuiLayer(scene)
 
     private fun tick(deltaTime: Float) {
-
+        scene.update(deltaTime)
         // Déplacements de caméra
         if (layer.focused && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             // Lock la souris

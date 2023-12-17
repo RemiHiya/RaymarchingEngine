@@ -13,6 +13,7 @@ abstract class Component: EditorElement {
     abstract val singleton: Boolean
 
     abstract fun construct()
+    abstract fun update(dt: Float)
 
     override fun display() {
         val name = ImString(displayName, 32)

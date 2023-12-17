@@ -32,6 +32,10 @@ open class PrimitiveComponent(): Component(), Debuggable {
 
     }
 
+    override fun update(dt: Float) {
+
+    }
+
     init {
         rebuildSubClasses()
         selection.set(subClasses.toList().indexOf(primitive::class.java))

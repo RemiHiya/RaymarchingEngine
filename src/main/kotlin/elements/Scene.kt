@@ -18,7 +18,7 @@ open class Scene {
     }
 
     fun update(dt: Float) {
-
+        actors.forEach { it.update(dt) }
     }
 
     fun add(actor: Actor) {
@@ -31,12 +31,4 @@ open class Scene {
     fun getObjects(): List<PrimitiveObject> {
         return actors.flatMap { it.getPrimitives().asIterable() }
     }
-
-    fun getActor(index: Int): Actor? {
-        return if (index in actors.indices) actors[index]
-        else null
-    }
-
-    //fun getActors() = actors
-
 }

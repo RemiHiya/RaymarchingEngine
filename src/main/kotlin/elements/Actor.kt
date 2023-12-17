@@ -27,6 +27,10 @@ open class Actor: EditorElement, Debuggable {
         components.forEach { it.construct() }
     }
 
+    open fun update(dt: Float) {
+        components.forEach { it.update(dt) }
+    }
+
     fun addComponent(component: Component): Component? {
         if (component.singleton) {
             if (components.any { it::class == component::class })

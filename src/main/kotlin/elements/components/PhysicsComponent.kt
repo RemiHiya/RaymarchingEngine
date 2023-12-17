@@ -20,11 +20,12 @@ class PhysicsComponent: Component(), Debuggable {
     var type: ColliderType = ColliderType.DYNAMIC
     var dynamicRebuild = false
     var gravity = Vector4(0f, 0f, -1f, 0f)
+    var mass = 1f
     var friction = 0.8f
     var center = Vector4()
     var radius = 0f
     private var objects: List<PrimitiveComponent> = listOf()
-    private lateinit var description: (Vector4) -> Float
+    lateinit var description: (Vector4) -> Float
     var linearVelocity = Vector4()
     var angularVelocity = Rotator4(0f, 0f, 0f, 0f)
 
@@ -130,7 +131,7 @@ class PhysicsComponent: Component(), Debuggable {
 
     override fun debug() {
         points.forEach {
-            Debug.drawPoint(Transform4(it.first).transformBy(Transform4(parent.transform.location*2f)).location)
+            Debug.drawPoint(Transform4(it.first).transformBy(Transform4(parent.transform.location*2f, parent.transform.rotation)).location)
         }
     }
 }

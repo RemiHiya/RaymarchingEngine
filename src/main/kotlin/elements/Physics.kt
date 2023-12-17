@@ -1,19 +1,25 @@
 package elements
 
 import api.math.transformBy
+import editor.Debug
 import elements.components.PhysicsComponent
 import utils.ColliderType
+import utils.Vector4
 
 class Physics {
     companion object {
         private var objects: MutableList<PhysicsComponent> = mutableListOf()
         private var potentialColliding: MutableSet<Pair<PhysicsComponent, PhysicsComponent>> = mutableSetOf()
+        private var colliding: MutableSet<Pair<
+                Pair<PhysicsComponent, PhysicsComponent>,
+                Pair<Vector4, Vector4>>> = mutableSetOf()
 
         // TODO : Multithreading
+        // TODO : pas de collision response entre 2 objets statiques
 
         fun simulate(scene: Scene, dt: Float) {
             initialize(scene.actors)
-            updatePositions(dt)
+            //updatePositions(dt)
             preDetect()
             detect()
             resolve()
@@ -56,6 +62,35 @@ class Physics {
         }
 
         private fun detect() {
+            potentialColliding.forEach { collisionData(it.first to it.second) }
+        }
+
+        private fun collisionData(objects: Pair<PhysicsComponent, PhysicsComponent>): Pair<Vector4, Vector4> {
+            var closestPoints: Pair<Vector4, Vector4> = Pair(Vector4(), Vector4())
+            var minDistance = Float.MAX_VALUE
+            val a = objects.first
+            val b = objects.second
+
+            val other = if (a.points.size < b.points.size) b else a
+            val self = if (a.points.size < b.points.size) a else b
+            val points = self.points.map { (it.first+self.center) to it.second }
+            val distFun = other.description
+
+            for (p in points) {
+                val worldPoint = p.first.transformBy(self.parent.transform)
+                // TODO : Utiliser une inverse transform (pour permettre les rotations)
+                val toOther = worldPoint - other.parent.transform.location
+                //Debug.drawPoint(toOther)
+                val tmp = distFun(toOther) + 1f
+                if (tmp < minDistance) {
+                    minDistance = tmp
+                    closestPoints = worldPoint to Vector4()
+                }
+            }
+            //Debug.drawCube(Vector3(), Vector3(4f,4f,4f), Rotator3(0f,0f,0f))
+            println(minDistance)
+            Debug.drawPoint(closestPoints.first.transformBy(self.parent.transform))
+            return closestPoints
         }
 
         private fun resolve() {

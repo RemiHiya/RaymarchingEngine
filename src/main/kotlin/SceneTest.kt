@@ -1,5 +1,6 @@
 import elements.Actor
 import elements.Scene
+import elements.components.PhysicsComponent
 import elements.components.PrimitiveComponent
 import elements.primitives.*
 import utils.*
@@ -24,7 +25,10 @@ class SceneTest: Scene() {
         val floor = Actor()
         val c = Cube(Transform4(Vector4()))
         c.setPrimitiveParameters(Vector4(4f, 4f, 4f, 4f), 0f)
+        val physics = PhysicsComponent()
+        physics.gravity = Vector4()
         floor.addComponent(PrimitiveComponent(c))
+        floor.addComponent(physics)
         floor.transform.location = Vector4(5f, 0f, -5f)
 
         add(floor)

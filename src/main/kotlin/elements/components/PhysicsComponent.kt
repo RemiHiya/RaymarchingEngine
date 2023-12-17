@@ -21,6 +21,8 @@ class PhysicsComponent: Component(), Debuggable {
     var dynamicRebuild = false
     var gravity = Vector4(0f, 0f, -1f, 0f)
     var friction = 0.8f
+    var center = Vector4()
+    var radius = 0f
     private var objects: List<PrimitiveComponent> = listOf()
     private lateinit var description: (Vector4) -> Float
     var linearVelocity = Vector4()
@@ -41,13 +43,18 @@ class PhysicsComponent: Component(), Debuggable {
      * Appelle la fonction [generate].
      */
     fun discretize() {
+        if (objects.isEmpty()) {
+            points.clear()
+            return
+        }
         description = getDesc()
-        var center = Vector4()
+        center = Vector4()
         objects.forEach { obj -> center += obj.primitive.v1 }
         center /= objects.size.toFloat()
-        val dist = objects.maxOf { obj -> (obj.primitive.v1 - center).length() +
-                abs(obj.primitive.simplifiedCollider(Vector4())) }
-        generate(center, dist)
+        radius = objects.maxOf {
+            obj -> (obj.primitive.v1 - center).length() + abs(obj.primitive.simplifiedCollider(Vector4()))
+        }
+        generate(center, radius)
     }
 
     /**

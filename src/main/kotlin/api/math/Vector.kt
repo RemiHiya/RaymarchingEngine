@@ -4,10 +4,7 @@ import utils.Rotator3
 import utils.Rotator4
 import utils.Vector3
 import utils.Vector4
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 
 fun max(a: Vector4, b: Vector4): Vector4 {
@@ -42,6 +39,14 @@ fun min(a: Vector3, b: Vector3): Vector3 {
         min(a.y, b.y),
         min(a.z, b.z)
     )
+}
+
+fun distance(a: Vector4, b: Vector4): Float {
+    return (a-b).length()
+}
+
+fun distanceSquared(a: Vector4, b: Vector4): Float {
+    return (b.x-a.x).pow(2) + (b.y-a.y).pow(2) + (b.z-a.z).pow(2) + (b.w-a.w).pow(2)
 }
 
 fun Vector4.rotate(rotator: Rotator4): Vector4 {

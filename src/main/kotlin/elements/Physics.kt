@@ -1,7 +1,8 @@
 package elements
 
+import api.math.rotation
+import api.math.times
 import api.math.transformBy
-import editor.Debug
 import elements.components.PhysicsComponent
 import utils.ColliderType
 import utils.Vector4
@@ -12,14 +13,19 @@ class Physics {
         private var potentialColliding: MutableSet<Pair<PhysicsComponent, PhysicsComponent>> = mutableSetOf()
         private var colliding: MutableSet<Pair<
                 Pair<PhysicsComponent, PhysicsComponent>,
-                Pair<Vector4, Vector4>>> = mutableSetOf()
+                Pair<Vector4, Float>>> = mutableSetOf()
 
-        // TODO : Multithreading
         // TODO : pas de collision response entre 2 objets statiques
 
+        fun simulateOnThread(scene: Scene, dt: Float) {
+            val physicsThread = Thread {
+                simulate(scene, dt)
+            }
+            physicsThread.start()
+        }
         fun simulate(scene: Scene, dt: Float) {
             initialize(scene.actors)
-            //updatePositions(dt)
+            updatePositions(dt)
             preDetect()
             detect()
             resolve()
@@ -62,11 +68,11 @@ class Physics {
         }
 
         private fun detect() {
-            potentialColliding.forEach { collisionData(it.first to it.second) }
+            // TODO : remplir le set "colliding" avec les collisions data
         }
 
-        private fun collisionData(objects: Pair<PhysicsComponent, PhysicsComponent>): Pair<Vector4, Vector4> {
-            var closestPoints: Pair<Vector4, Vector4> = Pair(Vector4(), Vector4())
+        private fun collisionData(objects: Pair<PhysicsComponent, PhysicsComponent>): Pair<Vector4, Float> {
+            var closestPoints: Pair<Vector4, Float> = Pair(Vector4(), 0f)
             var minDistance = Float.MAX_VALUE
             val a = objects.first
             val b = objects.second
@@ -78,18 +84,13 @@ class Physics {
 
             for (p in points) {
                 val worldPoint = p.first.transformBy(self.parent.transform)
-                // TODO : Utiliser une inverse transform (pour permettre les rotations)
-                val toOther = worldPoint - other.parent.transform.location
-                //Debug.drawPoint(toOther)
+                val toOther = rotation(other.parent.transform.rotation.toRadians()).inverse() * (worldPoint - other.parent.transform.location)
                 val tmp = distFun(toOther) + 1f
                 if (tmp < minDistance) {
                     minDistance = tmp
-                    closestPoints = worldPoint to Vector4()
+                    closestPoints = worldPoint to tmp
                 }
             }
-            //Debug.drawCube(Vector3(), Vector3(4f,4f,4f), Rotator3(0f,0f,0f))
-            println(minDistance)
-            Debug.drawPoint(closestPoints.first.transformBy(self.parent.transform))
             return closestPoints
         }
 

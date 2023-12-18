@@ -131,7 +131,7 @@ class PhysicsComponent: Component(), Debuggable {
 
     override fun debug() {
         points.forEach {
-            Debug.drawPoint(Transform4(it.first).transformBy(Transform4(parent.transform.location*2f, parent.transform.rotation)).location)
+            Debug.drawPoint(it.first.transformBy(Transform4(parent.transform.location*2f, parent.transform.rotation)))
         }
     }
 }

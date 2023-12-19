@@ -70,9 +70,16 @@ class Debug {
                 val t = pos.project().project().toScreen()
                 val dist = (pos - camera.transform.location).length()
                 val size = -dist/10f + 1f
-                ImGui.getWindowDrawList().addCircleFilled(t.x, t.y, size*5f, 0xFF0000FF.toInt(), 10)
+                ImGui.getWindowDrawList().addCircleFilled(t.x, t.y, 5f, 0xFF0000FF.toInt(), 10)
             }
-
+        }
+        fun drawPoint(pos: Vector3) {
+            objects.add {
+                val t = pos.project().toScreen()
+                val dist = (pos - camera.transform.location.toVector3()).length()
+                val size = -dist/10f + 1f
+                ImGui.getWindowDrawList().addCircleFilled(t.x, t.y, 5f, 0xFF0000FF.toInt(), 10)
+            }
         }
         fun drawScreenLine(a: Vector2, b: Vector2, thickness: Float) {
             ImGui.getWindowDrawList().addLine(a.x, a.y, b.x, b.y, 0xFF0000FF.toInt(), thickness)

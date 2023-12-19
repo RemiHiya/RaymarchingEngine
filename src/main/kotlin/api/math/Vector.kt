@@ -41,6 +41,11 @@ fun min(a: Vector3, b: Vector3): Vector3 {
     )
 }
 
+fun Vector4.mirrorByNormal(n: Vector4): Vector4 {
+    val normal = n.normalize()
+    return this - normal * (2f * this.dot(normal))
+}
+
 fun distance(a: Vector4, b: Vector4): Float {
     return (a-b).length()
 }

@@ -39,11 +39,20 @@ class PhysicsComponent: Component(), Debuggable {
 
     }
 
+    fun getNormal(pos: Vector4, epsilon: Float = 0.0001f): Vector4 {
+        val dx = description(Vector4(pos.x + epsilon, pos.y, pos.z, pos.w)) - description(pos)
+        val dy = description(Vector4(pos.x, pos.y + epsilon, pos.z, pos.w)) - description(pos)
+        val dz = description(Vector4(pos.x, pos.y, pos.z + epsilon, pos.w)) - description(pos)
+        val dw = description(Vector4(pos.x, pos.y, pos.z, pos.w + epsilon)) - description(pos)
+
+        return Vector4(dx, dy, dz, dw).normalize()
+    }
+
     /**
      * Prend en entrée [objects] les objets présents, en détermine le centre moyen et les bounds.
      * Appelle la fonction [generate].
      */
-    fun discretize() {
+    private fun discretize() {
         if (objects.isEmpty()) {
             points.clear()
             return

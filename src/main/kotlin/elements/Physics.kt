@@ -1,9 +1,7 @@
 package elements
 
-import api.math.rotate
-import api.math.rotation
-import api.math.times
-import api.math.transformBy
+import api.math.*
+import com.badlogic.gdx.Gdx
 import elements.components.PhysicsComponent
 import utils.ColliderType
 import utils.Vector4
@@ -31,11 +29,16 @@ class Physics {
             physicsThread.start()
         }
         fun simulate(scene: Scene, dt: Float) {
-            initialize(scene.actors)
-            updatePositions(dt)
-            preDetect()
-            detect()
-            resolve()
+            Gdx.app.postRunnable {
+                initialize(scene.actors)
+                updatePositions(dt)
+                preDetect()
+                detect()
+                resolve()
+            }
+
+
+
         }
 
         private fun initialize(actors: Array<Actor>) {
@@ -47,6 +50,7 @@ class Physics {
             for (i in objects) {
                 if (i.type == ColliderType.STATIC)
                     continue
+
                 i.linearVelocity *= i.friction
                 i.angularVelocity *= i.friction
                 i.linearVelocity += (i.gravity) * dt * .981f
@@ -80,8 +84,8 @@ class Physics {
                 if (i.first.type == ColliderType.STATIC && i.second.type == ColliderType.STATIC)
                     continue
                 val data = collisionData(i.first to i.second)
-                if (data.distance <= 0) {
-                    colliding += Triple(i.first, i.second, data)
+                if (data.third.distance <= 0) {
+                    colliding += data
                 }
             }
         }
@@ -91,7 +95,7 @@ class Physics {
          * @param objects La paire d'objets sur laquelle générer des données.
          * @return Les données de collision, voir [CollisionData].
          */
-        private fun collisionData(objects: Pair<PhysicsComponent, PhysicsComponent>): CollisionData {
+        private fun collisionData(objects: Pair<PhysicsComponent, PhysicsComponent>): Triple<PhysicsComponent, PhysicsComponent, CollisionData> {
             val a = objects.first
             val b = objects.second
             var distance = Float.MAX_VALUE
@@ -121,24 +125,44 @@ class Physics {
                 }
             }
 
+            if (locations.isEmpty()) {
+                return Triple(self, other, CollisionData(Vector4(), 1f, Vector4() to Vector4()))
+            }
             var result = CollisionData(
                 locations.reduce(Vector4::plus)/locations.size.toFloat(),
                 distance,
                 Vector4() to Vector4()
             )
-            selfLocations.reduce(Vector4::plus)/selfLocations.size.toFloat()
-            otherLocations.reduce(Vector4::plus)/otherLocations.size.toFloat()
 
             if (result.distance <= 0) {
                 val normalA = other.getNormal(otherLocations.reduce(Vector4::plus)/otherLocations.size.toFloat()).rotate(other.parent.transform.rotation)
                 val normalB = self.getNormal(selfLocations.reduce(Vector4::plus)/selfLocations.size.toFloat()).rotate(self.parent.transform.rotation)
                 result = result.copy(normals = normalA to normalB)
             }
-            return result
+            return Triple(self, other, result)
         }
 
 
         private fun resolve() {
+            for ((a, b, data) in colliding) {
+                if (data.distance > 0)
+                    continue
+                val massRatio = if (a.type == ColliderType.STATIC) {
+                    1f
+                } else if (b.type == ColliderType.STATIC) {
+                    0f
+                } else {
+                    a.mass / b.mass
+                }
+
+                a.parent.transform.location +=
+                    data.normals.first.mirrorByNormal(data.normals.second) * (1f-massRatio) * data.distance
+                b.parent.transform.location +=
+                    data.normals.second.mirrorByNormal(data.normals.first) * massRatio * data.distance
+
+            }
+
+
         }
     }
 }

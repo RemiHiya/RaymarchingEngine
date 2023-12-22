@@ -3,6 +3,9 @@ package utils
 import kotlin.math.PI
 
 data class Rotator3(var roll: Float, var pitch: Float, var yaw: Float) {
+    constructor(rot: Rotator4) : this(rot.roll, rot.pitch, rot.yaw)
+    constructor(vec: Vector3) : this(vec.x, vec.y, vec.z)
+
     fun toRadians() = Rotator3(
         roll*PI.toFloat()/180,
         pitch*PI.toFloat()/180,
@@ -15,6 +18,9 @@ data class Rotator3(var roll: Float, var pitch: Float, var yaw: Float) {
 }
 
 data class Rotator4(var roll: Float, var pitch: Float, var yaw: Float, var w: Float) {
+    constructor(rot: Rotator3) : this(rot.roll, rot.pitch, rot.yaw, 0f)
+    constructor(vec: Vector4) : this(vec.x, vec.y, vec.z, vec.w)
+
     fun toRadians() = Rotator4(
         roll*PI.toFloat()/180,
         pitch*PI.toFloat()/180,
@@ -27,4 +33,6 @@ data class Rotator4(var roll: Float, var pitch: Float, var yaw: Float, var w: Fl
     operator fun minus(other: Rotator4) = Rotator4(roll-other.roll, pitch-other.pitch, yaw-other.yaw, w-other.w)
     operator fun times(b: Float) = Rotator4(roll*b, pitch*b, yaw*b, w*b)
     operator fun times(b: Vector4) = Rotator4(roll*b.x, pitch*b.y, yaw*b.z, w*b.w)
+
+    fun toDegrees() = this * (180f / PI.toFloat())
 }

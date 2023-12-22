@@ -4,6 +4,8 @@ import kotlin.math.sqrt
 import kotlin.math.abs
 
 data class Vector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var w: Float = 0f) {
+    constructor(vec: Vector3) : this(vec.x, vec.y, vec.z, 0f)
+
     operator fun plus(other: Vector4) = Vector4(x + other.x, y + other.y, z + other.z, w + other.w)
     operator fun minus(other: Vector4) = Vector4(x - other.x, y - other.y, z - other.z, w - other.w)
     operator fun times(scalar: Float) = Vector4(x * scalar, y * scalar, z * scalar, w * scalar)
@@ -12,7 +14,7 @@ data class Vector4(var x: Float = 0f, var y: Float = 0f, var z: Float = 0f, var 
 
     fun length() = sqrt(x*x + y*y + z*z + w*w)
     fun normalize() = this / length()
-    fun dot(other: Vector4) = x * other.x + y * other.y + z * other.z
+    infix fun dot(other: Vector4) = x * other.x + y * other.y + z * other.z
     fun abs() = Vector4(abs(x), abs(y), abs(z), abs(w))
 
     override fun toString(): String {

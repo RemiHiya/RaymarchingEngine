@@ -85,7 +85,7 @@ class PhysicsComponent: Component(), Debuggable {
                 while (z <= steps) {
                     var w = -steps
                     while (w <= steps) {
-                        val point = center * 2f + Vector4(x*step, y*step, z*step, w*step)
+                        val point = center + Vector4(x*step, y*step, z*step, w*step)
                         val dist = description(point/2f)
                         if (abs(dist) > step) {
                             w += (step + abs(dist)/step).toInt()

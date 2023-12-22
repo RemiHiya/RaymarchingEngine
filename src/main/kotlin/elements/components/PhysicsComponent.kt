@@ -21,7 +21,8 @@ class PhysicsComponent: Component(), Debuggable {
     var dynamicRebuild = false
     var gravity = Vector4(0f, 0f, -1f, 0f)
     var mass = 1f
-    var friction = 0.8f
+    var linearFriction = 0.8f
+    var angularFriction = 0.9f
     var center = Vector4()
     var radius = 0f
     private var objects: List<PrimitiveComponent> = listOf()
@@ -48,6 +49,21 @@ class PhysicsComponent: Component(), Debuggable {
         return Vector4(dx, dy, dz, dw).normalize()
     }
 
+    fun addTorque(position: Vector4, force: Vector4) {
+        val c = center.transformBy(parent.transform)
+        val lever = position - c
+        val torque = Vector4(
+            lever.y * force.z - lever.z * force.y,
+            lever.z * force.x - lever.x * force.z,
+            lever.x * force.y - lever.y * force.x,
+            lever.w * force.x - lever.x * force.w
+        )
+        angularVelocity += Rotator4(torque * calculateMomentOfInertiaSphere())
+    }
+
+    fun calculateMomentOfInertiaSphere() = (2f / 5f) * mass * radius * radius
+
+
     /**
      * Prend en entrée [objects] les objets présents, en détermine le centre moyen et les bounds.
      * Appelle la fonction [generate].
@@ -65,6 +81,8 @@ class PhysicsComponent: Component(), Debuggable {
             obj -> (obj.primitive.v1 - center).length() + abs(obj.primitive.simplifiedCollider(Vector4()))
         }
         generate(center, radius)
+        if (points.isNotEmpty())
+            center = points.map { it.first }.reduce(Vector4::plus) / points.size.toFloat()
     }
 
     /**
@@ -75,7 +93,7 @@ class PhysicsComponent: Component(), Debuggable {
      * @param step Le pas utilisé lors de la génération des points (par défaut: 0.5f).
      * @param threshold Le seuil pour déterminer si un point est sur la surface (par défaut: 0.1f).
      */
-    private fun generate(center: Vector4, distance: Float, step: Float = .5f, threshold: Float = 0.1f) {
+    private fun generate(center: Vector4, distance: Float, step: Float = 1f, threshold: Float = 0.1f) {
         val steps = (distance / step).toInt() * 2
         var x = -steps
         while (x <= steps) {
@@ -85,7 +103,7 @@ class PhysicsComponent: Component(), Debuggable {
                 while (z <= steps) {
                     var w = -steps
                     while (w <= steps) {
-                        val point = center + Vector4(x*step, y*step, z*step, w*step)
+                        val point = center * 2f + Vector4(x*step, y*step, z*step, w*step)
                         val dist = description(point/2f)
                         if (abs(dist) > step) {
                             w += (step + abs(dist)/step).toInt()

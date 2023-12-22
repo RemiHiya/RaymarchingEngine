@@ -2,8 +2,11 @@ package elements
 
 import api.math.*
 import com.badlogic.gdx.Gdx
+import editor.Debug
 import elements.components.PhysicsComponent
 import utils.ColliderType
+import utils.Rotator4
+import utils.Vector3
 import utils.Vector4
 
 class Physics {
@@ -21,6 +24,7 @@ class Physics {
         private val colliding = mutableSetOf<Triple<PhysicsComponent, PhysicsComponent, CollisionData>>()
 
         // TODO : pas de collision response entre 2 objets statiques
+        // TODO : Fix le multithreading
 
         fun simulateOnThread(scene: Scene, dt: Float) {
             val physicsThread = Thread {
@@ -36,8 +40,6 @@ class Physics {
                 detect()
                 resolve()
             }
-
-
 
         }
 
@@ -55,6 +57,7 @@ class Physics {
                 i.angularVelocity *= i.friction
                 i.linearVelocity += (i.gravity) * dt * .981f
                 i.parent.transform.location += i.linearVelocity
+                i.parent.transform.rotation += i.angularVelocity
             }
         }
 
@@ -114,7 +117,7 @@ class Physics {
             for (p in points) {
                 val worldPoint = (p.first*.5f).transformBy(self.parent.transform)
                 val toOther = rotation(other.parent.transform.rotation.toRadians()).inverse() * (worldPoint - other.parent.transform.location)
-                val dist = distFun(toOther)
+                val dist = distFun(toOther) + p.second
                 if (dist <= 0) {
                     locations.add(worldPoint)
                     selfLocations.add(p.first)
@@ -154,11 +157,29 @@ class Physics {
                 } else {
                     a.mass / b.mass
                 }
+                Debug.drawPoint(Vector3(data.location))
+                Debug.drawLine(Vector3(data.location), Vector3(data.location)+Vector3(data.normals.first))
+                Debug.drawLine(Vector3(data.location), Vector3(data.location)+Vector3(data.normals.second))
 
-                a.parent.transform.location +=
+                /*a.parent.transform.location +=
                     data.normals.first.mirrorByNormal(data.normals.second) * (1f-massRatio) * data.distance
                 b.parent.transform.location +=
-                    data.normals.second.mirrorByNormal(data.normals.first) * massRatio * data.distance
+                    data.normals.second.mirrorByNormal(data.normals.first) * massRatio * data.distance*/
+
+                val r1 = data.location - a.parent.transform.location
+                val r2 = data.location - b.parent.transform.location
+
+                a.linearVelocity +=
+                    data.normals.first.mirrorByNormal(data.normals.second) * (1f-massRatio) * data.distance *1.25f* 1f/r1.length()
+                b.linearVelocity +=
+                    data.normals.second.mirrorByNormal(data.normals.first) * massRatio * data.distance *1.25f*1f/r2.length()
+
+                // TODO : Fix les rotations
+                val impulseTorque1 = (r1.toVector3().cross(data.normals.first.toVector3())) * Vector3(1f, -1f, 1f)
+                val impulseTorque2 = (r2.toVector3().cross(data.normals.second.toVector3())) * Vector3(1f, -1f, 1f)
+
+                a.angularVelocity += Rotator4(impulseTorque1.toVector4()) * (1f-massRatio)
+                b.angularVelocity -= Rotator4(impulseTorque2.toVector4()) * massRatio
 
             }
 

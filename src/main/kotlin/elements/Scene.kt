@@ -18,7 +18,7 @@ open class Scene {
     }
 
     fun update(dt: Float) {
-        Physics.simulateOnThread(this, dt)
+        Physics.simulate(this, dt)
         actors.forEach { it.update(dt) }
     }
 

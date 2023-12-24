@@ -1,14 +1,19 @@
 package elements
 
 import api.math.*
-import com.badlogic.gdx.Gdx
 import editor.Debug
 import elements.components.PhysicsComponent
 import utils.ColliderType
-import utils.Rotator4
 import utils.Vector3
 import utils.Vector4
 
+/**
+ * Cette classe gère les physiques d'une Scene donnée.
+ *
+ * Attention, le système détecte les collisions de manière précise mais les réponses aux collisions
+ * ne sont pas mathématiquement correctes, elles permettent uniquement de visualiser les collisions.
+ * @author RemiHiya
+ */
 class Physics {
     companion object {
         /**
@@ -33,31 +38,44 @@ class Physics {
             physicsThread.start()
         }
         fun simulate(scene: Scene, dt: Float) {
-            Gdx.app.postRunnable {
-                initialize(scene.actors)
-                updatePositions(dt)
-                preDetect()
-                detect()
-                resolve()
-            }
-
+            initialize(scene.actors)
+            updatePositions(dt)
+            preDetect()
+            detect()
+            resolve()
         }
 
+        /**
+         * Initialise la simulation en récupérant tout les [PhysicsComponent] existants dans la scène.
+         * @param actors La liste des actors présents dans la scène.
+         */
         private fun initialize(actors: Array<Actor>) {
             objects.clear()
             objects.addAll(actors.map { it.components }.flatMap { it.filterIsInstance<PhysicsComponent>() })
         }
 
+        /**
+         * Met à jour les transformations de tout les actors de la scène ayant un [PhysicsComponent] attaché.
+         */
         private fun updatePositions(dt: Float) {
             for (i in objects) {
                 if (i.type == ColliderType.STATIC)
                     continue
 
-                i.linearVelocity *= i.friction
-                i.angularVelocity *= i.friction
+                i.linearVelocity *= i.linearFriction
+                i.angularVelocity *= i.angularFriction
                 i.linearVelocity += (i.gravity) * dt * .981f
                 i.parent.transform.location += i.linearVelocity
                 i.parent.transform.rotation += i.angularVelocity
+            }
+        }
+
+        private fun updateObjectTransform(obj: PhysicsComponent) {
+            if (obj.type != ColliderType.STATIC) {
+                obj.linearVelocity *= obj.linearFriction
+                obj.angularVelocity *= obj.angularFriction
+                obj.parent.transform.location += obj.linearVelocity
+                obj.parent.transform.rotation += obj.angularVelocity
             }
         }
 
@@ -81,6 +99,12 @@ class Physics {
             }
         }
 
+        /**
+         * Génère une liste de paires de tout les objets en collision.
+         * Deux objets sont en collision si la distance signée les séparant est négative.
+         *
+         * Doit être appelée après la fonction [preDetect].
+         */
         private fun detect() {
             colliding.clear()
             for (i in potentialColliding) {
@@ -96,7 +120,8 @@ class Physics {
         /**
          * Génère les données de collision entre 2 objets.
          * @param objects La paire d'objets sur laquelle générer des données.
-         * @return Les données de collision, voir [CollisionData].
+         * @return Les données de collision.
+         * @see [CollisionData]
          */
         private fun collisionData(objects: Pair<PhysicsComponent, PhysicsComponent>): Triple<PhysicsComponent, PhysicsComponent, CollisionData> {
             val a = objects.first
@@ -145,7 +170,11 @@ class Physics {
             return Triple(self, other, result)
         }
 
-
+        /**
+         * Preuve de concept de résolution des collision.
+         *
+         * Doit être appelée après la fonction [detect].
+         */
         private fun resolve() {
             for ((a, b, data) in colliding) {
                 if (data.distance > 0)
@@ -157,14 +186,10 @@ class Physics {
                 } else {
                     a.mass / b.mass
                 }
+                // Debug du point de contact et des normales
                 Debug.drawPoint(Vector3(data.location))
                 Debug.drawLine(Vector3(data.location), Vector3(data.location)+Vector3(data.normals.first))
                 Debug.drawLine(Vector3(data.location), Vector3(data.location)+Vector3(data.normals.second))
-
-                /*a.parent.transform.location +=
-                    data.normals.first.mirrorByNormal(data.normals.second) * (1f-massRatio) * data.distance
-                b.parent.transform.location +=
-                    data.normals.second.mirrorByNormal(data.normals.first) * massRatio * data.distance*/
 
                 val r1 = data.location - a.parent.transform.location
                 val r2 = data.location - b.parent.transform.location
@@ -174,12 +199,11 @@ class Physics {
                 b.linearVelocity +=
                     data.normals.second.mirrorByNormal(data.normals.first) * massRatio * data.distance *1.25f*1f/r2.length()
 
-                // TODO : Fix les rotations
-                val impulseTorque1 = (r1.toVector3().cross(data.normals.first.toVector3())) * Vector3(1f, -1f, 1f)
-                val impulseTorque2 = (r2.toVector3().cross(data.normals.second.toVector3())) * Vector3(1f, -1f, 1f)
+                a.addTorque(data.location, data.normals.first)
+                b.addTorque(data.location, data.normals.second)
 
-                a.angularVelocity += Rotator4(impulseTorque1.toVector4()) * (1f-massRatio)
-                b.angularVelocity -= Rotator4(impulseTorque2.toVector4()) * massRatio
+                updateObjectTransform(a)
+                updateObjectTransform(b)
 
             }
 

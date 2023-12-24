@@ -6,6 +6,9 @@ import api.math.transformBy
 import editor.Debug
 import editor.Debuggable
 import editor.Gui
+import imgui.ImGui
+import imgui.flag.ImGuiTreeNodeFlags
+import imgui.type.ImFloat
 import imgui.type.ImInt
 import utils.*
 import kotlin.math.abs
@@ -150,10 +153,32 @@ class PhysicsComponent: Component(), Debuggable {
 
     override fun display() {
         super.display()
-        val op = ImInt(type.ordinal)
-        if (Gui.enumField<ColliderType>("Collider", op)) {
-            type = ColliderType.values()[op.get()]
+        if (ImGui.collapsingHeader("Options", ImGuiTreeNodeFlags.DefaultOpen)) {
+            ImGui.indent()
+            Gui.useColumn()
+            val op = ImInt(type.ordinal)
+            if (Gui.enumField<ColliderType>("Collider", op)) {
+                type = ColliderType.values()[op.get()]
+            }
+            Gui.vector4Field(gravity, "Gravity")
+            val m = ImFloat(mass)
+            if (Gui.floatField(m, "Mass")) {
+                mass = m.get()
+            }
+            Gui.stopColumn()
+            ImGui.unindent()
         }
+        ImGui.spacing()
+
+        if (ImGui.collapsingHeader("Runtime", ImGuiTreeNodeFlags.DefaultOpen)) {
+            ImGui.indent()
+            Gui.useColumn()
+            Gui.vector4Field(linearVelocity, "Linear velocity")
+            Gui.rotator4Field(angularVelocity, "Angular velocity")
+            Gui.stopColumn()
+            ImGui.unindent()
+        }
+
     }
 
     override fun debug() {

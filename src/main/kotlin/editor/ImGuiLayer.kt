@@ -15,6 +15,7 @@ import imgui.type.ImBoolean
 import imgui.type.ImString
 import misc.RESOURCE_PATH
 import org.lwjgl.glfw.GLFW.*
+import utils.Vector2
 import java.io.File
 
 
@@ -179,11 +180,11 @@ class ImGuiLayer(private val scene: Scene) {
         menuBar()
         ImGui.showDemoWindow()
 
+        worldSettings()
+
         ImGui.begin("Inspector")
         selection?.display()
         ImGui.end()
-
-        worldSettings()
 
         val flags = ImGuiWindowFlags.NoScrollbar or ImGuiWindowFlags.NoScrollWithMouse
 
@@ -195,24 +196,14 @@ class ImGuiLayer(private val scene: Scene) {
         viewportX = ImGui.getWindowSizeX()
         viewportY = ImGui.getWindowSizeY()
         focused = ImGui.isWindowHovered(ImGuiWindowFlags.NoTitleBar)
-        Debug.viewportX = viewportX
-        Debug.viewportY = viewportY
-        Debug.viewportPosX = ImGui.getWindowPosX()
-        Debug.viewportPosY = ImGui.getWindowPosY()
-        /*
-        val test = PhysicsComponent()
-        val tmp = mutableListOf<PrimitiveComponent>()
-        scene.getActor(1)?.components?.forEach { tmp += (it as PrimitiveComponent) }
-        test.objects = tmp
-        test.discretize()
-        test.points.forEach { point -> Debug.drawPoint(point) }
-        */
+        Debug.viewportSize = Vector2(viewportX, viewportY)
+        Debug.viewportPos = Vector2(ImGui.getWindowPosX(), ImGui.getWindowPosY())
+
         (selection as? Debuggable)?.debug()
         Debug.debugAll()
         ImGui.end()
 
         outliner(scene.actors)
-
 
         ImGui.end()
         ImGui.render()
@@ -314,7 +305,6 @@ class ImGuiLayer(private val scene: Scene) {
 
         ImGui.separator()
         for (actor in actors) {
-            //val flags = if (actor.children.isNotEmpty()) ImGuiTreeNodeFlags.OpenOnArrow else ImGuiTreeNodeFlags.Leaf
             var flags = if (actor==selection) ImGuiTreeNodeFlags.Selected else ImGuiTreeNodeFlags.None
             flags = flags or ImGuiTreeNodeFlags.OpenOnDoubleClick or ImGuiTreeNodeFlags.OpenOnArrow or ImGuiTreeNodeFlags.SpanAvailWidth
             val isOpen = ImGui.treeNodeEx(actor.displayName, flags)

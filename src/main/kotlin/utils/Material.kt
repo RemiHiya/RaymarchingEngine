@@ -1,4 +1,0 @@
-package utils
-
-class Material {
-}

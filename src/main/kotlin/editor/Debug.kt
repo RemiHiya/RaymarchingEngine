@@ -11,20 +11,18 @@ import kotlin.math.pow
 
 class Debug {
     companion object {
-        var viewportX = 0f
-        var viewportY = 0f
-        var viewportPosX = 0f
-        var viewportPosY = 0f
+        var viewportSize = Vector2()
+        var viewportPos = Vector2()
         lateinit var camera: CameraActor
         private var objects: MutableList<() -> Unit> = mutableListOf()
 
         fun debugAll() {
-            objects.forEach { obj -> obj.invoke() }
+            objects.forEach { it.invoke() }
             objects.clear()
         }
 
         private fun Vector2.toScreen(): Vector2 {
-            return (this*0.5f + Vector2(0.5f, 0.5f)) * Vector2(viewportX, viewportY) + Vector2(viewportPosX, viewportPosY)
+            return (this*0.5f + Vector2(0.5f, 0.5f)) * Vector2(viewportSize.x, viewportSize.y) + Vector2(viewportPos.x, viewportPos.y)
         }
         fun Vector4.project(center: Vector4=Vector4()): Vector3 {
             val cameraW = camera.transform.location.w
@@ -45,7 +43,7 @@ class Debug {
             val near = camera.nearClip
             val far = camera.farClip
             val fov = camera.fov.toRadians()
-            val aspectRatio = viewportX / viewportY
+            val aspectRatio = viewportSize.x / viewportSize.y
             val atanHalfFOV = atan(fov / 2f)
             val scaleY = 1f / atanHalfFOV
             val scaleX = (1f/ atanHalfFOV) / aspectRatio

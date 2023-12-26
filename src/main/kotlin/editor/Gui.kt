@@ -48,9 +48,19 @@ class Gui {
         fun floatField(value: ImFloat, name: String): Boolean {
             ImGui.text(name)
             startInput(name)
-            val out = ImGui.inputFloat("##", value, 0f, 0f, "%g")
+            //val out = ImGui.inputFloat("##", value, 0f, 0f, "%g")
+            val out = floatInput(value)
             endInput()
             return out
+        }
+        fun floatInput(value: ImFloat): Boolean {
+            val stringValue = value.get().toString()
+            val max = 5
+            val precision = when {
+                stringValue.contains('.') -> maxOf(1, stringValue.length - stringValue.indexOf('.')-1)
+                else -> 1
+            }
+            return ImGui.inputFloat("##", value, 0f, 0f, "%.${precision}f")
         }
         fun textField(label: String, value: ImString): Boolean {
             return ImGui.inputText(label, value, ImGuiInputTextFlags.AutoSelectAll or ImGuiInputTextFlags.EnterReturnsTrue)

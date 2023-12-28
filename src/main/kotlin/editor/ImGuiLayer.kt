@@ -3,6 +3,7 @@ package editor
 import App
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics
+import editor.material.Material
 import elements.Actor
 import elements.Scene
 import elements.components.Component
@@ -10,6 +11,7 @@ import imgui.ImFontConfig
 import imgui.ImGui
 import imgui.extension.imguizmo.ImGuizmo
 import imgui.extension.imguizmo.flag.Operation
+import imgui.extension.imnodes.ImNodes
 import imgui.flag.*
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
@@ -69,6 +71,7 @@ class ImGuiLayer(private val scene: Scene) {
 
     fun init() {
         ImGui.createContext()
+        ImNodes.createContext()
 
         // ------------------------------------------------------------
         // Initialize ImGuiIO config
@@ -205,6 +208,10 @@ class ImGuiLayer(private val scene: Scene) {
         (selection as? Debuggable)?.debug()
         Debug.debugAll()
         //showGizmo()
+        ImGui.end()
+
+        ImGui.begin("Material")
+        Material().display()
         ImGui.end()
 
         outliner(scene.actors)

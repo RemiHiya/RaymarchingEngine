@@ -25,12 +25,44 @@ import utils.Vector4
 class App(private val scene: Scene) : ApplicationAdapter() {
 
     companion object {
+        private lateinit var shaderProgram: ShaderProgram
+        private lateinit var parser: SceneParser
+
         private var scale = 0.3f
         private lateinit var frameBuffer: FrameBuffer
         fun setRenderScale(new: Float) {
             scale = new
         }
         fun getRenderScale() = scale
+
+        fun reloadShader() {
+            shaderProgram.dispose()
+            initShaderProgram()
+        }
+
+        private fun initShaderProgram() {
+            val vertexShader = """
+            attribute vec4 a_position;
+            void main() {
+                gl_Position = a_position;
+            }
+            """.trimIndent()
+
+            parser.rebuildObjects()
+            var shaderCode = parser.initialize()
+            shaderCode += parser.computeScene() + "\n"
+            shaderCode += parser.computeMaterials() + "\n"
+            shaderCode += parser.computeMapper() + "\n"
+            shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()
+
+            //println(shaderCode)
+            shaderProgram = ShaderProgram(vertexShader, shaderCode)
+            ShaderProgram.pedantic = false
+
+            if (!shaderProgram.isCompiled) {
+                throw GdxRuntimeException("Shader compilation failed: ${shaderProgram.log}")
+            }
+        }
 
         fun resizeFrameBuffer(width: Int, height: Int) {
             frameBuffer.dispose()
@@ -42,7 +74,6 @@ class App(private val scene: Scene) : ApplicationAdapter() {
 
     private var spriteBatch: SpriteBatch? = null
     private var texture: Texture? = null
-    private lateinit var shaderProgram: ShaderProgram
 
     private lateinit var viewport: Viewport
 
@@ -121,27 +152,8 @@ class App(private val scene: Scene) : ApplicationAdapter() {
         val pixmap = Pixmap(width, height, Format.RGBA8888)
         texture = Texture(pixmap)
 
-        val vertexShader = """
-            attribute vec4 a_position;
-            void main() {
-                gl_Position = a_position;
-            }
-        """.trimIndent()
-
-        parser.rebuildObjects()
-        var shaderCode = parser.initialize()
-        shaderCode += parser.computeScene() + "\n"
-        shaderCode += parser.computeMaterials() + "\n"
-        shaderCode += parser.computeMapper() + "\n"
-        shaderCode += Gdx.files.internal(PATH + "shaders/frag.glsl").readString()
-        //println(shaderCode)
-
-        shaderProgram = ShaderProgram(vertexShader, shaderCode)
-        ShaderProgram.pedantic = false
-
-        if (!shaderProgram.isCompiled) {
-            throw GdxRuntimeException("Shader compilation failed: ${shaderProgram.log}")
-        }
+        App.parser = parser
+        initShaderProgram()
 
     }
 

@@ -10,8 +10,6 @@ import utils.Vector4
 import java.io.File
 import kotlin.math.PI
 
-fun readFile(path: String) = File(path).readText()
-
 class SceneParser(private val scene : Scene) {
 
     /*
@@ -26,6 +24,8 @@ class SceneParser(private val scene : Scene) {
     private var materialMap: Map<Int, Int> = mapOf()
 
     private var objects: Array<PrimitiveObject> = arrayOf()
+
+    private fun readFile(path: String) = File(path).readText()
 
     fun initialize() = "#version 330 core\n" +
             "#define MAX_OBJECTS ${MAX_OBJECTS}\n" +
@@ -57,6 +57,9 @@ class SceneParser(private val scene : Scene) {
     }
 
     private fun getShaders() {
+        shaderCalls = mapOf()
+        shadersMap = mapOf()
+        shaders = arrayOf()
         var index = 0
         for (i in objects) {
             val s = "shaders/" + i.getShader()
@@ -78,6 +81,9 @@ class SceneParser(private val scene : Scene) {
         }
     }
 
+    /**
+     * Génère le code GLSL contenant les SDF des objets présents.
+     */
     fun computeScene(): String {
         getShaders()
         var out = ""
@@ -88,8 +94,12 @@ class SceneParser(private val scene : Scene) {
     }
 
 
-    //Ajoute les materials au shader (évite les répétitions)
+    /**
+     * Génère le code GLSL qui permet de prendre en compte les material des objets présents.
+     */
     fun computeMaterials(): String {
+        materialMap = mapOf()
+        materialCalls = arrayOf()
         var out = ""
         var index = 0
         for (i in 0 until objects.size) {
@@ -167,5 +177,5 @@ class SceneParser(private val scene : Scene) {
     }
 
 
-    private fun Float.toRad() = this * PI.toFloat() /180
+    private fun Float.toRad() = this * PI.toFloat() / 180f
 }

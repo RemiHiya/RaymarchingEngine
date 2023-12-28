@@ -304,6 +304,11 @@ class ImGuiLayer(private val scene: Scene) {
         if (selection !is Actor)
             ImGui.endDisabled()
 
+        ImGui.sameLine()
+        if (ImGui.button("Hot Reload")) {
+            App.reloadShader()
+        }
+
         addComponent.update()
         addActor.update()
 

@@ -8,6 +8,8 @@ import elements.Scene
 import elements.components.Component
 import imgui.ImFontConfig
 import imgui.ImGui
+import imgui.extension.imguizmo.ImGuizmo
+import imgui.extension.imguizmo.flag.Operation
 import imgui.flag.*
 import imgui.gl3.ImGuiImplGl3
 import imgui.glfw.ImGuiImplGlfw
@@ -176,6 +178,7 @@ class ImGuiLayer(private val scene: Scene) {
 
 
         ImGui.newFrame()
+        ImGuizmo.beginFrame()
         setupDockspace()
         menuBar()
         ImGui.showDemoWindow()
@@ -201,6 +204,7 @@ class ImGuiLayer(private val scene: Scene) {
 
         (selection as? Debuggable)?.debug()
         Debug.debugAll()
+        //showGizmo()
         ImGui.end()
 
         outliner(scene.actors)
@@ -355,6 +359,20 @@ class ImGuiLayer(private val scene: Scene) {
         }
 
         ImGui.end()
+    }
+
+    private fun showGizmo() {
+        if (ImGui.isKeyPressed(GLFW_KEY_T)) {
+            Guizmo.currentGizmoOperation = Operation.TRANSLATE
+        } else if (ImGui.isKeyPressed(GLFW_KEY_R)) {
+            Guizmo.currentGizmoOperation = Operation.ROTATE
+        } else if (ImGui.isKeyPressed(GLFW_KEY_S)) {
+            Guizmo.currentGizmoOperation = Operation.SCALE
+        } else if (ImGui.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+            Guizmo.USE_SNAP.set(!Guizmo.USE_SNAP.get())
+        }
+
+        Guizmo.update()
     }
 
 

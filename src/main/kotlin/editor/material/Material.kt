@@ -1,31 +1,18 @@
 package editor.material
 
-import imgui.ImGui
+import editor.material.nodes.MaterialOutput
 import imgui.extension.imnodes.ImNodes
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation
-import imgui.extension.imnodes.flag.ImNodesPinShape
 
 class Material {
 
-    var nodes = mutableListOf<MaterialNode>(MaterialNode(0), MaterialNode(1))
+    var nodes: Map<Int, MaterialNode> = hashMapOf(Pair(0, MaterialNode(0)), Pair(1, MaterialOutput(1)))
 
     fun display() {
         ImNodes.beginNodeEditor()
-        for (node in nodes) {
-            ImNodes.beginNode(node.id)
-
-            ImNodes.beginNodeTitleBar()
-            ImGui.text(node.name)
-            ImNodes.endNodeTitleBar()
-
-            ImNodes.beginInputAttribute(node.id, ImNodesPinShape.CircleFilled)
-            ImGui.text("In")
-            ImNodes.endInputAttribute()
-
-            ImNodes.endNode()
+        for (node in nodes.values) {
+            node.display()
         }
-
-
 
 
         ImNodes.miniMap(0.2f, ImNodesMiniMapLocation.BottomRight)

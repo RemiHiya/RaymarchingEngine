@@ -11,10 +11,10 @@ class MaterialOutput(id: Int) : MaterialNode(id) {
     override val hoverColor = color * 1.5f
     override val selectColor = color * 1.5f
 
-    override val inputs = listOf(
-        Pin(id(0), "Color", PinType.VECTOR3),
-        Pin(id(1), "Displacement", PinType.VECTOR3)
+    override val inputs = mapOf(
+        id(0) to Pin("Color", PinType.VECTOR3),
+        id(1) to Pin("Displacement", PinType.VECTOR3)
     )
 
-    override val outputs = listOf<Pin>()
+    override val outputs = mapOf<Int, Pin>()
 }

@@ -8,14 +8,18 @@ import utils.Color
 import java.lang.Integer.min
 
 // TODO : class abstraite
-open class MaterialNode(private val id: Int) {
+open class MaterialNode(val id: Int) {
     open val name = "Node name"
     open val color = Color(11, 109, 191)
     open val hoverColor = Color(11, 109, 191) + 50
     open val selectColor = Color(11, 109, 191) + 50
 
-    open val inputs: List<Pin> = listOf(Pin(id(0), "test pin", PinType.FLOAT))
-    open val outputs: List<Pin> = listOf(Pin(id(1), "test out", PinType.INT))
+    open val inputs: Map<Int, Pin> = mapOf(id(0) to Pin("test pin", PinType.FLOAT))
+    open val outputs: Map<Int, Pin> = mapOf(id(1) to Pin("test out", PinType.INT),
+        id(2) to Pin("test out2", PinType.INT))
+
+    var inLinks = mutableMapOf<Int, Int>()
+    var outLinks = mutableMapOf<Int, Int>()
 
     protected fun id(index: Int): Int {
         return ImGui.getID("pin_${name}_${id}_$index")
@@ -37,19 +41,19 @@ open class MaterialNode(private val id: Int) {
         val minSize = min(inputs.size, outputs.size)
 
         for (i in 0 until minSize) {
-            displayInput(inputs[i])
+            displayInput(inputs.keys.toList()[i], inputs.values.toList()[i])
             ImGui.sameLine()
             ImGui.dummy(20f, 0f)
             ImGui.sameLine()
-            displayOutput(outputs[i])
+            displayOutput(outputs.keys.toList()[i], outputs.values.toList()[i])
         }
 
         for (i in minSize until inputs.size) {
-            displayInput(inputs[i])
+            displayInput(inputs.keys.toList()[i], inputs.values.toList()[i])
         }
 
         for (i in minSize until outputs.size) {
-            displayOutput(outputs[i])
+            displayOutput(outputs.keys.toList()[i], outputs.values.toList()[i])
         }
 
         ImNodes.endNode()
@@ -59,20 +63,20 @@ open class MaterialNode(private val id: Int) {
         ImNodes.popColorStyle()
     }
 
-    private fun displayInput(pin: Pin) {
+    private fun displayInput(id: Int, pin: Pin) {
         ImNodes.pushColorStyle(ImNodesColorStyle.Pin, pin.type.color.toInt())
         ImNodes.pushColorStyle(ImNodesColorStyle.PinHovered, (pin.type.color + 50).toInt())
-        ImNodes.beginInputAttribute(pin.id, ImNodesPinShape.CircleFilled)
+        ImNodes.beginInputAttribute(id, ImNodesPinShape.CircleFilled)
         ImGui.text(pin.name)
         ImNodes.endInputAttribute()
         ImNodes.popColorStyle()
         ImNodes.popColorStyle()
     }
 
-    private fun displayOutput(pin: Pin) {
+    private fun displayOutput(id: Int, pin: Pin) {
         ImNodes.pushColorStyle(ImNodesColorStyle.Pin, pin.type.color.toInt())
         ImNodes.pushColorStyle(ImNodesColorStyle.PinHovered, (pin.type.color + 50).toInt())
-        ImNodes.beginOutputAttribute(pin.id, ImNodesPinShape.CircleFilled)
+        ImNodes.beginOutputAttribute(id, ImNodesPinShape.CircleFilled)
         ImGui.text(pin.name)
         ImNodes.endOutputAttribute()
         ImNodes.popColorStyle()

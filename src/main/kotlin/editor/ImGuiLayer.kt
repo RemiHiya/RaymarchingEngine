@@ -30,6 +30,8 @@ class ImGuiLayer(private val scene: Scene) {
 
     private var selection: EditorElement? = null
 
+    var mat: Material? = null
+
     private var layout = ""
     private var reloadLayout = false
     private val addComponentWindowOpen = ImBoolean(false)
@@ -211,7 +213,9 @@ class ImGuiLayer(private val scene: Scene) {
         ImGui.end()
 
         ImGui.begin("Material")
-        Material().display()
+        if (mat == null)
+            mat = Material()
+        mat!!.display()
         ImGui.end()
 
         outliner(scene.actors)

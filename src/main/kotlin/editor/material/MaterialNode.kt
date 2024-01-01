@@ -7,17 +7,14 @@ import imgui.extension.imnodes.flag.ImNodesPinShape
 import utils.Color
 import java.lang.Integer.min
 
-// TODO : class abstraite
-open class MaterialNode(val id: Int) {
-    open val name = "Node name"
+abstract class MaterialNode(private val id: Int) {
+    abstract val name: String
     open val color = Color(11, 109, 191)
     open val hoverColor = Color(11, 109, 191) + 50
     open val selectColor = Color(11, 109, 191) + 50
 
-    open val inputs: Map<Int, Pin> = mapOf(id(0) to Pin("test pin", PinType.VECTOR3))
-    open val outputs: Map<Int, Pair<Pin, String>> = mapOf(
-        id(1) to (Pin("test out", PinType.VECTOR3) to "%0, A"),
-        id(2) to (Pin("test out2", PinType.VECTOR3) to "%0, B"))
+    abstract val inputs: Map<Int, Pin>
+    abstract val outputs: Map<Int, Pair<Pin, String>>
 
     var inLinks = mutableMapOf<Int, Int>()
     var outLinks = mutableMapOf<Int, Int>()
@@ -25,8 +22,6 @@ open class MaterialNode(val id: Int) {
     protected fun id(index: Int): Int {
         return ImGui.getID("pin_${name}_${id}_$index")
     }
-
-    open fun getCode() = ""
 
     open fun display() {
         ImNodes.pushColorStyle(ImNodesColorStyle.TitleBar, color.toInt())

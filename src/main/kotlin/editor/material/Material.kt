@@ -1,6 +1,9 @@
 package editor.material
 
+import editor.material.nodes.Add
 import editor.material.nodes.MaterialOutput
+import editor.material.nodes.Subtract
+import editor.material.nodes.Vec3
 import imgui.ImGui
 import imgui.extension.imnodes.ImNodes
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation
@@ -9,7 +12,7 @@ import imgui.type.ImInt
 
 class Material {
 
-    private var nodes: List<MaterialNode> = mutableListOf(MaterialNode(0), MaterialOutput(1), MaterialNode(2))
+    private var nodes: List<MaterialNode> = mutableListOf(MaterialOutput(0), Vec3(1), Vec3(2), Add(3), Subtract(4))
 
     private val linkA = ImInt()
     private val linkB = ImInt()
@@ -57,15 +60,10 @@ class Material {
         return target in nodes.flatMap { it.inputs.keys.toList() }
     }
 
-    fun getCode() {
-        val out = nodes.find { it is MaterialOutput }!! as MaterialOutput
-    }
-
     fun generateCode(): String {
-        val outputNode = nodes.find { it is MaterialOutput } as? MaterialOutput ?: return "// 404 Output Node not found."
-
+        val outputNode = nodes.find { it is MaterialOutput } as? MaterialOutput
+            ?: return "// 404 Output Node not found."
         return getInputCode(outputNode.inputs.toList()[0].first)
-
     }
 
     private fun getInputCode(inputId: Int): String {

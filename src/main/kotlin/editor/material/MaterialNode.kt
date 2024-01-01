@@ -14,9 +14,10 @@ open class MaterialNode(val id: Int) {
     open val hoverColor = Color(11, 109, 191) + 50
     open val selectColor = Color(11, 109, 191) + 50
 
-    open val inputs: Map<Int, Pin> = mapOf(id(0) to Pin("test pin", PinType.FLOAT))
-    open val outputs: Map<Int, Pin> = mapOf(id(1) to Pin("test out", PinType.INT),
-        id(2) to Pin("test out2", PinType.VECTOR3))
+    open val inputs: Map<Int, Pin> = mapOf(id(0) to Pin("test pin", PinType.VECTOR3))
+    open val outputs: Map<Int, Pair<Pin, String>> = mapOf(
+        id(1) to (Pin("test out", PinType.VECTOR3) to "%0, A"),
+        id(2) to (Pin("test out2", PinType.VECTOR3) to "%0, B"))
 
     var inLinks = mutableMapOf<Int, Int>()
     var outLinks = mutableMapOf<Int, Int>()
@@ -45,7 +46,7 @@ open class MaterialNode(val id: Int) {
             ImGui.sameLine()
             ImGui.dummy(20f, 0f)
             ImGui.sameLine()
-            displayOutput(outputs.keys.toList()[i], outputs.values.toList()[i])
+            displayOutput(outputs.keys.toList()[i], outputs.values.map { it.first }.toList()[i])
         }
 
         for (i in minSize until inputs.size) {
@@ -53,7 +54,7 @@ open class MaterialNode(val id: Int) {
         }
 
         for (i in minSize until outputs.size) {
-            displayOutput(outputs.keys.toList()[i], outputs.values.toList()[i])
+            displayOutput(outputs.keys.toList()[i], outputs.values.map { it.first }.toList()[i])
         }
 
         ImNodes.endNode()

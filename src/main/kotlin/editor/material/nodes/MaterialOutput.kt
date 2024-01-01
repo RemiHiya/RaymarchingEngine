@@ -16,5 +16,5 @@ class MaterialOutput(id: Int) : MaterialNode(id) {
         id(1) to Pin("Displacement", PinType.VECTOR3)
     )
 
-    override val outputs = mapOf<Int, Pin>()
+    override val outputs = mapOf<Int, Pair<Pin, String>>()
 }

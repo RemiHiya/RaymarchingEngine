@@ -16,7 +16,7 @@ open class MaterialNode(val id: Int) {
 
     open val inputs: Map<Int, Pin> = mapOf(id(0) to Pin("test pin", PinType.FLOAT))
     open val outputs: Map<Int, Pin> = mapOf(id(1) to Pin("test out", PinType.INT),
-        id(2) to Pin("test out2", PinType.INT))
+        id(2) to Pin("test out2", PinType.VECTOR3))
 
     var inLinks = mutableMapOf<Int, Int>()
     var outLinks = mutableMapOf<Int, Int>()

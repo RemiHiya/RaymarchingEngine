@@ -7,22 +7,21 @@ import imgui.extension.imnodes.flag.ImNodesMiniMapLocation
 import imgui.flag.ImGuiMouseButton
 import imgui.type.ImInt
 
-
 class Material {
 
-    private var nodes: Map<Int, MaterialNode> = hashMapOf(Pair(0, MaterialNode(0)), Pair(1, MaterialOutput(1)))
+    private var nodes: List<MaterialNode> = mutableListOf(MaterialNode(0), MaterialOutput(1))
 
-    private val linkA = ImInt(-362346692)
-    private val linkB = ImInt(-1344809183)
+    private val linkA = ImInt()
+    private val linkB = ImInt()
 
     fun display() {
         ImNodes.beginNodeEditor()
-        for (node in nodes.values) {
+        for (node in nodes) {
             node.display()
         }
 
         var link = 1
-        for (i in nodes.values.map { it.inLinks }) {
+        for (i in nodes.map { it.inLinks }) {
             for (j in i) {
                 link++
                 ImNodes.link(link, j.value, j.key)
@@ -43,12 +42,17 @@ class Material {
             val source = if (!tmp) linkA.get() else linkB.get()
             val target = if (tmp) linkA.get() else linkB.get()
 
-            nodes.values.find { it.outputs.contains(source) }!!.outLinks[source] = target
-            nodes.values.find { it.inputs.contains(target) }!!.inLinks[target] = source
+            val nodeA = nodes.find { it.outputs.contains(source) }!!
+            val nodeB = nodes.find { it.inputs.contains(target) }!!
+
+            if (nodeA.outputs[source]!!.type == nodeB.inputs[target]!!.type) {
+                nodeA.outLinks[source] = target
+                nodeB.inLinks[target] = source
+            }
         }
     }
 
     private fun isInput(target: Int): Boolean {
-        return target in nodes.values.flatMap { it.inputs.keys.toList() }
+        return target in nodes.flatMap { it.inputs.keys.toList() }
     }
 }

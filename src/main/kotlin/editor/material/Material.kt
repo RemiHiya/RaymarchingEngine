@@ -1,12 +1,10 @@
 package editor.material
 
-import editor.material.nodes.Add
 import editor.material.nodes.MaterialOutput
-import editor.material.nodes.Subtract
-import editor.material.nodes.Vec3
 import imgui.ImGui
 import imgui.extension.imnodes.ImNodes
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation
+import imgui.flag.ImGuiFocusedFlags
 import imgui.flag.ImGuiMouseButton
 import imgui.type.ImInt
 import org.reflections.Reflections
@@ -14,7 +12,7 @@ import kotlin.reflect.full.primaryConstructor
 
 class Material {
 
-    private var nodes: MutableList<MaterialNode> = mutableListOf(MaterialOutput(0), Vec3(1), Vec3(2), Add(3), Subtract(4))
+    private var nodes: MutableList<MaterialNode> = mutableListOf(MaterialOutput(0))
 
     private val linkA = ImInt()
     private val linkB = ImInt()
@@ -30,7 +28,10 @@ class Material {
             }
         }
 
-        if (ImGui.isMouseClicked(ImGuiMouseButton.Right)) {
+        val popup = ImGui.isMouseClicked(ImGuiMouseButton.Right) &&
+                ImNodes.isEditorHovered() &&
+                ImGui.isWindowFocused(ImGuiFocusedFlags.RootAndChildWindows)
+        if (popup) {
             ImGui.openPopup("add node")
         }
 
@@ -47,7 +48,6 @@ class Material {
                     ImNodes.setNodeScreenSpacePos(new.id, pos.x, pos.y)
                 }
             }
-
             ImGui.endPopup()
         }
 

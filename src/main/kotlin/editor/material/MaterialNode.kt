@@ -34,6 +34,8 @@ abstract class MaterialNode(val id: Int) {
         ImGui.text(name)
         ImNodes.endNodeTitleBar()
 
+        customDisplay()
+
         val minSize = min(inputs.size, outputs.size)
 
         for (i in 0 until minSize) {
@@ -59,11 +61,26 @@ abstract class MaterialNode(val id: Int) {
         ImNodes.popColorStyle()
     }
 
+    open fun customDisplay() = Unit
+
     private fun displayInput(id: Int, pin: Pin) {
         ImNodes.pushColorStyle(ImNodesColorStyle.Pin, pin.type.color.toInt())
         ImNodes.pushColorStyle(ImNodesColorStyle.PinHovered, (pin.type.color + 50).toInt())
         ImNodes.beginInputAttribute(id, ImNodesPinShape.CircleFilled)
         ImGui.text(pin.name)
+
+        ImGui.sameLine()
+        if (id !in inLinks) {
+            ImGui.pushItemWidth(50f)
+            when (pin.type) {
+                PinType.FLOAT -> ImGui.dragFloat("##", floatArrayOf(0f))
+                PinType.INT -> ImGui.dragFloat("##", floatArrayOf(0f))
+                PinType.VECTOR3 -> ImGui.colorButton("##", floatArrayOf(0f,1f,.8f))
+            }
+
+            ImGui.popItemWidth()
+        }
+
         ImNodes.endInputAttribute()
         ImNodes.popColorStyle()
         ImNodes.popColorStyle()

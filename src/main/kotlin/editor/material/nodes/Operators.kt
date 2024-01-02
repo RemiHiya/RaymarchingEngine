@@ -32,3 +32,29 @@ class Subtract(id: Int) : MaterialNode(id) {
     )
     override val outputs = mapOf(id(2) to (Pin("", PinType.VECTOR3) to "(%0 - %1)"))
 }
+
+class Multiply(id: Int) : MaterialNode(id) {
+    override val name = "Multiply"
+    override val color = col
+    override val hoverColor = color * 1.5f
+    override val selectColor = color * 1.5f
+
+    override val inputs = mapOf(
+        id(0) to Pin("a", PinType.VECTOR3),
+        id(1) to Pin("b", PinType.VECTOR3)
+    )
+    override val outputs = mapOf(id(2) to (Pin("", PinType.VECTOR3) to "(%0 * %1)"))
+}
+
+class Divide(id: Int) : MaterialNode(id) {
+    override val name = "Divide"
+    override val color = col
+    override val hoverColor = color * 1.5f
+    override val selectColor = color * 1.5f
+
+    override val inputs = mapOf(
+        id(0) to Pin("a", PinType.VECTOR3),
+        id(1) to Pin("b", PinType.VECTOR3)
+    )
+    override val outputs = mapOf(id(2) to (Pin("", PinType.VECTOR3) to "(%0 / %1)"))
+}

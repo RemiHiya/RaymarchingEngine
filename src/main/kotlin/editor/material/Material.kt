@@ -9,19 +9,18 @@ import imgui.extension.imnodes.ImNodes
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation
 import imgui.flag.ImGuiMouseButton
 import imgui.type.ImInt
+import org.reflections.Reflections
+import kotlin.reflect.full.primaryConstructor
 
 class Material {
 
-    private var nodes: List<MaterialNode> = mutableListOf(MaterialOutput(0), Vec3(1), Vec3(2), Add(3), Subtract(4))
+    private var nodes: MutableList<MaterialNode> = mutableListOf(MaterialOutput(0), Vec3(1), Vec3(2), Add(3), Subtract(4))
 
     private val linkA = ImInt()
     private val linkB = ImInt()
 
     fun display() {
         ImNodes.beginNodeEditor()
-        for (node in nodes) {
-            node.display()
-        }
 
         var link = 1
         for (i in nodes.map { it.inLinks }) {
@@ -32,9 +31,29 @@ class Material {
         }
 
         if (ImGui.isMouseClicked(ImGuiMouseButton.Right)) {
-            // Menu contextuel
+            ImGui.openPopup("add node")
         }
 
+        if (ImGui.beginPopup("add node")) {
+            ImGui.text("Add node")
+            val pos = ImGui.getMousePosOnOpeningCurrentPopup()
+
+            val reflections = Reflections(MaterialNode::class.java.`package`.name)
+            val subclasses = reflections.getSubTypesOf(MaterialNode::class.java).map { it.kotlin }
+            for (i in subclasses) {
+                if (ImGui.menuItem(i.simpleName)) {
+                    val new = i.primaryConstructor!!.call(nodes.size)
+                    nodes.add(new)
+                    ImNodes.setNodeScreenSpacePos(new.id, pos.x, pos.y)
+                }
+            }
+
+            ImGui.endPopup()
+        }
+
+        for (node in nodes) {
+            node.display()
+        }
 
         ImNodes.miniMap(0.2f, ImNodesMiniMapLocation.BottomRight)
         ImNodes.endNodeEditor()

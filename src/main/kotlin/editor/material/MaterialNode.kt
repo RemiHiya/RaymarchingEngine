@@ -7,7 +7,7 @@ import imgui.extension.imnodes.flag.ImNodesPinShape
 import utils.Color
 import java.lang.Integer.min
 
-abstract class MaterialNode(private val id: Int) {
+abstract class MaterialNode(val id: Int) {
     abstract val name: String
     open val color = Color(11, 109, 191)
     open val hoverColor = Color(11, 109, 191) + 50

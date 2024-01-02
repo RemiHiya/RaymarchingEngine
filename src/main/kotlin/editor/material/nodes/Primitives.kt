@@ -11,6 +11,7 @@ import utils.Vector3
 
 private val col = Color(154, 92, 49)
 
+@Suppress("unused")
 class Vec3(id: Int) : MaterialNode(id) {
     private var value = Vector3()
     private var switch = ImBoolean(false)
@@ -19,6 +20,8 @@ class Vec3(id: Int) : MaterialNode(id) {
     override val color = col
     override val hoverColor = color * 1.5f
     override val selectColor = color * 1.5f
+
+    override val aliases = listOf("vector3", "vec3")
 
     override val inputs = mapOf<Int, Pin>()
     override val outputs = mutableMapOf(

@@ -7,6 +7,7 @@ import imgui.extension.imnodes.flag.ImNodesMiniMapLocation
 import imgui.flag.ImGuiFocusedFlags
 import imgui.flag.ImGuiMouseButton
 import imgui.type.ImInt
+import imgui.type.ImString
 import org.reflections.Reflections
 import kotlin.reflect.full.primaryConstructor
 
@@ -16,6 +17,8 @@ class Material {
 
     private val linkA = ImInt()
     private val linkB = ImInt()
+
+    private val search = ImString(32)
 
     fun display() {
         ImNodes.beginNodeEditor()
@@ -37,15 +40,26 @@ class Material {
 
         if (ImGui.beginPopup("add node")) {
             ImGui.text("Add node")
+            // Focus du clavier sur la barre de recherche quand on ouvre le pop-up (ne s'exécute qu'une fois)
+            if (popup)
+                ImGui.setKeyboardFocusHere()
+            ImGui.inputText("##input_search", search)
             val pos = ImGui.getMousePosOnOpeningCurrentPopup()
 
+            // Filtre les sous classes de MaterialNode en fonction de leur aliases
             val reflections = Reflections(MaterialNode::class.java.`package`.name)
             val subclasses = reflections.getSubTypesOf(MaterialNode::class.java).map { it.kotlin }
+                .filter { materialNodeClass ->
+                    val materialNodeInstance = materialNodeClass.constructors.first().call(0)
+                    val aliases = materialNodeInstance.aliases
+                    (aliases+materialNodeInstance.name).any { sub -> sub.contains(search.get(), true) }
+                }
             for (i in subclasses) {
                 if (ImGui.menuItem(i.simpleName)) {
                     val new = i.primaryConstructor!!.call(nodes.size)
                     nodes.add(new)
                     ImNodes.setNodeScreenSpacePos(new.id, pos.x, pos.y)
+                    search.set("")
                 }
             }
             ImGui.endPopup()

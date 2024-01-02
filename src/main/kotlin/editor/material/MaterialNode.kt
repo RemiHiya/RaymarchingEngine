@@ -16,6 +16,8 @@ abstract class MaterialNode(val id: Int) {
     abstract val inputs: Map<Int, Pin>
     abstract val outputs: Map<Int, Pair<Pin, String>>
 
+    abstract val aliases: List<String>
+
     var inLinks = mutableMapOf<Int, Int>()
     var outLinks = mutableMapOf<Int, Int>()
 
